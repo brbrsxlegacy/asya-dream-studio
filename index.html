@@ -223,8 +223,11 @@ function renderCharacter(){
   </svg>`;
 }
 
+function change(cat){
+  currentIndices[cat] = (currentIndices[cat] + 1) % assets[cat].length;
+  renderCharacter();
+}
 
-function change(cat){ currentIndices[cat]=(currentIndices[cat]+1)%assets[cat].length; renderCharacter(); }
 function saveCurrentCharacter(){ const nick=localStorage.getItem('nickname'); const svgContent=bodyBase + assets.hair[currentIndices.hair] + assets.top[currentIndices.top] + assets.bottom[currentIndices.bottom]; const saved=JSON.parse(localStorage.getItem('savedCharacters')||'[]'); saved.push({svg:`<svg viewBox="0 0 100 150">${svgContent}</svg>`,nick}); localStorage.setItem('savedCharacters',JSON.stringify(saved)); alert('Karakter kaydedildi!'); }
 function loadLibrary(){ const nick=localStorage.getItem('nickname'); const container=document.getElementById('dolap-list'); container.innerHTML=''; const saved=JSON.parse(localStorage.getItem('savedCharacters')||'[]'); const myChars=saved.filter(c=>c.nick===nick); if(myChars.length===0){ const div=document.createElement('div'); div.textContent='Henüz karakter yok.'; container.appendChild(div); return;} myChars.forEach(c=>{ const card=document.createElement('div'); card.className='character-card'; card.innerHTML=`${c.svg}<p>${c.nick}</p>`; container.appendChild(card); }); }
 window.onload = () => {
@@ -262,6 +265,7 @@ function startGame(){
 
 </body>
 </html>
+
 
 
 
