@@ -2,166 +2,142 @@
 <html lang="tr">
 <head>
     <meta charset="UTF-8">
-    <title>CSS Pro Karakter Tasarımcısı</title>
+    <title>Pro Character Creator - No Emojis</title>
     <style>
         :root {
             --skin: #ffdbac;
-            --eye-color: #00ffcc;
-            --hair-color: #442211;
-            --top-color: #3498db;
-            --bottom-color: #2c3e50;
+            --eye: #00ffcc;
+            --hair: #442211;
+            --top: #ff4757;
+            --bottom: #2f3542;
         }
 
-        body { background: #1a1a1a; color: white; font-family: 'Segoe UI', sans-serif; display: flex; flex-direction: column; align-items: center; }
+        body { background: #0a0a0a; color: white; font-family: 'Arial', sans-serif; display: flex; flex-direction: column; align-items: center; margin: 0; padding: 20px; }
 
-        /* --- KARAKTER ALANI --- */
-        #canvas {
-            width: 300px; height: 450px; background: radial-gradient(circle, #333, #000);
-            border-radius: 20px; position: relative; margin: 20px; border: 4px solid #444;
+        /* --- KARAKTER VİTRİNİ --- */
+        #container {
+            width: 320px; height: 480px; background: radial-gradient(circle, #222, #000);
+            border-radius: 30px; position: relative; border: 4px solid #333; overflow: hidden;
         }
 
-        /* KAFA VE GÖZLER */
+        /* SAÇ (Kafanın Arkasında Kalması İçin z-index: 1) */
+        .hair-back { position: absolute; left: 50%; transform: translateX(-50%); top: 50px; z-index: 1; transition: 0.3s; }
+        
+        /* KAFA (z-index: 2) */
         .head { 
-            width: 80px; height: 100px; background: var(--skin); 
-            border-radius: 40px 40px 35px 35px; position: absolute; 
-            left: 110px; top: 70px; z-index: 5; 
+            width: 90px; height: 110px; background: var(--skin); border-radius: 40px 40px 35px 35px;
+            position: absolute; left: 115px; top: 60px; z-index: 2; border-bottom: 2px solid rgba(0,0,0,0.1);
         }
 
-        .eye-socket { 
-            display: flex; justify-content: space-around; width: 60px; margin: 40px auto 0; 
-        }
+        /* GÖZLER */
+        .eye-wrap { display: flex; justify-content: space-around; width: 65px; margin: 45px auto 0; }
+        .eye { width: 16px; height: 10px; background: white; border-radius: 50%; position: relative; border: 1px solid #333; }
+        .pupil { width: 7px; height: 7px; background: var(--eye); border-radius: 50%; position: absolute; left: 4px; box-shadow: 0 0 8px var(--eye); }
 
-        .eye { 
-            width: 15px; height: 8px; background: white; border-radius: 50%; 
-            position: relative; border: 1px solid #333; overflow: hidden;
-        }
+        /* ÜST GİYİM (z-index: 3) */
+        .top-wrap { position: absolute; left: 50%; transform: translateX(-50%); top: 170px; z-index: 3; transition: 0.3s; }
+        
+        /* ALT GİYİM (z-index: 3) */
+        .bottom-wrap { position: absolute; left: 50%; transform: translateX(-50%); top: 285px; z-index: 3; transition: 0.3s; }
 
-        .pupil { 
-            width: 7px; height: 7px; background: var(--eye-color); 
-            border-radius: 50%; position: absolute; left: 4px; top: 1px; 
-            box-shadow: 0 0 5px var(--eye-color);
-        }
+        /* --- CSS ÇİZİM MODELLERİ (SAÇ) --- */
+        .h-long { width: 120px; height: 180px; background: var(--hair); border-radius: 40px 40px 20px 20px; }
+        .h-ponytail { width: 30px; height: 120px; background: var(--hair); border-radius: 15px; margin-left: 50px; }
+        .h-bob { width: 110px; height: 80px; background: var(--hair); border-radius: 30px 30px 5px 5px; }
+        .h-wave { width: 130px; height: 150px; background: var(--hair); border-radius: 50% 50% 20% 20%; clip-path: polygon(0% 0%, 100% 0%, 100% 100%, 80% 90%, 50% 100%, 20% 90%, 0% 100%); }
+        .h-shaved { width: 85px; height: 40px; background: var(--hair); border-radius: 40px 40px 0 0; }
 
-        /* SAÇ ÇİZİMLERİ */
-        .hair-style { position: absolute; width: 100px; height: 100px; left: 100px; top: 55px; z-index: 6; }
-        .hair-1 { width: 90px; height: 50px; background: var(--hair-color); border-radius: 50px 50px 0 0; top: 60px; left: 105px; } /* Kısa */
-        .hair-2 { width: 90px; height: 100px; background: var(--hair-color); border-radius: 40px 40px 10px 10px; top: 60px; left: 105px; } /* Uzun */
-        .hair-3 { width: 40px; height: 40px; background: var(--hair-color); border-radius: 50%; top: 40px; left: 130px; box-shadow: 0 40px 0 var(--hair-color); } /* Mohawk */
+        /* --- CSS ÇİZİM MODELLERİ (ÜST - AÇIK) --- */
+        .t-bikini { width: 100px; height: 40px; display: flex; justify-content: space-between; }
+        .t-bikini::before, .t-bikini::after { content: ''; width: 45px; height: 40px; background: var(--top); clip-path: polygon(50% 0%, 0% 100%, 100% 100%); }
+        
+        .t-crop { width: 90px; height: 45px; background: var(--top); border-radius: 5px 5px 0 0; }
+        
+        .t-tank { width: 80px; height: 70px; background: var(--top); clip-path: polygon(20% 0%, 80% 0%, 100% 100%, 0% 100%); }
+        
+        .t-strapless { width: 90px; height: 35px; background: var(--top); }
 
-        /* ÜST GİYİM ÇİZİMLERİ */
-        .top-style { 
-            position: absolute; width: 120px; height: 100px; 
-            left: 90px; top: 165px; z-index: 4; transition: 0.3s;
-        }
-        .tshirt { background: var(--top-color); border-radius: 20px 20px 5px 5px; }
-        .hoodie { background: var(--top-color); border-radius: 30px 30px 5px 5px; }
-        .hoodie::before { content: ''; position: absolute; top: -15px; left: 20px; width: 80px; height: 40px; background: inherit; border-radius: 50% 50% 0 0; }
-        .tanktop { width: 80px; left: 110px; background: var(--top-color); clip-path: polygon(20% 0%, 80% 0%, 100% 100%, 0% 100%); }
-
-        /* ALT GİYİM ÇİZİMLERİ */
-        .bottom-style { 
-            position: absolute; width: 100px; height: 120px; 
-            left: 100px; top: 265px; z-index: 3; display: flex; justify-content: space-between;
-        }
-        .leg { width: 45px; height: 100%; background: var(--bottom-color); border-radius: 5px; }
-        .shorts .leg { height: 50px; }
-        .cargo .leg { border-right: 5px solid rgba(0,0,0,0.2); }
+        /* --- CSS ÇİZİM MODELLERİ (ALT) --- */
+        .b-shorts { width: 100px; height: 40px; display: flex; justify-content: space-between; }
+        .b-shorts div { width: 48px; height: 100%; background: var(--bottom); border-radius: 0 0 5px 5px; }
+        
+        .b-mini { width: 95px; height: 35px; background: var(--bottom); border-radius: 0 0 10px 10px; }
+        
+        .b-bikini { width: 80px; height: 40px; background: var(--bottom); clip-path: polygon(0 0, 100% 0, 50% 100%); }
 
         /* PANEL */
-        .panel { display: grid; grid-template-columns: repeat(3, 1fr); gap: 10px; background: #333; padding: 20px; border-radius: 15px; width: 90%; max-width: 800px; }
-        .control-group { display: flex; flex-direction: column; gap: 5px; }
-        select, input { padding: 8px; border-radius: 5px; border: none; background: #555; color: white; }
+        .panel { display: grid; grid-template-columns: repeat(3, 1fr); gap: 15px; background: #1e1e1e; padding: 20px; border-radius: 20px; margin-top: 20px; width: 90%; max-width: 800px; }
+        .group { display: flex; flex-direction: column; gap: 8px; }
+        select, input { background: #333; color: #00ffcc; border: 1px solid #444; padding: 10px; border-radius: 8px; }
     </style>
 </head>
 <body>
 
-    <h1>CSS Character Engine v1.0</h1>
-
-    <div id="canvas">
-        <div id="hair-container" class="hair-style hair-1"></div>
+    <div id="container">
+        <div id="hair-box" class="hair-back h-long"></div>
+        
         <div class="head">
-            <div class="eye-socket">
+            <div class="eye-wrap">
                 <div class="eye"><div class="pupil"></div></div>
                 <div class="eye"><div class="pupil"></div></div>
             </div>
         </div>
-        <div id="top-container" class="top-style tshirt"></div>
-        <div id="bottom-container" class="bottom-style jeans">
-            <div class="leg"></div>
-            <div class="leg"></div>
+
+        <div id="top-box" class="top-wrap t-bikini"></div>
+
+        <div id="bottom-box" class="bottom-wrap b-shorts">
+            <div></div><div></div>
         </div>
     </div>
 
     <div class="panel">
-        <div class="control-group">
-            <label>Göz Rengi</label>
-            <input type="color" onchange="updateColor('--eye-color', this.value)" value="#00ffcc">
-            <label>Saç Rengi</label>
-            <input type="color" onchange="updateColor('--hair-color', this.value)" value="#442211">
+        <div class="group">
+            <label>SAÇ STİLİ (Arkada)</label>
+            <select onchange="changeClass('hair-box', 'hair-back ' + this.value)">
+                <option value="h-long">Uzun Düz</option>
+                <option value="h-bob">Küt / Bob</option>
+                <option value="h-ponytail">At Kuyruğu</option>
+                <option value="h-wave">Dalgalı</option>
+                <option value="h-shaved">Kısa / Modern</option>
+            </select>
+            <input type="color" onchange="updateColor('--hair', this.value)" value="#442211">
         </div>
 
-        <div class="control-group">
-            <label>Üst Stil (10 Çeşit)</label>
-            <select onchange="changeStyle('top-container', this.value)">
-                <option value="tshirt">T-Shirt</option>
-                <option value="hoodie">Hoodie (Kapüşonlu)</option>
-                <option value="tanktop">Atlet</option>
-                <option value="vneck">V Yaka</option>
-                <option value="armor">Zırh Plakası</option>
-                <option value="crop">Crop Top</option>
-                <option value="suit">Ceket</option>
-                <option value="oversize">Oversize</option>
-                <option value="vest">Yelek</option>
-                <option value="turtleneck">Boğazlı</option>
+        <div class="group">
+            <label>AÇIK ÜSTLER</label>
+            <select onchange="changeClass('top-box', 'top-wrap ' + this.value)">
+                <option value="t-bikini">Bikini Üstü</option>
+                <option value="t-crop">Crop Top</option>
+                <option value="t-tank">Spor Atlet</option>
+                <option value="t-strapless">Straplez</option>
             </select>
-            <input type="color" onchange="updateColor('--top-color', this.value)" value="#3498db">
+            <input type="color" onchange="updateColor('--top', this.value)" value="#ff4757">
         </div>
 
-        <div class="control-group">
-            <label>Alt Stil (10 Çeşit)</label>
-            <select onchange="changeStyle('bottom-container', this.value)">
-                <option value="jeans">Pantolon</option>
-                <option value="shorts">Şort</option>
-                <option value="cargo">Kargo Pantolon</option>
-                <option value="skinny">Skinny Fit</option>
-                <option value="skirt">Etek</option>
-                <option value="wide">Bol Kesim</option>
-                <option value="leggings">Tayt</option>
-                <option value="robotic">Mekanik Bacak</option>
-                <option value="boots">Çizmeli Pantolon</option>
-                <option value="distressed">Yırtık Kot</option>
+        <div class="group">
+            <label>AÇIK ALTLAR</label>
+            <select onchange="changeClass('bottom-box', 'bottom-wrap ' + this.value)">
+                <option value="b-shorts">Mini Şort</option>
+                <option value="b-mini">Mini Etek</option>
+                <option value="b-bikini">V-Kesim Alt</option>
             </select>
-            <input type="color" onchange="updateColor('--bottom-color', this.value)" value="#2c3e50">
-        </div>
-
-        <div class="control-group">
-            <label>Saç Stili (10 Çeşit)</label>
-            <select onchange="changeStyle('hair-container', this.value)">
-                <option value="hair-1">Kısa Saç</option>
-                <option value="hair-2">Uzun Saç</option>
-                <option value="hair-3">Mohawk</option>
-                <option value="hair-4">Kel (No Hair)</option>
-                <option value="hair-5">Dikenli</option>
-                <option value="hair-6">Yanlar Sıfır</option>
-                <option value="hair-7">Küt Kesim</option>
-                <option value="hair-8">Asker Tıraşı</option>
-                <option value="hair-9">Topuz</option>
-                <option value="hair-10">Afro Style</option>
-            </select>
+            <input type="color" onchange="updateColor('--bottom', this.value)" value="#2f3542">
         </div>
     </div>
 
     <script>
-        function updateColor(variable, value) {
-            document.documentElement.style.setProperty(variable, value);
+        function changeClass(id, newClass) {
+            const el = document.getElementById(id);
+            el.className = newClass;
+            // Alt giyim çekmecesi için iç divleri kontrol et
+            if(id === 'bottom-box' && (newClass.includes('b-shorts'))) {
+                el.innerHTML = '<div></div><div></div>';
+            } else if (id === 'bottom-box') {
+                el.innerHTML = '';
+            }
         }
-
-        function changeStyle(elementId, newClass) {
-            const el = document.getElementById(elementId);
-            // Mevcut sınıfları temizle (ana sınıflar hariç)
-            if(elementId === 'top-container') el.className = 'top-style ' + newClass;
-            else if(elementId === 'bottom-container') el.className = 'bottom-style ' + newClass;
-            else if(elementId === 'hair-container') el.className = 'hair-style ' + newClass;
+        function updateColor(prop, val) {
+            document.documentElement.style.setProperty(prop, val);
         }
     </script>
 </body>
