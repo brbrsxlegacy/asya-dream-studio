@@ -1,21 +1,16 @@
 // PNG linklerini değiştir veya kendi dosyalarını kullan
 const assets = {
     hair: [
-        "https://i.imgur.com/L0g0l82.png",
-        "https://i.imgur.com/f2K0HbX.png",
-        "https://i.imgur.com/XrJ7tGd.png"
+        "/mnt/data/b897870f-8158-4ba6-aae0-f29a8953a7af.png"  // senin yüklediğin dosya
     ],
     top: [
-        "https://i.imgur.com/yX1AqWf.png",
-        "https://i.imgur.com/qvHL2cM.png",
-        "https://i.imgur.com/LR0O4xK.png"
+        "/mnt/data/b897870f-8158-4ba6-aae0-f29a8953a7af.png"
     ],
     bottom: [
-        "https://i.imgur.com/MWkZc0U.png",
-        "https://i.imgur.com/bGzvPaI.png",
-        "https://i.imgur.com/HykSgrE.png"
+        "/mnt/data/b897870f-8158-4ba6-aae0-f29a8953a7af.png"
     ]
 };
+
 
 let currentIndices = { hair: 0, top: 0, bottom: 0 };
 
@@ -40,3 +35,4 @@ function randomize() {
 
 // Başlangıçta rastgele seç
 window.onload = () => randomize();
+
