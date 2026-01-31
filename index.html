@@ -10,7 +10,7 @@
   --neon-pink: #ff00ff;
   --neon-blue: #00ffff;
 }
-.hidden {
+.hidden{
   display: none !important;
 }
 *{box-sizing:border-box;margin:0;padding:0;}
@@ -172,7 +172,11 @@ let currentIndices={
 // --- SAYFA FONKSİYONLARI ---
 function hideAll(){ document.getElementById('login').classList.add('hidden'); document.getElementById('menu').classList.add('hidden'); document.getElementById('creator').classList.add('hidden'); document.getElementById('library').classList.add('hidden'); document.getElementById('game').classList.add('hidden'); }
 function enterSite(){ const nick=document.getElementById('nickname').value.trim(); if(!nick)return alert('Takma ad boş olamaz!'); localStorage.setItem('nickname',nick); document.getElementById('display-nick').textContent=nick; hideAll(); document.getElementById('menu').classList.remove('hidden'); }
-function openCreator(){ hideAll(); document.getElementById('creator').classList.remove('hidden'); renderCharacter(); }
+function openCreator(){
+  hideAll();
+  document.getElementById('creator').classList.remove('hidden');
+  renderCharacter();
+}
 function openLibrary(){ hideAll(); document.getElementById('library').classList.remove('hidden'); loadLibrary(); }
 function openGame(){ hideAll(); document.getElementById('game').classList.remove('hidden'); startGame(); }
 function backToMenu(){ hideAll(); document.getElementById('menu').classList.remove('hidden'); }
@@ -230,6 +234,7 @@ function startGame(){
 
 </body>
 </html>
+
 
 
 
