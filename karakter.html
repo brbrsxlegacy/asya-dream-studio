@@ -1,0 +1,32 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Benim Karakterim</title>
+    <style>
+        /* Buraya az önce verdiğim CSS kodlarını veya aşağıdakini yapıştır */
+        .human { position: relative; width: 100px; margin: 100px auto; }
+        .head { width: 50px; height: 50px; background: #ffdbac; border-radius: 50%; margin: 0 auto; }
+        .body { width: 60px; height: 80px; background: #3498db; margin: 0 auto; position: relative; }
+        .arm { width: 15px; height: 60px; background: #ffdbac; position: absolute; top: 0; }
+        .arm.left { left: -20px; }
+        .arm.right { right: -20px; }
+        .legs { display: flex; justify-content: space-between; width: 60px; margin: 0 auto; }
+        .leg { width: 20px; height: 70px; background: #2c3e50; }
+    </style>
+</head>
+<body>
+
+    <div class="human">
+        <div class="head"></div>
+        <div class="body">
+            <div class="arm left"></div>
+            <div class="arm right"></div>
+        </div>
+        <div class="legs">
+            <div class="leg left"></div>
+            <div class="leg right"></div>
+        </div>
+    </div>
+
+</body>
+</html>
