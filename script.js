@@ -1,48 +1,42 @@
-// PNG linkleri veya yerel dosya yolunu kullanabilirsin
+// PNG linklerini değiştir veya kendi dosyalarını kullan
 const assets = {
     hair: [
-        'images/hair1.png',
-        'images/hair2.png',
-        'images/hair3.png'
+        "https://i.imgur.com/L0g0l82.png",
+        "https://i.imgur.com/f2K0HbX.png",
+        "https://i.imgur.com/XrJ7tGd.png"
     ],
     top: [
-        'images/top1.png',
-        'images/top2.png',
-        'images/top3.png'
+        "https://i.imgur.com/yX1AqWf.png",
+        "https://i.imgur.com/qvHL2cM.png",
+        "https://i.imgur.com/LR0O4xK.png"
     ],
     bottom: [
-        'images/bottom1.png',
-        'images/bottom2.png',
-        'images/bottom3.png'
+        "https://i.imgur.com/MWkZc0U.png",
+        "https://i.imgur.com/bGzvPaI.png",
+        "https://i.imgur.com/HykSgrE.png"
     ]
 };
 
-let currentIndices = {
-    hair: 0,
-    top: 0,
-    bottom: 0
-};
+let currentIndices = { hair: 0, top: 0, bottom: 0 };
 
+// Katman değiştirme fonksiyonu
 function change(category, step) {
     currentIndices[category] = (currentIndices[category] + step + assets[category].length) % assets[category].length;
     const layer = document.getElementById(`${category}-layer`);
-    
-    // PNG kullanımı için innerText yerine <img> ekle
-    layer.innerHTML = `<img src="${assets[category][currentIndices[category]]}" style="width:100%; height:100%;">`;
-    
-    // Küçük "muq" animasyonu
-    layer.style.transform = "scale(1.1) translate(-50%, -50%)";
-    setTimeout(() => {
-        layer.style.transform = "scale(1.0) translate(-50%, -50%)";
-    }, 100);
+    layer.innerHTML = `<img src="${assets[category][currentIndices[category]]}">`;
+    // kısa animasyon
+    layer.style.transform = "scale(1.1)";
+    setTimeout(() => layer.style.transform = "scale(1.0)", 100);
 }
 
+// Rastgele kombin
 function randomize() {
     Object.keys(assets).forEach(cat => {
-        const randomIdx = Math.floor(Math.random() * assets[cat].length);
-        currentIndices[cat] = randomIdx;
-        document.getElementById(`${cat}-layer`).innerHTML = `<img src="${assets[cat][randomIdx]}" style="width:100%; height:100%;">`;
+        const idx = Math.floor(Math.random() * assets[cat].length);
+        currentIndices[cat] = idx;
+        document.getElementById(`${cat}-layer`).innerHTML = `<img src="${assets[cat][idx]}">`;
     });
 }
 
+// Başlangıçta rastgele seç
 window.onload = () => randomize();
