@@ -2,180 +2,156 @@
 <html lang="tr">
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Göz ve 20 Stil Karakter Paneli</title>
+    <title>Ultimate Character Engine - 30 Styles</title>
     <style>
         :root {
-            --bg-color: #1a1a1a;
-            --eye-color: #00ffcc;
-            --outfit-color: #444;
-            --accent-color: #fff;
+            --skin: #ffdbac; --eye: #00ffcc; --hair: #442211;
+            --top: #3498db; --bottom: #2c3e50;
+        }
+        body { background: #0f0f0f; color: #eee; font-family: 'Courier New', monospace; display: flex; flex-direction: column; align-items: center; margin: 0; padding: 20px; }
+        
+        /* KARAKTER EKRANI */
+        #viewport {
+            width: 350px; height: 500px; background: #1a1a1a; 
+            border: 5px solid #333; border-radius: 20px; position: relative; overflow: hidden;
+            box-shadow: 0 0 50px rgba(0,0,0,0.5);
         }
 
-        body {
-            background-color: var(--bg-color);
-            color: white;
-            font-family: 'Segoe UI', sans-serif;
-            display: flex;
-            flex-direction: column;
-            align-items: center;
-            padding: 20px;
-        }
+        /* KAFA VE GÖZLER (SABİT) */
+        .head { width: 70px; height: 90px; background: var(--skin); border-radius: 30px; position: absolute; left: 140px; top: 80px; z-index: 10; border: 1px solid rgba(0,0,0,0.1); }
+        .eye-row { display: flex; justify-content: space-around; margin-top: 35px; padding: 0 10px; }
+        .eye { width: 14px; height: 8px; background: white; border-radius: 5px; position: relative; }
+        .pupil { width: 6px; height: 6px; background: var(--eye); border-radius: 50%; position: absolute; left: 4px; box-shadow: 0 0 8px var(--eye); }
 
-        /* --- Karakter Görsel Alanı --- */
-        #character-canvas {
-            width: 300px;
-            height: 400px;
-            border: 4px solid #333;
-            border-radius: 20px;
-            position: relative;
-            background: linear-gradient(to bottom, #2c3e50, #000);
-            overflow: hidden;
-            transition: all 0.5s ease;
-        }
+        /* --- STİL KATMANLARI --- */
+        .layer { position: absolute; transition: 0.3s all ease-in-out; }
 
-        /* Sabit Gözler */
-        .eyes {
-            position: absolute;
-            top: 30%;
-            width: 100%;
-            display: flex;
-            justify-content: center;
-            gap: 40px;
-            z-index: 10;
-        }
+        /* SAÇLAR (10 ÇEŞİT) */
+        .hair { width: 90px; height: 60px; left: 130px; top: 65px; z-index: 11; }
+        .hair.h-1 { background: var(--hair); border-radius: 40px 40px 0 0; } /* Kısa */
+        .hair.h-2 { background: var(--hair); border-radius: 40px 40px 10px 10px; height: 110px; } /* Uzun */
+        .hair.h-3 { width: 20px; left: 165px; background: var(--hair); border-radius: 10px; box-shadow: 0 15px 0 var(--hair), 0 30px 0 var(--hair); } /* Mohawk */
+        .hair.h-4 { background: transparent; border-top: 15px solid var(--hair); border-radius: 50%; } /* Kel/Hafif */
+        .hair.h-5 { background: var(--hair); clip-path: polygon(0 100%, 20% 0, 40% 100%, 60% 0, 80% 100%, 100% 0, 100% 100%); } /* Dikenli */
+        .hair.h-6 { background: var(--hair); border-radius: 50% 50% 0 0; width: 100px; left: 125px; transform: scaleY(1.2); } /* Afro */
+        .hair.h-7 { background: var(--hair); border-radius: 0 0 20px 20px; top: 60px; height: 30px; } /* Kâkül */
+        .hair.h-8 { background: #ccc; border-radius: 10px; border: 2px solid #999; } /* Kask */
+        .hair.h-9 { background: var(--hair); border-radius: 50%; width: 40px; height: 40px; top: 45px; left: 155px; } /* Topuz */
+        .hair.h-10 { background: var(--hair); clip-path: ellipse(25% 40% at 50% 50%); } /* Hipster */
 
-        .eye {
-            width: 50px;
-            height: 20px;
-            background: white;
-            border-radius: 50% / 100% 100% 0 0; /* Göz kapağı formu */
-            box-shadow: 0 0 20px var(--eye-color);
-            position: relative;
-            overflow: hidden;
-        }
+        /* ÜST GİYİM (10 ÇEŞİT) */
+        .top { width: 120px; height: 110px; left: 115px; top: 170px; z-index: 5; }
+        .t-1 { background: var(--top); border-radius: 15px; } /* T-shirt */
+        .t-2 { background: var(--top); clip-path: polygon(0 0, 100% 0, 85% 100%, 15% 100%); } /* Atlet */
+        .t-3 { background: var(--top); border-radius: 50px 50px 10px 10px; } /* Hoodie */
+        .t-4 { background: #444; border-left: 10px solid var(--top); border-right: 10px solid var(--top); } /* Ceket */
+        .t-5 { background: var(--top); height: 180px; clip-path: polygon(0 0, 100% 0, 100% 100%, 50% 80%, 0 100%); } /* Pelerin/Pelerinli */
+        .t-6 { background: var(--top); border: 4px solid gold; box-sizing: border-box; } /* Kraliyet */
+        .t-7 { background: var(--top); opacity: 0.7; border-radius: 50% 50% 0 0; } /* Bio-Zırh */
+        .t-8 { background: var(--top); clip-path: polygon(25% 0%, 75% 0%, 100% 100%, 0% 100%); } /* Kimono */
+        .t-9 { background: #222; border-top: 20px solid var(--top); } /* Boğazlı */
+        .t-10 { background: var(--top); box-shadow: inset 0 0 20px #000; } /* Mekanik Gövde */
 
-        .eye::after {
-            content: '';
-            position: absolute;
-            width: 20px;
-            height: 20px;
-            background: var(--eye-color);
-            left: 50%;
-            transform: translateX(-50%);
-            border-radius: 50%;
-            box-shadow: inset 0 0 10px #000;
-        }
+        /* ALT GİYİM (10 ÇEŞİT) */
+        .bottom { width: 110px; height: 130px; left: 120px; top: 280px; z-index: 4; display: flex; justify-content: space-between; }
+        .leg { width: 50px; height: 100%; background: var(--bottom); border-radius: 5px; }
+        .b-1 .leg { } /* Pantolon */
+        .b-2 .leg { height: 60px; } /* Şort */
+        .b-3 .leg { width: 52px; border-bottom: 15px solid #000; } /* Botlu Pantolon */
+        .b-4 .leg { border-radius: 50px; width: 40px; } /* Tayt */
+        .b-5 { width: 130px; left: 110px; } .b-5 .leg { clip-path: polygon(0 0, 100% 0, 80% 100%, 20% 100%); } /* Geniş Pantolon */
+        .b-6 .leg { background: linear-gradient(to bottom, var(--bottom) 70%, #555 70%); } /* Dizlikli */
+        .b-7 .leg { border-right: 8px solid rgba(0,0,0,0.3); } /* Kargo */
+        .b-8 .leg { background: transparent; border: 4px solid var(--bottom); height: 110px; } /* Mekanik Bacak */
+        .b-9 .leg { border-radius: 0 0 50% 50%; background: var(--bottom); } /* Etek/Tunik Altı */
+        .b-10 .leg { filter: contrast(150%); border-top: 5px solid white; } /* Uzay Pantolonu */
 
-        /* Değişen Kıyafet Alanı */
-        #outfit {
-            position: absolute;
-            bottom: 0;
-            width: 200px;
-            height: 220px;
-            left: 50%;
-            transform: translateX(-50%);
-            background-color: var(--outfit-color);
-            border-radius: 50px 50px 0 0;
-            transition: all 0.4s ease;
-            display: flex;
-            justify-content: center;
-            align-items: center;
-            text-align: center;
-            font-weight: bold;
-            font-size: 0.8rem;
-            color: var(--accent-color);
-            border: 2px solid rgba(255,255,255,0.1);
-        }
-
-        /* --- Kontrol Paneli --- */
-        .controls {
-            margin-top: 20px;
-            display: grid;
-            grid-template-columns: repeat(4, 1fr);
-            gap: 10px;
-            max-width: 600px;
-        }
-
-        button {
-            padding: 8px;
-            cursor: pointer;
-            background: #333;
-            color: white;
-            border: 1px solid #555;
-            border-radius: 5px;
-            font-size: 12px;
-            transition: 0.2s;
-        }
-
-        button:hover {
-            background: var(--eye-color);
-            color: #000;
-        }
-
-        .active-style { font-size: 1.2rem; margin-top: 10px; color: var(--eye-color); }
+        /* KONTROL PANELİ */
+        .panel { display: grid; grid-template-columns: repeat(3, 1fr); gap: 15px; margin-top: 20px; background: #222; padding: 20px; border-radius: 15px; width: 90%; max-width: 900px; }
+        .group { display: flex; flex-direction: column; gap: 8px; }
+        select { background: #333; color: #00ffcc; border: 1px solid #444; padding: 10px; border-radius: 5px; cursor: pointer; }
+        input[type="color"] { width: 100%; height: 30px; border: none; cursor: pointer; background: none; }
     </style>
 </head>
 <body>
 
-    <h2>Karakter Stil Laboratuvarı</h2>
-    <div id="character-canvas">
-        <div class="eyes">
-            <div class="eye"></div>
-            <div class="eye"></div>
+    <h2 style="color: var(--eye)">CHARACTER DESIGNER PRO</h2>
+
+    <div id="viewport">
+        <div id="hair-layer" class="layer hair h-1"></div>
+        <div class="head">
+            <div class="eye-row">
+                <div class="eye"><div class="pupil"></div></div>
+                <div class="eye"><div class="pupil"></div></div>
+            </div>
         </div>
-        <div id="outfit">Kıyafet Seçilmedi</div>
+        <div id="top-layer" class="layer top t-1"></div>
+        <div id="bottom-layer" class="layer bottom b-1">
+            <div class="leg"></div>
+            <div class="leg"></div>
+        </div>
     </div>
 
-    <div class="active-style" id="style-name">Stil: Standart</div>
-
-    <div class="controls" id="button-container">
+    <div class="panel">
+        <div class="group">
+            <label>💇‍♂️ SAÇ STİLİ</label>
+            <select onchange="updateStyle('hair-layer', 'layer hair ' + this.value)">
+                <option value="h-1">Kısa Standart</option>
+                <option value="h-2">Uzun Rocker</option>
+                <option value="h-3">Mohawk Punk</option>
+                <option value="h-4">Hafif Seyrek</option>
+                <option value="h-5">Dikenli Anime</option>
+                <option value="h-6">Afro / Hacimli</option>
+                <option value="h-7">Modern Kâkül</option>
+                <option value="h-8">Koruyucu Kask</option>
+                <option value="h-9">Samuray Topuzu</option>
+                <option value="h-10">Zarif Hipster</option>
+            </select>
+            <input type="color" onchange="updateColor('--hair', this.value)" value="#442211">
         </div>
 
+        <div class="group">
+            <label>👕 ÜST GİYİM</label>
+            <select onchange="updateStyle('top-layer', 'layer top ' + this.value)">
+                <option value="t-1">Klasik T-Shirt</option>
+                <option value="t-2">Sporcu Atleti</option>
+                <option value="t-3">Sokak Hoodie</option>
+                <option value="t-4">Deri Ceket</option>
+                <option value="t-5">Ulu Pelerin</option>
+                <option value="t-6">Kraliyet Zırhı</option>
+                <option value="t-7">Bio-Organik</option>
+                <option value="t-8">Geleneksel Kimono</option>
+                <option value="t-9">Boğazlı Kazak</option>
+                <option value="t-10">Siborg Gövde</option>
+            </select>
+            <input type="color" onchange="updateColor('--top', this.value)" value="#3498db">
+        </div>
+
+        <div class="group">
+            <label>👖 ALT GİYİM</label>
+            <select onchange="updateStyle('bottom-layer', 'layer bottom ' + this.value)">
+                <option value="b-1">Düz Pantolon</option>
+                <option value="b-2">Yazlık Şort</option>
+                <option value="b-3">Ağır Botlu</option>
+                <option value="b-4">Esnek Tayt</option>
+                <option value="b-5">Bol Şalvar</option>
+                <option value="b-6">Zırhlı Pantolon</option>
+                <option value="b-7">Cepli Kargo</option>
+                <option value="b-8">Robotik Bacak</option>
+                <option value="b-9">Tunik Altı</option>
+                <option value="b-10">Tekno Pantolon</option>
+            </select>
+            <input type="color" onchange="updateColor('--bottom', this.value)" value="#2c3e50">
+        </div>
+    </div>
+
     <script>
-        const outfitData = [
-            { name: "Siberpunk", color: "#ff00ff", border: "neon", text: "NEON CEKET" },
-            { name: "Steampunk", color: "#8b4513", border: "leather", text: "DİŞLİ YELEK" },
-            { name: "Minimalist", color: "#ffffff", border: "none", text: "BEYAZ TULUM" },
-            { name: "Gotik", color: "#000000", border: "lace", text: "SİYAH PELERİN" },
-            { name: "Techwear", color: "#2f4f4f", border: "cargo", text: "STRAP YELEK" },
-            { name: "Samuray", color: "#b22222", border: "kimono", text: "KIRMIZI KİMONO" },
-            { name: "Buz Büyücüsü", color: "#add8e6", border: "frost", text: "KRİSTAL ZIRH" },
-            { name: "Orman Korucusu", color: "#228b22", border: "leaf", text: "YAPRAK ZIRH" },
-            { name: "Astronot", color: "#f5f5f5", border: "suit", text: "NASA TULUMU" },
-            { name: "Kraliyet", color: "#ffd700", border: "gold", text: "ALTIN KAFTAN" },
-            { name: "Post-Apokaliptik", color: "#556b2f", border: "torn", text: "YIRTIK DERİ" },
-            { name: "Derin Deniz", color: "#00008b", border: "glow", text: "BASINÇ KOSTÜMÜ" },
-            { name: "Retro Futurist", color: "#ff6347", border: "plastic", text: "PLASTİK CEKET" },
-            { name: "Gölge Suikastçı", color: "#121212", border: "shadow", text: "GİZLİLİK ÖRTÜSÜ" },
-            { name: "Hacker", color: "#00ff00", border: "code", text: "MATRIX HOODIE" },
-            { name: "Çöl Gezgini", color: "#edc9af", border: "sand", text: "KETEN SARGILAR" },
-            { name: "Cyber Angel", color: "#e6e6fa", border: "wing", text: "IŞIK KANATLAR" },
-            { name: "Mafya Boss", color: "#333", border: "suit", text: "STRİPED TAKIM" },
-            { name: "Punk Rocker", color: "#800000", border: "studs", text: "ZIMBALI CEKET" },
-            { name: "Yapay Zeka", color: "#00ffff", border: "glass", text: "SAYDAM GÖVDE" }
-        ];
-
-        const outfitEl = document.getElementById('outfit');
-        const styleNameEl = document.getElementById('style-name');
-        const btnContainer = document.getElementById('button-container');
-
-        outfitData.forEach((style, index) => {
-            const btn = document.createElement('button');
-            btn.innerText = style.name;
-            btn.onclick = () => {
-                // Kıyafeti Güncelle
-                outfitEl.style.backgroundColor = style.color;
-                outfitEl.innerText = style.text;
-                styleNameEl.innerText = `Stil: ${style.name}`;
-                
-                // Bazı özel efektler
-                if(style.name === "Siberpunk") outfitEl.style.boxShadow = "0 0 30px #ff00ff";
-                else if(style.name === "Kraliyet") outfitEl.style.boxShadow = "0 0 30px #ffd700";
-                else outfitEl.style.boxShadow = "none";
-            };
-            btnContainer.appendChild(btn);
-        });
+        function updateStyle(id, newClasses) {
+            document.getElementById(id).className = newClasses;
+        }
+        function updateColor(prop, val) {
+            document.documentElement.style.setProperty(prop, val);
+        }
     </script>
 </body>
 </html>
