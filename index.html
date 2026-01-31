@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>30 Stil Karakter Paneli</title>
+    <title>30 Stil Karakter Paneli - Geliştirilmiş</title>
     <style>
         :root {
             --bg-color: #1a1a1a;
@@ -25,7 +25,7 @@
 
         #character-canvas {
             width: 300px;
-            height: 450px;
+            height: 500px;
             border: 4px solid #333;
             border-radius: 20px;
             position: relative;
@@ -33,53 +33,67 @@
             overflow: hidden;
         }
 
-        /* --- KATMANLAR --- */
         .layer { position: absolute; left: 50%; transform: translateX(-50%); transition: 0.3s; }
 
-        /* Saç Arkada */
-        #hair { top: 40px; z-index: 1; width: 120px; height: 100px; background: var(--hair-color); }
-
-        /* Kafa ve Mutlu Ağız */
+        /* --- KAFA --- */
+        #hair { top: 40px; z-index: 10; width: 100px; height: 90px; background: var(--hair-color); border-radius: 40px 40px 0 0; }
+        
         .head { 
-            width: 80px; height: 100px; background: var(--skin); border-radius: 40px; 
-            top: 60px; z-index: 2; position: absolute; left: 50%; transform: translateX(-50%);
+            width: 70px; height: 85px; background: var(--skin); border-radius: 35px; 
+            top: 55px; z-index: 9; position: absolute; left: 50%; transform: translateX(-50%);
         }
-        .mouth {
-            width: 24px; height: 12px; border-bottom: 3px solid #7d2d2d;
-            border-radius: 0 0 12px 12px; margin: 60px auto 0;
-        }
+        .eyes { position: absolute; top: 35px; width: 100%; display: flex; justify-content: space-around; padding: 0 15px; box-sizing: border-box; }
+        .eye { width: 6px; height: 6px; background: #333; border-radius: 50%; }
+        .mouth { width: 20px; height: 10px; border-bottom: 3px solid #7d2d2d; border-radius: 50%; margin: 55px auto 0; }
 
-        /* Üst Giyim */
-        #top { top: 165px; z-index: 3; width: 100px; height: 60px; background: var(--top-color); border-radius: 10px 10px 0 0; }
+        /* --- ÜST VÜCUT VE KOLLAR --- */
+        .upper-body-wrapper { position: absolute; top: 140px; left: 50%; transform: translateX(-50%); width: 160px; height: 120px; z-index: 5; }
+        
+        #top { width: 80px; height: 80px; background: var(--top-color); border-radius: 15px 15px 5px 5px; margin: 0 auto; position: relative; z-index: 6; }
 
-        /* Alt Giyim */
-        #bottom { top: 230px; z-index: 2; width: 90px; height: 80px; background: var(--bottom-color); }
+        .arm { width: 22px; height: 90px; background: var(--skin); position: absolute; top: 5px; border-radius: 11px; z-index: 4; transition: 0.3s; }
+        .arm.left { left: 15px; transform: rotate(5deg); }
+        .arm.right { right: 15px; transform: rotate(-5deg); }
+        
+        /* Kısa kollu efekti için */
+        .arm::before { content: ""; position: absolute; top: 0; width: 100%; height: 30px; background: var(--top-color); border-radius: 11px 11px 0 0; }
 
-        /* --- KONTROL PANELİ --- */
-        .panel {
-            margin-top: 20px;
-            display: grid;
-            grid-template-columns: repeat(3, 1fr);
-            gap: 15px;
-            max-width: 800px;
-        }
+        /* --- ALT VÜCUT VE BACAKLAR --- */
+        .legs-wrapper { position: absolute; top: 220px; left: 50%; transform: translateX(-50%); width: 80px; height: 180px; display: flex; justify-content: space-between; z-index: 3; }
+        
+        .leg { width: 32px; height: 150px; background: var(--bottom-color); position: relative; border-radius: 5px; transition: 0.3s; }
+        .foot { position: absolute; bottom: -10px; width: 40px; height: 15px; background: #111; border-radius: 5px 10px 2px 2px; }
+        .leg.left .foot { right: 0; }
+        .leg.right .foot { left: 0; }
+
+        /* --- PANEL --- */
+        .panel { margin-top: 20px; display: grid; grid-template-columns: repeat(3, 1fr); gap: 15px; max-width: 800px; }
         .group { display: flex; flex-direction: column; gap: 5px; }
         label { font-size: 0.8rem; color: #00ffcc; font-weight: bold; }
         select { background: #333; color: white; border: 1px solid #555; padding: 5px; border-radius: 4px; }
-        
     </style>
 </head>
 <body>
 
-    <h2>Karakter Tasarım Laboratuvarı</h2>
+    <h2>Karakter Tasarım Laboratuvarı v2.0</h2>
 
     <div id="character-canvas">
         <div id="hair" class="layer"></div>
         <div class="head">
+            <div class="eyes"><div class="eye"></div><div class="eye"></div></div>
             <div class="mouth"></div>
         </div>
-        <div id="top" class="layer"></div>
-        <div id="bottom" class="layer"></div>
+
+        <div class="upper-body-wrapper">
+            <div id="top"></div>
+            <div id="leftArm" class="arm left"></div>
+            <div id="rightArm" class="arm right"></div>
+        </div>
+
+        <div class="legs-wrapper">
+            <div id="leftLeg" class="leg left"><div class="foot"></div></div>
+            <div id="rightLeg" class="leg right"><div class="foot"></div></div>
+        </div>
     </div>
 
     <div class="panel">
@@ -89,13 +103,8 @@
                 <option value="long">Uzun Düz</option>
                 <option value="bob">Küt Kesim</option>
                 <option value="spike">Dikenli</option>
-                <option value="afro">Afro</option>
                 <option value="bald">Kel</option>
                 <option value="mohawk">Mohawk</option>
-                <option value="ponytail">At Kuyruğu</option>
-                <option value="side">Yana Yatık</option>
-                <option value="shaved">Yanlar Sıfır</option>
-                <option value="square">Kutu Kesim</option>
             </select>
         </div>
 
@@ -105,13 +114,7 @@
                 <option value="tshirt">T-Shirt</option>
                 <option value="crop">Crop Top</option>
                 <option value="tank">Atlet</option>
-                <option value="bikini">Bikini</option>
                 <option value="hoodie">Hoodie</option>
-                <option value="armor">Zırh</option>
-                <option value="kimono">Kimono</option>
-                <option value="strapless">Straplez</option>
-                <option value="vneck">V-Yaka</option>
-                <option value="jacket">Açık Ceket</option>
             </select>
         </div>
 
@@ -120,14 +123,8 @@
             <select onchange="applyBottom(this.value)">
                 <option value="jeans">Pantolon</option>
                 <option value="shorts">Mini Şort</option>
-                <option value="skirt">Mini Etek</option>
-                <option value="vcut">V-Kesim Alt</option>
+                <option value="skirt">Etek</option>
                 <option value="cargo">Kargo</option>
-                <option value="leggings">Tayt</option>
-                <option value="robotic">Mekanik</option>
-                <option value="swim">Yüzme Şortu</option>
-                <option value="wide">Bol Kesim</option>
-                <option value="torn">Yırtık Kot</option>
             </select>
         </div>
     </div>
@@ -135,35 +132,48 @@
     <script>
         const hair = document.getElementById('hair');
         const topPart = document.getElementById('top');
-        const bottomPart = document.getElementById('bottom');
+        const leftArm = document.getElementById('leftArm');
+        const rightArm = document.getElementById('rightArm');
+        const leftLeg = document.getElementById('leftLeg');
+        const rightLeg = document.getElementById('rightLeg');
 
-        // --- STİL FONKSİYONLARI ---
         function applyHair(style) {
-            hair.style.borderRadius = "0";
+            hair.style.display = "block";
             hair.style.clipPath = "none";
-            if(style === 'long') hair.style.borderRadius = "40px 40px 0 0";
-            if(style === 'bob') { hair.style.height = "70px"; hair.style.borderRadius = "40px 40px 5px 5px"; }
+            hair.style.width = "100px";
+            if(style === 'long') hair.style.height = "120px";
+            if(style === 'bob') hair.style.height = "80px";
             if(style === 'spike') hair.style.clipPath = "polygon(0% 100%, 20% 0%, 40% 100%, 60% 0%, 80% 100%, 100% 0%, 100% 100%)";
-            if(style === 'bald') hair.style.background = "transparent"; else hair.style.background = "var(--hair-color)";
-            if(style === 'afro') hair.style.borderRadius = "50% 50% 20% 20%";
-            if(style === 'mohawk') { hair.style.width = "30px"; hair.style.borderRadius = "10px"; } else { hair.style.width = "120px"; }
+            if(style === 'bald') hair.style.display = "none";
+            if(style === 'mohawk') { hair.style.width = "30px"; hair.style.height = "80px"; }
         }
 
         function applyTop(style) {
-            topPart.style.clipPath = "none";
-            topPart.style.height = "60px";
-            if(style === 'crop') topPart.style.height = "35px";
-            if(style === 'tank') topPart.style.clipPath = "polygon(20% 0%, 80% 0%, 100% 100%, 0% 100%)";
-            if(style === 'bikini') { topPart.style.height = "30px"; topPart.style.clipPath = "polygon(0 0, 45% 0, 50% 100%, 55% 0, 100% 0, 100% 100%, 0 100%)"; }
-            if(style === 'strapless') topPart.style.borderRadius = "0";
+            topPart.style.height = "80px";
+            if(style === 'crop') topPart.style.height = "45px";
+            if(style === 'tank') {
+                leftArm.style.top = "-5px";
+                rightArm.style.top = "-5px";
+            } else {
+                leftArm.style.top = "5px";
+                rightArm.style.top = "5px";
+            }
         }
 
         function applyBottom(style) {
-            bottomPart.style.clipPath = "none";
-            bottomPart.style.height = "80px";
-            if(style === 'shorts') bottomPart.style.height = "35px";
-            if(style === 'vcut') { bottomPart.style.height = "40px"; bottomPart.style.clipPath = "polygon(0 0, 100% 0, 50% 100%)"; }
-            if(style === 'skirt') { bottomPart.style.height = "40px"; bottomPart.style.borderRadius = "0 0 20px 20px"; }
+            const legs = [leftLeg, rightLeg];
+            legs.forEach(leg => {
+                leg.style.height = "150px";
+                leg.style.width = "32px";
+                leg.style.borderRadius = "5px";
+                if(style === 'shorts') leg.style.height = "50px";
+                if(style === 'skirt') {
+                    leg.style.width = "40px";
+                    leg.style.height = "60px";
+                    leg.style.borderRadius = "0 0 15px 15px";
+                }
+                if(style === 'cargo') leg.style.width = "42px";
+            });
         }
     </script>
 </body>
