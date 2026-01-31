@@ -143,8 +143,8 @@
 </div>
 
 <script>
-    // GÜNCELLENMİŞ VE BACAK ARASI DARALTILMIŞ SVG KODLARI
-    const bodySVG = `<svg viewBox="0 0 100 150">
+    // Karakterin temel vücut yapısı (Bacak arası daraltıldı)
+    const bodyBase = `<svg viewBox="0 0 100 150">
         <rect x="35" y="30" width="30" height="30" fill="#ffdbac"/> <rect x="40" y="60" width="20" height="40" fill="#ffdbac"/> <rect x="40" y="100" width="9" height="40" fill="#ffdbac"/> <rect x="51" y="100" width="9" height="40" fill="#ffdbac"/> </svg>`;
 
     const assets = {
@@ -154,20 +154,51 @@
             `<svg viewBox="0 0 100 150"><rect x="35" y="15" width="30" height="20" fill="#00ffff"/></svg>` 
         ],
         top: [
-            `<svg viewBox="0 0 100 150"><rect x="40" y="60" width="20" height="35" fill="#ff0055"/></svg>`, // Gövdeye tam oturan tişört
+            `<svg viewBox="0 0 100 150"><rect x="40" y="60" width="20" height="35" fill="#ff0055"/></svg>`, 
             `<svg viewBox="0 0 100 150"><rect x="40" y="60" width="20" height="35" fill="#222"/><rect x="45" y="70" width="10" height="5" fill="#fff"/></svg>`,
             `<svg viewBox="0 0 100 150"><rect x="40" y="60" width="20" height="20" fill="#00ff00"/></svg>`
         ],
         bottom: [
-            // Pantolon bacakları vücuda göre hizalandı
             `<svg viewBox="0 0 100 150"><rect x="40" y="95" width="9" height="45" fill="#2b2b80"/><rect x="51" y="95" width="9" height="45" fill="#2b2b80"/></svg>`, 
             `<svg viewBox="0 0 100 150"><rect x="40" y="95" width="20" height="15" fill="#555"/></svg>`, 
             `<svg viewBox="0 0 100 150"><rect x="40" y="95" width="9" height="45" fill="#ff00ff"/><rect x="51" y="95" width="9" height="45" fill="#ff00ff"/></svg>` 
         ]
     };
-    // ... geri kalan fonksiyonlar aynı ...
+
+    let currentIndices = { hair: 0, top: 0, bottom: 0 };
+
+    function updateLayer(category) {
+        const layer = document.getElementById(`${category}-layer`);
+        if (layer) {
+            layer.innerHTML = assets[category][currentIndices[category]];
+            // Animasyon efekti
+            layer.classList.remove('pop');
+            void layer.offsetWidth; 
+            layer.classList.add('pop');
+        }
+    }
+
+    function change(category) {
+        currentIndices[category] = (currentIndices[category] + 1) % assets[category].length;
+        updateLayer(category);
+    }
+
+    function randomize() {
+        Object.keys(assets).forEach(cat => {
+            currentIndices[cat] = Math.floor(Math.random() * assets[cat].length);
+            updateLayer(cat);
+        });
+    }
+
+    // Sayfa yüklendiğinde karakteri oluştur
+    window.onload = () => {
+        const bodyLayer = document.getElementById('body-layer');
+        if (bodyLayer) bodyLayer.innerHTML = bodyBase;
+        randomize();
+    };
 </script>
 
 </body>
 </html>
+
 
