@@ -29,8 +29,10 @@
 .layer img {
     width: 80%;
     height: auto;
-    image-rendering: pixelated;
+    filter: drop-shadow(0 0 8px var(--neon-pink)) drop-shadow(0 0 12px var(--neon-blue));
+    transition: filter 0.2s ease, transform 0.2s ease;
 }
+
 
 button {
     background: transparent;
@@ -47,5 +49,17 @@ button:hover {
     background: var(--neon-blue);
     color: black;
     box-shadow: 0 0 10px var(--neon-blue);
+}
+
+#random-btn {
+    margin-top: 10px;
+    border-color: #ff0;
+    color: #ff0;
+    box-shadow: 0 0 15px #ff0, 0 0 30px #ff0;
+}
+#random-btn:hover {
+    background: #ff0;
+    color: black;
+    box-shadow: 0 0 20px #ff0, 0 0 40px #ff0;
 }
 
