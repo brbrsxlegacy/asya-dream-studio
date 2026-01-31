@@ -48,17 +48,22 @@ body {
 
 .layer {
     position: absolute;
-    /* Katmanı merkeze zorla */
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%); /* Tam merkezi yakalar */
+    width: 100%;
+    height: 100%;
     display: flex;
     justify-content: center;
     align-items: center;
-    width: 100%;
-    height: 100%;
-    
-    /* Pikselli resimlerin net görünmesi için */
-    image-rendering: pixelated; 
-    font-size: 150px; /* Emojiler için boyut */
+    image-rendering: pixelated;
     pointer-events: none;
+}
+
+.layer img, .layer span {
+    max-width: 100%;
+    max-height: 100%;
+    object-fit: contain; /* Görselin kutuya sığmasını sağlar */
 }
 .controls {
     display: flex;
@@ -95,4 +100,5 @@ button:hover {
     color: yellow;
 
 }
+
 
