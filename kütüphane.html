@@ -75,13 +75,13 @@ button:hover{background:var(--neon-pink);color:black;box-shadow:0 0 15px var(--n
 
 <script>
 // --- KARAKTER ---
-const svgContent =
-bodyBase +
-assets.hair[currentIndices.hair] +
-assets.face[currentIndices.face] +
-assets.top[currentIndices.top] +
-assets.bottom[currentIndices.bottom] +
-assets.shoes[currentIndices.shoes];
+const bodyBase=`
+<rect x="35" y="30" width="30" height="30" fill="#ffdbac"/>
+<rect x="40" y="60" width="20" height="40" fill="#ffdbac"/>
+<rect x="40" y="100" width="9" height="40" fill="#ffdbac"/>
+<rect x="51" y="100" width="9" height="40" fill="#ffdbac"/>
+`;
+
 
 const assets={
 hair:[
@@ -194,6 +194,7 @@ function startGame(){
 
 </body>
 </html>
+
 
 
 
