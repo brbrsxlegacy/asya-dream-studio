@@ -34,7 +34,14 @@ function randomize() {
     });
 }
 
+function openGame(){
+  hideAll();
+  document.getElementById('game').classList.remove('hidden');
+  startGame();
+}
+
 // Başlangıçta rastgele seç
 window.onload = () => randomize();
+
 
 
