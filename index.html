@@ -10,6 +10,17 @@
   --neon-pink: #ff00ff;
   --neon-blue: #00ffff;
 }
+/* NEON FADE-IN & GLOW ANİMASYONU */
+@keyframes neonFadeIn {
+  0% {opacity: 0; filter: drop-shadow(0 0 0px #ff00ff);}
+  50% {opacity: 0.5; filter: drop-shadow(0 0 8px #ff00ff);}
+  100% {opacity: 1; filter: drop-shadow(0 0 20px #ff00ff);}
+}
+
+.neon-show {
+  animation: neonFadeIn 0.8s ease forwards;
+}
+
 .hidden{
   display: none !important;
 }
@@ -174,7 +185,11 @@ function hideAll(){ document.getElementById('login').classList.add('hidden'); do
 function enterSite(){ const nick=document.getElementById('nickname').value.trim(); if(!nick)return alert('Takma ad boş olamaz!'); localStorage.setItem('nickname',nick); document.getElementById('display-nick').textContent=nick; hideAll(); document.getElementById('menu').classList.remove('hidden'); }
 function openCreator(){
   hideAll();
-  document.getElementById('creator').classList.remove('hidden');
+  const creator = document.getElementById('creator');
+  creator.classList.remove('hidden');
+  creator.classList.remove('neon-show'); // reset
+  void creator.offsetWidth; // restart animation
+  creator.classList.add('neon-show');
   renderCharacter();
 }
 function openLibrary(){ hideAll(); document.getElementById('library').classList.remove('hidden'); loadLibrary(); }
@@ -234,6 +249,7 @@ function startGame(){
 
 </body>
 </html>
+
 
 
 
