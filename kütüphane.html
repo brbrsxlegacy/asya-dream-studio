@@ -1,0 +1,162 @@
+<!DOCTYPE html>
+<html lang="tr">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Pixel Master - Online Kitaplık</title>
+<link href="https://fonts.googleapis.com/css2?family=Press+Start+2P&display=swap" rel="stylesheet">
+<style>
+body {
+    font-family: 'Press Start 2P', cursive;
+    margin: 0;
+    padding: 0;
+    background: radial-gradient(circle, #1a1a2e 0%, #020205 100%);
+    color: white;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    height: 100vh;
+}
+div { display: none; flex-direction: column; align-items: center; gap: 20px; }
+button { padding: 10px 20px; cursor: pointer; background: transparent; border: 2px solid #ff00ff; color: #ff00ff; border-radius: 5px; transition: 0.3s; }
+button:hover { background: #ff00ff; color: black; }
+#library-container { display: flex; overflow-x: auto; gap: 20px; padding: 20px; }
+.character-card { min-width: 250px; background: rgba(0,0,0,0.7); padding: 10px; border: 2px solid #00ffff; border-radius: 10px; text-align: center; }
+#character-canvas { position: relative; width: 280px; height: 400px; background: #111; border: 2px solid #333; border-radius: 10px; display: flex; justify-content: center; align-items: center; overflow: hidden; }
+.layer { position: absolute; width: 100%; height: 100%; display: flex; justify-content: center; align-items: center; }
+svg { width: 220px; height: 320px; image-rendering: pixelated; }
+</style>
+</head>
+<body>
+
+<!-- Takma ad giriş -->
+<div id="login">
+    <p>Takma adınızı girin:</p>
+    <input type="text" id="nickname" placeholder="Örn: PixelKanka">
+    <button onclick="enterSite()">GİR</button>
+</div>
+
+<!-- Ana Menü -->
+<div id="menu">
+    <h2>Merhaba <span id="display-nick"></span>!</h2>
+    <button onclick="openLibrary()">Online Kitaplık</button>
+    <button onclick="openCreator()">Oluştur</button>
+</div>
+
+<!-- Online Kitaplık -->
+<div id="library">
+    <h2>Online Kitaplık</h2>
+    <div id="library-container"></div>
+    <button onclick="backToMenu()">Geri</button>
+</div>
+
+<!-- Karakter Oluşturma -->
+<div id="creator">
+    <h2>Karakter Oluştur</h2>
+    <div id="character-canvas">
+        <div class="layer" id="body-layer"></div>
+        <div class="layer" id="bottom-layer"></div>
+        <div class="layer" id="top-layer"></div>
+        <div class="layer" id="hair-layer"></div>
+    </div>
+    <div class="controls">
+        <button onclick="change('hair')">Saç Değiştir</button>
+        <button onclick="change('top')">Üst Giyim Değiştir</button>
+        <button onclick="change('bottom')">Alt Giyim Değiştir</button>
+        <button onclick="saveCurrentCharacter()">Kaydet</button>
+        <button onclick="backToMenu()">Geri</button>
+    </div>
+</div>
+
+<script>
+// --- TAKMA AD & MENÜ ---
+function enterSite() {
+    const nick = document.getElementById('nickname').value.trim();
+    if(!nick) return alert('Takma ad boş olamaz!');
+    localStorage.setItem('nickname', nick);
+    document.getElementById('display-nick').textContent = nick;
+    document.getElementById('login').style.display = 'none';
+    document.getElementById('menu').style.display = 'flex';
+}
+
+function openLibrary() {
+    hideAll();
+    document.getElementById('library').style.display = 'flex';
+    loadLibrary();
+}
+
+function openCreator() {
+    hideAll();
+    document.getElementById('creator').style.display = 'flex';
+}
+
+function backToMenu() {
+    hideAll();
+    document.getElementById('menu').style.display = 'flex';
+}
+
+function hideAll() {
+    document.getElementById('login').style.display = 'none';
+    document.getElementById('menu').style.display = 'none';
+    document.getElementById('library').style.display = 'none';
+    document.getElementById('creator').style.display = 'none';
+}
+
+// --- KARAKTER VERİLERİ ---
+const bodyBase = `<svg viewBox="0 0 100 150">
+<rect x="35" y="30" width="30" height="30" fill="#ffdbac"/>
+<rect x="40" y="60" width="20" height="40" fill="#ffdbac"/>
+<rect x="40" y="100" width="9" height="40" fill="#ffdbac"/>
+<rect x="51" y="100" width="9" height="40" fill="#ffdbac"/>
+</svg>`;
+
+const assets = {
+    hair:[`<svg viewBox="0 0 100 150"><rect x="35" y="25" width="30" height="10" fill="#4d2600"/></svg>`,
+          `<svg viewBox="0 0 100 150"><rect x="32" y="20" width="36" height="20" fill="#ffd700"/></svg>`],
+    top:[`<svg viewBox="0 0 100 150"><rect x="40" y="60" width="20" height="35" fill="#ff0055"/></svg>`,
+         `<svg viewBox="0 0 100 150"><rect x="40" y="60" width="20" height="35" fill="#222"/></svg>`],
+    bottom:[`<svg viewBox="0 0 100 150"><rect x="40" y="95" width="9" height="45" fill="#2b2b80"/><rect x="51" y="95" width="9" height="45" fill="#2b2b80"/></svg>`,
+            `<svg viewBox="0 0 100 150"><rect x="40" y="95" width="20" height="15" fill="#555"/></svg>`]
+};
+
+let currentIndices = {hair:0, top:0, bottom:0};
+
+function updateLayer(cat){
+    const layer = document.getElementById(cat+'-layer');
+    layer.innerHTML = assets[cat][currentIndices[cat]];
+}
+
+function change(cat){
+    currentIndices[cat] = (currentIndices[cat]+1)%assets[cat].length;
+    updateLayer(cat);
+}
+
+// --- KAYDETME ---
+function saveCurrentCharacter(){
+    const nick = localStorage.getItem('nickname');
+    const svg = `<div>${bodyBase}${assets.hair[currentIndices.hair]}${assets.top[currentIndices.top]}${assets.bottom[currentIndices.bottom]}</div>`;
+    const saved = JSON.parse(localStorage.getItem('savedCharacters') || '[]');
+    saved.push({svg, nick});
+    localStorage.setItem('savedCharacters', JSON.stringify(saved));
+    alert('Karakter kaydedildi!');
+}
+
+// --- KITAPLIK ---
+function loadLibrary(){
+    const container = document.getElementById('library-container');
+    container.innerHTML = '';
+    const saved = JSON.parse(localStorage.getItem('savedCharacters') || '[]');
+    if(saved.length===0) container.innerHTML='<p>Henüz karakter yok!</p>';
+    else saved.forEach(c=>{
+        const card = document.createElement('div');
+        card.className='character-card';
+        card.innerHTML=`${c.svg}<p>${c.nick}</p>`;
+        container.appendChild(card);
+    });
+}
+
+// --- SAYFA AÇILIŞI ---
+window.onload = ()=>{ document.getElementById('login').style.display='flex'; document.getElementById('body-layer').innerHTML=bodyBase; updateLayer('hair'); updateLayer('top'); updateLayer('bottom'); }
+</script>
+</body>
+</html>
