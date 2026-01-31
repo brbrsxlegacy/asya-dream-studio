@@ -3,13 +3,13 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Pixel Dress Up - Code Edition</title>
+    <title>Pixel Master - Code Artist Edition</title>
     <link href="https://fonts.googleapis.com/css2?family=Press+Start+2P&display=swap" rel="stylesheet">
     <style>
         :root {
             --neon-pink: #ff00ff;
             --neon-blue: #00ffff;
-            --neon-yellow: #ffff00;
+            --bg-dark: #0a0a0a;
         }
 
         body {
@@ -21,47 +21,31 @@
             align-items: center;
             height: 100vh;
             color: white;
-            overflow: hidden;
-        }
-
-        .game-wrapper {
-            display: flex;
-            flex-direction: column;
-            align-items: center;
-            gap: 20px;
-        }
-
-        .neon-title {
-            font-size: 24px;
-            color: var(--neon-blue);
-            text-shadow: 0 0 15px var(--neon-blue);
-            letter-spacing: 4px;
         }
 
         .main-container {
             display: flex;
-            gap: 30px;
-            background: rgba(255, 255, 255, 0.05);
+            gap: 40px;
+            background: rgba(0, 0, 0, 0.8);
             padding: 30px;
-            border: 3px solid var(--neon-pink);
-            box-shadow: 0 0 30px rgba(255, 0, 255, 0.3);
-            border-radius: 20px;
-            backdrop-filter: blur(10px);
+            border: 4px solid var(--neon-pink);
+            box-shadow: 0 0 25px var(--neon-pink);
+            border-radius: 15px;
+            align-items: center;
         }
 
-        /* KARAKTER ALANI - BURASI ÇOK ÖNEMLİ */
+        /* KARAKTER KUTUSU - MERKEZLEME BURADA */
         #character-canvas {
             position: relative;
-            width: 250px;
-            height: 350px;
-            background: #000;
+            width: 280px;
+            height: 400px;
+            background: #111;
             border: 2px solid #333;
             border-radius: 10px;
-            overflow: hidden;
-            /* İçindekileri tam ortalar */
             display: flex;
             justify-content: center;
             align-items: center;
+            overflow: hidden;
         }
 
         .layer {
@@ -71,154 +55,140 @@
             display: flex;
             justify-content: center;
             align-items: center;
-            pointer-events: none;
         }
 
-        /* Kodla çizilen parçaların boyutu */
-        .layer svg {
-            width: 200px;
-            height: 300px;
-            filter: drop-shadow(0 0 5px rgba(0,0,0,0.5));
+        /* SVG Çizim Ayarları */
+        svg {
+            width: 220px;
+            height: 320px;
+            image-rendering: pixelated;
         }
 
-        /* KONTROL PANELİ */
         .controls {
             display: flex;
             flex-direction: column;
-            gap: 15px;
-            justify-content: center;
-        }
-
-        .category {
-            background: rgba(0,0,0,0.4);
-            padding: 10px;
-            border-radius: 8px;
-            border-left: 4px solid var(--neon-blue);
+            gap: 20px;
         }
 
         .category p {
-            margin: 0 0 8px 0;
+            margin: 0 0 10px 0;
             font-size: 10px;
-            color: var(--neon-pink);
+            color: var(--neon-blue);
+            text-shadow: 0 0 5px var(--neon-blue);
         }
 
         button {
             background: transparent;
-            border: 2px solid var(--neon-blue);
-            color: var(--neon-blue);
+            border: 2px solid var(--neon-pink);
+            color: var(--neon-pink);
             padding: 10px 15px;
             cursor: pointer;
             font-family: 'Press Start 2P';
             font-size: 10px;
             transition: 0.3s;
+            border-radius: 5px;
             width: 100%;
         }
 
         button:hover {
-            background: var(--neon-blue);
-            color: black;
-            box-shadow: 0 0 15px var(--neon-blue);
+            background: var(--neon-pink);
+            color: white;
+            box-shadow: 0 0 15px var(--neon-pink);
         }
 
         #random-btn {
-            border-color: var(--neon-yellow);
-            color: var(--neon-yellow);
-            margin-top: 10px;
+            border-color: #ffff00;
+            color: #ffff00;
         }
 
         #random-btn:hover {
-            background: var(--neon-yellow);
-            box-shadow: 0 0 20px var(--neon-yellow);
+            background: #ffff00;
+            color: black;
         }
 
-        /* Zıplama Animasyonu */
-        @keyframes bounce {
-            0%, 100% { transform: translateY(0); }
-            50% { transform: translateY(-5px); }
+        /* Değişim Efekti */
+        .pop { animation: pop-anim 0.2s ease; }
+        @keyframes pop-anim {
+            0% { transform: scale(1); }
+            50% { transform: scale(1.1); }
+            100% { transform: scale(1); }
         }
-        .bounce { animation: bounce 0.2s ease; }
     </style>
 </head>
 <body>
 
-<div class="game-wrapper">
-    <h1 class="neon-title">PIXEL MASTER</h1>
-    
-    <div class="main-container">
-        <div id="character-canvas">
-            <div class="layer" id="body-layer"></div>
-            <div class="layer" id="bottom-layer"></div>
-            <div class="layer" id="top-layer"></div>
-            <div class="layer" id="hair-layer"></div>
-        </div>
+<div class="main-container">
+    <div id="character-canvas">
+        <div class="layer" id="body-layer"></div>
+        <div class="layer" id="bottom-layer"></div>
+        <div class="layer" id="top-layer"></div>
+        <div class="layer" id="hair-layer"></div>
+    </div>
 
-        <div class="controls">
-            <div class="category">
-                <p>HAIR STYLE</p>
-                <button onclick="change('hair')">NEXT STYLE</button>
-            </div>
-            <div class="category">
-                <p>TOP CLOTHES</p>
-                <button onclick="change('top')">CHANGE TOP</button>
-            </div>
-            <div class="category">
-                <p>PANTS</p>
-                <button onclick="change('bottom')">NEXT PANTS</button>
-            </div>
-            <button id="random-btn" onclick="randomize()">RANDOM LOOK</button>
+    <div class="controls">
+        <div class="category">
+            <p>SAÇ STİLİ</p>
+            <button onclick="change('hair')">DEĞİŞTİR</button>
         </div>
+        <div class="category">
+            <p>ÜST GİYİM</p>
+            <button onclick="change('top')">DEĞİŞTİR</button>
+        </div>
+        <div class="category">
+            <p>ALT GİYİM</p>
+            <button onclick="change('bottom')">DEĞİŞTİR</button>
+        </div>
+        <button id="random-btn" onclick="randomize()">RASTGELE</button>
     </div>
 </div>
 
 <script>
-    // SVG Kodları - Karakteri oluşturan çizimler
-    const bodyBase = `<svg viewBox="0 0 100 150"><rect x="35" y="30" width="30" height="30" fill="#ffdbac"/><rect x="40" y="60" width="20" height="40" fill="#ffdbac"/><rect x="30" y="100" width="10" height="40" fill="#ffdbac"/><rect x="60" y="100" width="10" height="40" fill="#ffdbac"/></svg>`;
+    // KODLA ÇİZİLEN SVG VARLIKLARI
+    const bodySVG = `<svg viewBox="0 0 100 150">
+        <rect x="35" y="30" width="30" height="30" fill="#ffdbac"/> <rect x="42" y="60" width="16" height="40" fill="#ffdbac"/> <rect x="35" y="100" width="10" height="40" fill="#ffdbac"/> <rect x="55" y="100" width="10" height="40" fill="#ffdbac"/> </svg>`;
 
-    const designs = {
+    const assets = {
         hair: [
-            `<svg viewBox="0 0 100 150"><rect x="32" y="25" width="36" height="15" fill="#4d2600"/><rect x="65" y="30" width="10" height="20" fill="#4d2600"/></svg>`, // Kahve Yan
-            `<svg viewBox="0 0 100 150"><rect x="35" y="20" width="30" height="15" fill="#ffd700"/><rect x="35" y="20" width="5" height="25" fill="#ffd700"/></svg>`, // Sarı Punk
-            `<svg viewBox="0 0 100 150"><rect x="30" y="25" width="40" height="10" fill="#00ffff"/></svg>` // Neon Mavi Bandana
+            `<svg viewBox="0 0 100 150"><rect x="35" y="25" width="30" height="10" fill="#4d2600"/></svg>`, // Kısa
+            `<svg viewBox="0 0 100 150"><rect x="32" y="20" width="36" height="20" fill="#ffd700"/><rect x="65" y="25" width="5" height="30" fill="#ffd700"/></svg>`, // Uzun Sarı
+            `<svg viewBox="0 0 100 150"><rect x="35" y="15" width="30" height="20" fill="#00ffff"/></svg>` // Neon Mavi
         ],
         top: [
-            `<svg viewBox="0 0 100 150"><rect x="35" y="60" width="30" height="35" fill="#ff0055"/><rect x="25" y="60" width="10" height="20" fill="#ff0055"/></svg>`, // Kırmızı Tişört
-            `<svg viewBox="0 0 100 150"><rect x="35" y="60" width="30" height="40" fill="#222"/><rect x="45" y="65" width="10" height="10" fill="white"/></svg>`, // Siyah Ceket
-            `<svg viewBox="0 0 100 150"><rect x="35" y="60" width="30" height="35" fill="#00ff00" opacity="0.8"/></svg>` // Yeşil Atlet
+            `<svg viewBox="0 0 100 150"><rect x="38" y="60" width="24" height="35" fill="#ff0055"/></svg>`, // Pembe Tişört
+            `<svg viewBox="0 0 100 150"><rect x="38" y="60" width="24" height="35" fill="#222"/><rect x="45" y="70" width="10" height="5" fill="#fff"/></svg>`, // Logo Siyah
+            `<svg viewBox="0 0 100 150"><rect x="38" y="60" width="24" height="20" fill="#00ff00"/></svg>` // Yeşil Crop
         ],
         bottom: [
-            `<svg viewBox="0 0 100 150"><rect x="35" y="95" width="12" height="45" fill="#2b2b80"/><rect x="53" y="95" width="12" height="45" fill="#2b2b80"/></svg>`, // Kot Pantolon
-            `<svg viewBox="0 0 100 150"><rect x="35" y="95" width="30" height="20" fill="#555"/></svg>`, // Şort
+            `<svg viewBox="0 0 100 150"><rect x="35" y="95" width="12" height="45" fill="#2b2b80"/><rect x="53" y="95" width="12" height="45" fill="#2b2b80"/></svg>`, // Jean
+            `<svg viewBox="0 0 100 150"><rect x="35" y="95" width="30" height="15" fill="#555"/></svg>`, // Şort
             `<svg viewBox="0 0 100 150"><rect x="35" y="95" width="12" height="45" fill="#ff00ff"/><rect x="53" y="95" width="12" height="45" fill="#ff00ff"/></svg>` // Neon Tayt
         ]
     };
 
-    let current = { hair: 0, top: 0, bottom: 0 };
+    let indices = { hair: 0, top: 0, bottom: 0 };
 
-    function render(category) {
-        const layer = document.getElementById(`${category}-layer`);
-        layer.innerHTML = designs[category][current[category]];
-        
-        // Küçük bir tepki animasyonu
-        layer.classList.remove('bounce');
-        void layer.offsetWidth; // Reflow tetikle
-        layer.classList.add('bounce');
+    function change(type) {
+        indices[type] = (indices[type] + 1) % assets[type].length;
+        updateLayer(type);
     }
 
-    function change(category) {
-        current[category] = (current[category] + 1) % designs[category].length;
-        render(category);
+    function updateLayer(type) {
+        const el = document.getElementById(`${type}-layer`);
+        el.innerHTML = assets[type][indices[type]];
+        el.classList.remove('pop');
+        void el.offsetWidth;
+        el.classList.add('pop');
     }
 
     function randomize() {
-        Object.keys(designs).forEach(cat => {
-            current[cat] = Math.floor(Math.random() * designs[cat].length);
-            render(cat);
+        ['hair', 'top', 'bottom'].forEach(type => {
+            indices[type] = Math.floor(Math.random() * assets[type].length);
+            updateLayer(type);
         });
     }
 
-    // Başlangıç kurulumu
     window.onload = () => {
-        document.getElementById('body-layer').innerHTML = bodyBase;
+        document.getElementById('body-layer').innerHTML = bodyBase = bodySVG;
         randomize();
     };
 </script>
