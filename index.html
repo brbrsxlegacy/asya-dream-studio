@@ -2,256 +2,107 @@
 <html lang="tr">
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>30 Stil Karakter Paneli - Geliştirilmiş</title>
+    <title>Retro 80s Pixel Dress Up</title>
     <style>
-        :root {
-            --bg-color: #1a1a1a;
-            --hair-color: #442211;
-            --top-color: #ff4757;
-            --bottom-color: #2f3542;
-            --skin: #ffdbac;
-        }
-
+        /* Retro Arka Plan ve Font */
         body {
-            background-color: var(--bg-color);
-            color: white;
-            font-family: 'Segoe UI', sans-serif;
+            background-color: #1a1a2e;
+            color: #e94560;
+            font-family: 'Courier New', Courier, monospace;
             display: flex;
             flex-direction: column;
             align-items: center;
-            padding: 20px;
-        }
-
-        #character-canvas {
-            width: 300px;
-            height: 500px;
-            border: 4px solid #333;
-            border-radius: 20px;
-            position: relative;
-            background: #222;
+            justify-content: center;
+            height: 100vh;
+            margin: 0;
             overflow: hidden;
         }
 
-        .layer { position: absolute; left: 50%; transform: translateX(-50%); transition: 0.3s; }
+        h1 { text-shadow: 3px 3px #0f3460; }
 
-        /* --- KAFA --- */
-        #hair { top: 40px; z-index: 10; width: 100px; height: 90px; background: var(--hair-color); border-radius: 40px 40px 0 0; }
-        
-        .head { 
-            width: 70px; height: 85px; background: var(--skin); border-radius: 35px; 
-            top: 55px; z-index: 9; position: absolute; left: 50%; transform: translateX(-50%);
+        /* Oyun Alanı */
+        #game-container {
+            position: relative;
+            width: 400px;
+            height: 500px;
+            background: #16213e;
+            border: 4px solid #e94560;
+            box-shadow: 0 0 20px #e94560;
         }
-        .eyes { position: absolute; top: 35px; width: 100%; display: flex; justify-content: space-around; padding: 0 15px; box-sizing: border-box; }
-        .eye { width: 6px; height: 6px; background: #333; border-radius: 50%; }
-        .mouth { width: 20px; height: 10px; border-bottom: 3px solid #7d2d2d; border-radius: 50%; margin: 55px auto 0; }
 
-        /* --- ÜST VÜCUT VE KOLLAR --- */
-        .upper-body-wrapper { position: absolute; top: 140px; left: 50%; transform: translateX(-50%); width: 160px; height: 120px; z-index: 5; }
-        
-        #top { width: 80px; height: 80px; background: var(--top-color); border-radius: 15px 15px 5px 5px; margin: 0 auto; position: relative; z-index: 6; }
+        /* Karakter Katmanları */
+        .layer {
+            position: absolute;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            width: 300px;
+            height: 400px;
+            image-rendering: pixelated; /* Pikselli görünüm için kritik! */
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 80px; /* Demo amaçlı emoji kullanıyoruz, buraya PNG gelecek */
+        }
 
-        .arm { width: 22px; height: 90px; background: var(--skin); position: absolute; top: 5px; border-radius: 11px; z-index: 4; transition: 0.3s; }
-        .arm.left { left: 15px; transform: rotate(5deg); }
-        .arm.right { right: 15px; transform: rotate(-5deg); }
-        
-        /* Kısa kollu efekti için */
-        .arm::before { content: ""; position: absolute; top: 0; width: 100%; height: 30px; background: var(--top-color); border-radius: 11px 11px 0 0; }
+        /* Menü Alanı */
+        #menu {
+            margin-top: 20px;
+            display: flex;
+            gap: 10px;
+        }
 
-        /* --- ALT VÜCUT VE BACAKLAR --- */
-        .legs-wrapper { position: absolute; top: 220px; left: 50%; transform: translateX(-50%); width: 80px; height: 180px; display: flex; justify-content: space-between; z-index: 3; }
-        
-        .leg { width: 32px; height: 150px; background: var(--bottom-color); position: relative; border-radius: 5px; transition: 0.3s; }
-        .foot { position: absolute; bottom: -10px; width: 40px; height: 15px; background: #111; border-radius: 5px 10px 2px 2px; }
-        .leg.left .foot { right: 0; }
-        .leg.right .foot { left: 0; }
+        button {
+            background: #0f3460;
+            color: white;
+            border: 2px solid #e94560;
+            padding: 10px;
+            cursor: pointer;
+            font-weight: bold;
+        }
 
-        /* --- PANEL --- */
-        .panel { margin-top: 20px; display: grid; grid-template-columns: repeat(3, 1fr); gap: 15px; max-width: 800px; }
-        .group { display: flex; flex-direction: column; gap: 5px; }
-        label { font-size: 0.8rem; color: #00ffcc; font-weight: bold; }
-        select { background: #333; color: white; border: 1px solid #555; padding: 5px; border-radius: 4px; }
+        button:hover {
+            background: #e94560;
+            color: #1a1a2e;
+        }
     </style>
 </head>
 <body>
 
-    <h2>Karakter Tasarım Laboratuvarı v2.0</h2>
+    <h1>NEON PIXEL STYLE</h1>
 
-    <div id="character-canvas">
-        <div id="hair" class="layer"></div>
-        <div class="head">
-            <div class="eyes"><div class="eye"></div><div class="eye"></div></div>
-            <div class="mouth"></div>
-        </div>
-
-        <div class="upper-body-wrapper">
-            <div id="top"></div>
-            <div id="leftArm" class="arm left"></div>
-            <div id="rightArm" class="arm right"></div>
-        </div>
-
-        <div class="legs-wrapper">
-            <div id="leftLeg" class="leg left"><div class="foot"></div></div>
-            <div id="rightLeg" class="leg right"><div class="foot"></div></div>
-        </div>
+    <div id="game-container">
+        <div class="layer" id="body">👤</div>
+        <div class="layer" id="outfit-top"></div>
+        <div class="layer" id="outfit-bottom"></div>
+        <div class="layer" id="outfit-accessory"></div>
     </div>
 
-    <div class="panel">
-        <div class="group">
-            <label>SAÇ STİLİ</label>
-            <select onchange="applyHair(this.value)">
-                <option value="long">Uzun Düz</option>
-                <option value="bob">Küt Kesim</option>
-                <option value="spike">Dikenli</option>
-                <option value="bald">Kel</option>
-                <option value="mohawk">Mohawk</option>
-            </select>
-        </div>
-
-        <div class="group">
-            <label>ÜST GİYİM</label>
-            <select onchange="applyTop(this.value)">
-                <option value="tshirt">T-Shirt</option>
-                <option value="crop">Crop Top</option>
-                <option value="tank">Atlet</option>
-                <option value="hoodie">Hoodie</option>
-            </select>
-        </div>
-
-        <div class="group">
-            <label>ALT GİYİM</label>
-            <select onchange="applyBottom(this.value)">
-                <option value="jeans">Pantolon</option>
-                <option value="shorts">Mini Şort</option>
-                <option value="skirt">Etek</option>
-                <option value="cargo">Kargo</option>
-            </select>
-        </div>
+    <div id="menu">
+        <button onclick="changeStyle('top')">ÜST DEĞİŞTİR</button>
+        <button onclick="changeStyle('bottom')">ALT DEĞİŞTİR</button>
+        <button onclick="changeStyle('acc')">AKSESUAR</button>
     </div>
 
-<div class="k-ana-konteynir">
-    <div class="k-insan">
-        <div class="k-kafa-grubu">
-            <div class="k-sac-on"></div> <div class="k-kafa"></div>
-        </div>
-        
-        <div class="k-boyun"></div>
-        
-        <div class="k-torso">
-            <div class="k-kol k-sol"></div>
-            <div class="k-kol k-sag"></div>
-        </div>
+    <script>
+        const styles = {
+            top: ['👕', '👘', '🧥', '👚'],
+            bottom: ['👖', '🩳', '👗', '🧥'],
+            acc: ['🕶️', '👑', '🎧', '🎸']
+        };
 
-        <div class="k-alt-govde">
-            <div class="k-bacak">
-                <div class="k-ayak k-sol-ayak"></div>
-            </div>
-            <div class="k-bacak">
-                <div class="k-ayak k-sag-ayak"></div>
-            </div>
-        </div>
-    </div>
-</div>
+        let indices = { top: -1, bottom: -1, acc: -1 };
 
-<style>
-    .k-ana-konteynir {
-        width: 100%;
-        display: flex;
-        justify-content: center;
-        padding: 50px 0;
-        /* Alttaki satır, karakterin sayfa seçimlerini engellememesini sağlar */
-        pointer-events: auto; 
-    }
-
-    .k-insan {
-        display: flex;
-        flex-direction: column;
-        align-items: center;
-        position: relative;
-    }
-
-    /* Kafa ve Saç Düzeni */
-    .k-kafa-grubu {
-        position: relative;
-        width: 50px;
-        height: 60px;
-        z-index: 20;
-    }
-
-    .k-kafa {
-        width: 100%;
-        height: 100%;
-        background: #ffdbac;
-        border-radius: 50% 50% 40% 40%;
-        position: absolute;
-        z-index: 1;
-        border: 1px solid #d4a373;
-    }
-
-    .k-sac-on {
-        width: 110%;
-        height: 40%;
-        background: #4b2c20; /* Kahverengi saç */
-        position: absolute;
-        top: -5px;
-        left: -5%;
-        border-radius: 20px 20px 5px 5px;
-        z-index: 2; /* Kafanın önüne çektik */
-    }
-
-    .k-boyun {
-        width: 14px;
-        height: 10px;
-        background: #ffdbac;
-        margin-top: -5px;
-        z-index: 5;
-    }
-
-    /* Göğüs/Torso Oranı */
-    .k-torso {
-        width: 90px;
-        height: 110px;
-        background: #2980b9;
-        border-radius: 15px 15px 8px 8px;
-        position: relative;
-        z-index: 10;
-    }
-
-    .k-kol {
-        width: 20px;
-        height: 100px;
-        background: #ffdbac;
-        position: absolute;
-        top: 10px;
-        border-radius: 10px;
-        z-index: -1; /* Kolları gövdenin hafif arkasına aldık */
-    }
-
-    .k-sol { left: -25px; }
-    .k-sag { right: -25px; }
-
-    /* Bacak Oranı (Anatomik olarak en uzun parça) */
-    .k-alt-govde {
-        display: flex;
-        gap: 6px;
-        margin-top: -5px;
-    }
-
-    .k-bacak {
-        width: 40px;
-        height: 140px; /* Bacakları 140px yaparak uzunluk oranını sağladık */
-        background: #34495e;
-        position: relative;
-    }
-
-    .k-ayak {
-        width: 55px;
-        height: 16px;
-        background: #222;
-        position: absolute;
-        bottom: 0;
-    }
-
-    .k-sol-ayak { left: -8px; border-radius: 8px 2px 2px 5px; }
-    .k-sag-ayak { right: -8px; border-radius: 2px 8px 5px 2px; }
-</style>
+        function changeStyle(type) {
+            indices[type] = (indices[type] + 1) % styles[type].length;
+            const elementId = type === 'top' ? 'outfit-top' : (type === 'bottom' ? 'outfit-bottom' : 'outfit-accessory');
+            
+            // Görseli güncelle
+            document.getElementById(elementId).innerText = styles[type][indices[type]];
+            
+            // "Muq" bir efekt için konsola log basalım
+            console.log(`${type} stili güncellendi: ${styles[type][indices[type]]}`);
+        }
+    </script>
+</body>
+</html>
