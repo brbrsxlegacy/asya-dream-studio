@@ -1,0 +1,91 @@
+:root {
+    --neon-pink: #ff00ff;
+    --neon-blue: #00ffff;
+    --bg-dark: #0a0a0a;
+}
+
+body {
+    background-color: var(--bg-dark);
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    height: 100vh;
+    margin: 0;
+    font-family: 'Press Start 2P', cursive, sans-serif; /* Pixel fontu varsayalım */
+    color: white;
+}
+
+.game-wrapper {
+    text-align: center;
+}
+
+.neon-text {
+    color: var(--neon-blue);
+    text-shadow: 0 0 10px var(--neon-blue), 0 0 20px var(--neon-blue);
+    margin-bottom: 20px;
+}
+
+.main-container {
+    display: flex;
+    gap: 30px;
+    background: #1a1a1a;
+    padding: 20px;
+    border: 4px solid var(--neon-pink);
+    box-shadow: 0 0 15px var(--neon-pink);
+}
+
+#character-canvas {
+    position: relative;
+    width: 250px;
+    height: 350px;
+    background: #222;
+    border: 2px solid #444;
+    overflow: hidden;
+}
+
+.layer {
+    position: absolute;
+    width: 100%;
+    height: 100%;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    font-size: 100px;
+    image-rendering: pixelated; /* Piksellerin net kalmasını sağlar */
+    transition: all 0.3s ease;
+}
+
+.controls {
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    gap: 15px;
+}
+
+.category p {
+    margin: 5px 0;
+    font-size: 12px;
+    color: var(--neon-pink);
+}
+
+button {
+    background: transparent;
+    border: 2px solid var(--neon-blue);
+    color: var(--neon-blue);
+    padding: 8px 15px;
+    cursor: pointer;
+    font-size: 10px;
+    transition: 0.2s;
+}
+
+button:hover {
+    background: var(--neon-blue);
+    color: black;
+    box-shadow: 0 0 10px var(--neon-blue);
+}
+
+#random-btn {
+    margin-top: 10px;
+    border-color: yellow;
+    color: yellow;
+}

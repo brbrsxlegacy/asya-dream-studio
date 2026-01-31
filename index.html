@@ -1,0 +1,42 @@
+<!DOCTYPE html>
+<html lang="tr">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Pixel Dress Up Pro</title>
+    <link rel="stylesheet" href="style.css">
+</head>
+<body>
+
+    <div class="game-wrapper">
+        <h1 class="neon-text">PIXEL VIBE</h1>
+        
+        <div class="main-container">
+            <div id="character-canvas">
+                <div class="layer" id="body-layer">👤</div>
+                <div class="layer" id="hair-layer"></div>
+                <div class="layer" id="top-layer"></div>
+                <div class="layer" id="bottom-layer"></div>
+            </div>
+
+            <div class="controls">
+                <div class="category">
+                    <p>SAÇ</p>
+                    <button onclick="change('hair', 1)">Next ➔</button>
+                </div>
+                <div class="category">
+                    <p>ÜST</p>
+                    <button onclick="change('top', 1)">Next ➔</button>
+                </div>
+                <div class="category">
+                    <p>ALT</p>
+                    <button onclick="change('bottom', 1)">Next ➔</button>
+                </div>
+                <button id="random-btn" onclick="randomize()">RANDOMIZE</button>
+            </div>
+        </div>
+    </div>
+
+    <script src="script.js"></script>
+</body>
+</html>
