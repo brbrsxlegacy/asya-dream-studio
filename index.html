@@ -139,7 +139,7 @@ button:hover {
 <script>
 const assets = {
     hair: [
-        "https://i.imgur.com/L0g0l82.png",
+        "/mnt/data/5a96d8c8-6699-4884-9824-fb1a0a19328a.png", // senin yüklediğin görsel
         "https://i.imgur.com/f2K0HbX.png",
         "https://i.imgur.com/XrJ7tGd.png"
     ],
@@ -162,8 +162,9 @@ function change(category, step) {
     const layer = document.getElementById(`${category}-layer`);
     layer.innerHTML = `<img src="${assets[category][currentIndices[category]]}">`;
     // küçük animasyon
-    layer.style.transform = "scale(1.1) translate(-50%, -50%)";
-    setTimeout(() => layer.style.transform = "scale(1.0) translate(-50%, -50%)", 100);
+    layer.style.transition = "transform 0.2s ease";
+    layer.style.transform = "scale(1.2)";
+    setTimeout(() => layer.style.transform = "scale(1.0)", 150);
 }
 
 function randomize() {
@@ -176,5 +177,7 @@ function randomize() {
 
 window.onload = () => randomize();
 </script>
+
 </body>
 </html>
+
