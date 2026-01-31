@@ -1,42 +1,180 @@
 <!DOCTYPE html>
 <html lang="tr">
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Pixel Dress Up Pro</title>
-    <link rel="stylesheet" href="style.css">
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Pixel Dress Up Pro</title>
+<style>
+:root {
+    --neon-pink: #ff00ff;
+    --neon-blue: #00ffff;
+    --bg-dark: #0a0a0a;
+}
+
+body {
+    background: linear-gradient(135deg, #0f0c29, #302b63, #24243e);
+    margin: 0;
+    font-family: 'Press Start 2P', cursive, sans-serif;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    height: 100vh;
+    color: white;
+}
+
+.game-wrapper {
+    text-align: center;
+}
+
+.neon-text {
+    font-size: 32px;
+    color: var(--neon-blue);
+    text-shadow: 0 0 10px var(--neon-blue), 0 0 20px var(--neon-blue);
+    margin-bottom: 20px;
+}
+
+.main-container {
+    display: flex;
+    gap: 40px;
+    background: #111;
+    padding: 20px;
+    border: 4px solid var(--neon-pink);
+    box-shadow: 0 0 20px var(--neon-pink);
+    border-radius: 12px;
+}
+
+#character-canvas {
+    position: relative;
+    width: 300px;
+    height: 450px;
+    background: #222;
+    border: 2px solid #444;
+    overflow: hidden;
+    border-radius: 8px;
+}
+
+.layer {
+    position: absolute;
+    width: 100%;
+    height: 100%;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    image-rendering: pixelated;
+    transition: all 0.3s ease;
+}
+
+.layer img {
+    width: 80%;
+    height: auto;
+}
+
+.controls {
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    gap: 20px;
+}
+
+.category p {
+    margin: 5px 0;
+    font-size: 12px;
+    color: var(--neon-pink);
+}
+
+button {
+    background: transparent;
+    border: 2px solid var(--neon-blue);
+    color: var(--neon-blue);
+    padding: 8px 15px;
+    cursor: pointer;
+    font-size: 12px;
+    transition: 0.2s;
+    border-radius: 6px;
+}
+
+button:hover {
+    background: var(--neon-blue);
+    color: black;
+    box-shadow: 0 0 10px var(--neon-blue);
+}
+
+#random-btn {
+    margin-top: 10px;
+    border-color: yellow;
+    color: yellow;
+}
+</style>
 </head>
 <body>
+<div class="game-wrapper">
+    <h1 class="neon-text">PIXEL VIBE</h1>
+    
+    <div class="main-container">
+        <div id="character-canvas">
+            <div class="layer" id="body-layer"><img src="https://i.imgur.com/o7t7Q8y.png"></div>
+            <div class="layer" id="hair-layer"></div>
+            <div class="layer" id="top-layer"></div>
+            <div class="layer" id="bottom-layer"></div>
+        </div>
 
-    <div class="game-wrapper">
-        <h1 class="neon-text">PIXEL VIBE</h1>
-        
-        <div class="main-container">
-            <div id="character-canvas">
-                <div class="layer" id="body-layer">👤</div>
-                <div class="layer" id="hair-layer"></div>
-                <div class="layer" id="top-layer"></div>
-                <div class="layer" id="bottom-layer"></div>
+        <div class="controls">
+            <div class="category">
+                <p>SAÇ</p>
+                <button onclick="change('hair', 1)">Next ➔</button>
             </div>
-
-            <div class="controls">
-                <div class="category">
-                    <p>SAÇ</p>
-                    <button onclick="change('hair', 1)">Next ➔</button>
-                </div>
-                <div class="category">
-                    <p>ÜST</p>
-                    <button onclick="change('top', 1)">Next ➔</button>
-                </div>
-                <div class="category">
-                    <p>ALT</p>
-                    <button onclick="change('bottom', 1)">Next ➔</button>
-                </div>
-                <button id="random-btn" onclick="randomize()">RANDOMIZE</button>
+            <div class="category">
+                <p>ÜST</p>
+                <button onclick="change('top', 1)">Next ➔</button>
             </div>
+            <div class="category">
+                <p>ALT</p>
+                <button onclick="change('bottom', 1)">Next ➔</button>
+            </div>
+            <button id="random-btn" onclick="randomize()">RANDOMIZE</button>
         </div>
     </div>
+</div>
 
-    <script src="script.js"></script>
+<script>
+const assets = {
+    hair: [
+        "https://i.imgur.com/L0g0l82.png",
+        "https://i.imgur.com/f2K0HbX.png",
+        "https://i.imgur.com/XrJ7tGd.png"
+    ],
+    top: [
+        "https://i.imgur.com/yX1AqWf.png",
+        "https://i.imgur.com/qvHL2cM.png",
+        "https://i.imgur.com/LR0O4xK.png"
+    ],
+    bottom: [
+        "https://i.imgur.com/MWkZc0U.png",
+        "https://i.imgur.com/bGzvPaI.png",
+        "https://i.imgur.com/HykSgrE.png"
+    ]
+};
+
+let currentIndices = { hair: 0, top: 0, bottom: 0 };
+
+function change(category, step) {
+    currentIndices[category] = (currentIndices[category] + step + assets[category].length) % assets[category].length;
+    const layer = document.getElementById(`${category}-layer`);
+    layer.innerHTML = `<img src="${assets[category][currentIndices[category]]}">`;
+    // küçük animasyon
+    layer.style.transform = "scale(1.1) translate(-50%, -50%)";
+    setTimeout(() => layer.style.transform = "scale(1.0) translate(-50%, -50%)", 100);
+}
+
+function randomize() {
+    Object.keys(assets).forEach(cat => {
+        const idx = Math.floor(Math.random() * assets[cat].length);
+        currentIndices[cat] = idx;
+        document.getElementById(`${cat}-layer`).innerHTML = `<img src="${assets[cat][idx]}">`;
+    });
+}
+
+window.onload = () => randomize();
+</script>
 </body>
 </html>
