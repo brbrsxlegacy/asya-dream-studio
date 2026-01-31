@@ -19,10 +19,11 @@ function change(category, step) {
     currentIndices[category] = (currentIndices[category] + step + assets[category].length) % assets[category].length;
     const layer = document.getElementById(`${category}-layer`);
     layer.innerHTML = `<img src="${assets[category][currentIndices[category]]}">`;
-    // kısa animasyon
-    layer.style.transform = "scale(1.1)";
-    setTimeout(() => layer.style.transform = "scale(1.0)", 100);
+    layer.style.transition = "transform 0.2s ease";
+    layer.style.transform = "scale(1.2)";
+    setTimeout(() => layer.style.transform = "scale(1.0)", 150);
 }
+
 
 // Rastgele kombin
 function randomize() {
@@ -35,4 +36,5 @@ function randomize() {
 
 // Başlangıçta rastgele seç
 window.onload = () => randomize();
+
 
