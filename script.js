@@ -43,5 +43,19 @@ function openGame(){
 // Başlangıçta rastgele seç
 window.onload = () => randomize();
 
+function enterSite(){
+  const nickInput = document.getElementById("nickname");
+  const nick = nickInput ? nickInput.value.trim() : "Oyuncu";
+
+  localStorage.setItem("nickname", nick);
+
+  const nickSpan = document.getElementById("display-nick");
+  if(nickSpan) nickSpan.textContent = nick;
+
+  hideAll();
+  document.getElementById("menu").classList.remove("hidden");
+}
+
+
 
 
