@@ -2,107 +2,196 @@
 <html lang="tr">
 <head>
     <meta charset="UTF-8">
-    <title>Retro 80s Pixel Dress Up</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Pixel Master - Code Artist Edition</title>
+    <link href="https://fonts.googleapis.com/css2?family=Press+Start+2P&display=swap" rel="stylesheet">
     <style>
-        /* Retro Arka Plan ve Font */
+        :root {
+            --neon-pink: #ff00ff;
+            --neon-blue: #00ffff;
+            --bg-dark: #0a0a0a;
+        }
+
         body {
-            background-color: #1a1a2e;
-            color: #e94560;
-            font-family: 'Courier New', Courier, monospace;
-            display: flex;
-            flex-direction: column;
-            align-items: center;
-            justify-content: center;
-            height: 100vh;
+            background: radial-gradient(circle, #1a1a2e 0%, #020205 100%);
             margin: 0;
+            font-family: 'Press Start 2P', cursive;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            height: 100vh;
+            color: white;
+        }
+
+        .main-container {
+            display: flex;
+            gap: 40px;
+            background: rgba(0, 0, 0, 0.8);
+            padding: 30px;
+            border: 4px solid var(--neon-pink);
+            box-shadow: 0 0 25px var(--neon-pink);
+            border-radius: 15px;
+            align-items: center;
+        }
+
+        /* KARAKTER KUTUSU - MERKEZLEME BURADA */
+        #character-canvas {
+            position: relative;
+            width: 280px;
+            height: 400px;
+            background: #111;
+            border: 2px solid #333;
+            border-radius: 10px;
+            display: flex;
+            justify-content: center;
+            align-items: center;
             overflow: hidden;
         }
 
-        h1 { text-shadow: 3px 3px #0f3460; }
-
-        /* Oyun Alanı */
-        #game-container {
-            position: relative;
-            width: 400px;
-            height: 500px;
-            background: #16213e;
-            border: 4px solid #e94560;
-            box-shadow: 0 0 20px #e94560;
-        }
-
-        /* Karakter Katmanları */
         .layer {
             position: absolute;
-            top: 50%;
-            left: 50%;
-            transform: translate(-50%, -50%);
-            width: 300px;
-            height: 400px;
-            image-rendering: pixelated; /* Pikselli görünüm için kritik! */
+            width: 100%;
+            height: 100%;
             display: flex;
-            align-items: center;
             justify-content: center;
-            font-size: 80px; /* Demo amaçlı emoji kullanıyoruz, buraya PNG gelecek */
+            align-items: center;
         }
 
-        /* Menü Alanı */
-        #menu {
-            margin-top: 20px;
+        /* SVG Çizim Ayarları */
+        svg {
+            width: 220px;
+            height: 320px;
+            image-rendering: pixelated;
+        }
+
+        .controls {
             display: flex;
-            gap: 10px;
+            flex-direction: column;
+            gap: 20px;
+        }
+
+        .category p {
+            margin: 0 0 10px 0;
+            font-size: 10px;
+            color: var(--neon-blue);
+            text-shadow: 0 0 5px var(--neon-blue);
         }
 
         button {
-            background: #0f3460;
-            color: white;
-            border: 2px solid #e94560;
-            padding: 10px;
+            background: transparent;
+            border: 2px solid var(--neon-pink);
+            color: var(--neon-pink);
+            padding: 10px 15px;
             cursor: pointer;
-            font-weight: bold;
+            font-family: 'Press Start 2P';
+            font-size: 10px;
+            transition: 0.3s;
+            border-radius: 5px;
+            width: 100%;
         }
 
         button:hover {
-            background: #e94560;
-            color: #1a1a2e;
+            background: var(--neon-pink);
+            color: white;
+            box-shadow: 0 0 15px var(--neon-pink);
+        }
+
+        #random-btn {
+            border-color: #ffff00;
+            color: #ffff00;
+        }
+
+        #random-btn:hover {
+            background: #ffff00;
+            color: black;
+        }
+
+        /* Değişim Efekti */
+        .pop { animation: pop-anim 0.2s ease; }
+        @keyframes pop-anim {
+            0% { transform: scale(1); }
+            50% { transform: scale(1.1); }
+            100% { transform: scale(1); }
         }
     </style>
 </head>
 <body>
 
-    <h1>NEON PIXEL STYLE</h1>
-
-    <div id="game-container">
-        <div class="layer" id="body">👤</div>
-        <div class="layer" id="outfit-top"></div>
-        <div class="layer" id="outfit-bottom"></div>
-        <div class="layer" id="outfit-accessory"></div>
+<div class="main-container">
+    <div id="character-canvas">
+        <div class="layer" id="body-layer"></div>
+        <div class="layer" id="bottom-layer"></div>
+        <div class="layer" id="top-layer"></div>
+        <div class="layer" id="hair-layer"></div>
     </div>
 
-    <div id="menu">
-        <button onclick="changeStyle('top')">ÜST DEĞİŞTİR</button>
-        <button onclick="changeStyle('bottom')">ALT DEĞİŞTİR</button>
-        <button onclick="changeStyle('acc')">AKSESUAR</button>
+    <div class="controls">
+        <div class="category">
+            <p>SAÇ STİLİ</p>
+            <button onclick="change('hair')">DEĞİŞTİR</button>
+        </div>
+        <div class="category">
+            <p>ÜST GİYİM</p>
+            <button onclick="change('top')">DEĞİŞTİR</button>
+        </div>
+        <div class="category">
+            <p>ALT GİYİM</p>
+            <button onclick="change('bottom')">DEĞİŞTİR</button>
+        </div>
+        <button id="random-btn" onclick="randomize()">RASTGELE</button>
     </div>
+</div>
 
-    <script>
-        const styles = {
-            top: ['👕', '👘', '🧥', '👚'],
-            bottom: ['👖', '🩳', '👗', '🧥'],
-            acc: ['🕶️', '👑', '🎧', '🎸']
-        };
+<script>
+    // KODLA ÇİZİLEN SVG VARLIKLARI
+    const bodySVG = `<svg viewBox="0 0 100 150">
+        <rect x="35" y="30" width="30" height="30" fill="#ffdbac"/> <rect x="42" y="60" width="16" height="40" fill="#ffdbac"/> <rect x="35" y="100" width="10" height="40" fill="#ffdbac"/> <rect x="55" y="100" width="10" height="40" fill="#ffdbac"/> </svg>`;
 
-        let indices = { top: -1, bottom: -1, acc: -1 };
+    const assets = {
+        hair: [
+            `<svg viewBox="0 0 100 150"><rect x="35" y="25" width="30" height="10" fill="#4d2600"/></svg>`, // Kısa
+            `<svg viewBox="0 0 100 150"><rect x="32" y="20" width="36" height="20" fill="#ffd700"/><rect x="65" y="25" width="5" height="30" fill="#ffd700"/></svg>`, // Uzun Sarı
+            `<svg viewBox="0 0 100 150"><rect x="35" y="15" width="30" height="20" fill="#00ffff"/></svg>` // Neon Mavi
+        ],
+        top: [
+            `<svg viewBox="0 0 100 150"><rect x="38" y="60" width="24" height="35" fill="#ff0055"/></svg>`, // Pembe Tişört
+            `<svg viewBox="0 0 100 150"><rect x="38" y="60" width="24" height="35" fill="#222"/><rect x="45" y="70" width="10" height="5" fill="#fff"/></svg>`, // Logo Siyah
+            `<svg viewBox="0 0 100 150"><rect x="38" y="60" width="24" height="20" fill="#00ff00"/></svg>` // Yeşil Crop
+        ],
+        bottom: [
+            `<svg viewBox="0 0 100 150"><rect x="35" y="95" width="12" height="45" fill="#2b2b80"/><rect x="53" y="95" width="12" height="45" fill="#2b2b80"/></svg>`, // Jean
+            `<svg viewBox="0 0 100 150"><rect x="35" y="95" width="30" height="15" fill="#555"/></svg>`, // Şort
+            `<svg viewBox="0 0 100 150"><rect x="35" y="95" width="12" height="45" fill="#ff00ff"/><rect x="53" y="95" width="12" height="45" fill="#ff00ff"/></svg>` // Neon Tayt
+        ]
+    };
 
-        function changeStyle(type) {
-            indices[type] = (indices[type] + 1) % styles[type].length;
-            const elementId = type === 'top' ? 'outfit-top' : (type === 'bottom' ? 'outfit-bottom' : 'outfit-accessory');
-            
-            // Görseli güncelle
-            document.getElementById(elementId).innerText = styles[type][indices[type]];
-            
-            // "Muq" bir efekt için konsola log basalım
-            console.log(`${type} stili güncellendi: ${styles[type][indices[type]]}`);
-        }
-    </script>
+    let indices = { hair: 0, top: 0, bottom: 0 };
+
+    function change(type) {
+        indices[type] = (indices[type] + 1) % assets[type].length;
+        updateLayer(type);
+    }
+
+    function updateLayer(type) {
+        const el = document.getElementById(`${type}-layer`);
+        el.innerHTML = assets[type][indices[type]];
+        el.classList.remove('pop');
+        void el.offsetWidth;
+        el.classList.add('pop');
+    }
+
+    function randomize() {
+        ['hair', 'top', 'bottom'].forEach(type => {
+            indices[type] = Math.floor(Math.random() * assets[type].length);
+            updateLayer(type);
+        });
+    }
+
+    window.onload = () => {
+        document.getElementById('body-layer').innerHTML = bodyBase = bodySVG;
+        randomize();
+    };
+</script>
+
 </body>
 </html>
