@@ -8,7 +8,7 @@
 <link href="https://fonts.googleapis.com/css2?family=Press+Start+2P&display=swap" rel="stylesheet">
 
 <style>
-:root {
+:root{
   --neon-pink:#ff00ff;
   --neon-blue:#00ffff;
 }
@@ -21,38 +21,43 @@
 
 html,body{
   width:100%;
-  height:100%;
+  min-height:100vh;
   font-family:'Press Start 2P', cursive;
   background:radial-gradient(circle at 50% 50%,#1a1a2e 0%,#000 100%);
   color:white;
 
   display:flex;
   justify-content:center;
-  align-items:center;
+  align-items:flex-start;
+  padding-top:40px;
 }
 
 .hidden{display:none;}
 
 button{
-  padding:10px 18px;
-  cursor:pointer;
+  padding:10px 16px;
   font-family:'Press Start 2P';
+  cursor:pointer;
+  background:transparent;
   border:2px solid var(--neon-pink);
   color:var(--neon-pink);
-  background:transparent;
   border-radius:8px;
-  transition:.3s;
 }
 button:hover{
   background:var(--neon-pink);
   color:black;
-  box-shadow:0 0 15px var(--neon-pink);
+}
+
+input{
+  padding:8px;
+  font-family:'Press Start 2P';
+  margin-top:10px;
 }
 
 .controls{
   display:flex;
   flex-wrap:wrap;
-  gap:15px;
+  gap:10px;
   justify-content:center;
   margin-top:15px;
 }
@@ -64,12 +69,13 @@ button:hover{
   gap:15px;
 }
 
+/* ❗ SABİT BOYUT – EKRANI KAPLAMAZ */
 #character-canvas{
-  width:90vw;
-  height:70vh;
+  width:320px;
+  height:480px;
   background:linear-gradient(145deg,#111,#222);
   border:2px solid var(--neon-blue);
-  border-radius:20px;
+  border-radius:15px;
 
   display:flex;
   justify-content:center;
@@ -85,11 +91,11 @@ button:hover{
 }
 
 .character-card{
-  background:rgba(0,0,0,0.7);
+  width:120px;
+  padding:10px;
   border:2px solid var(--neon-blue);
   border-radius:10px;
-  padding:10px;
-  width:120px;
+  background:rgba(0,0,0,.6);
   text-align:center;
 }
 .character-card svg{
@@ -110,7 +116,7 @@ button:hover{
 
 <!-- MENU -->
 <div id="menu" class="hidden">
-  <h2>Merhaba <span id="display-nick"></span>!</h2>
+  <h3>Merhaba <span id="display-nick"></span></h3>
   <div class="controls">
     <button onclick="openCreator()">Oluştur</button>
     <button onclick="openLibrary()">Dolap</button>
@@ -119,7 +125,7 @@ button:hover{
 
 <!-- CREATOR -->
 <div id="creator" class="hidden">
-  <h2>Karakter Oluştur</h2>
+  <h3>Karakter Oluştur</h3>
   <div id="character-canvas"></div>
   <div class="controls">
     <button onclick="change('hair')">Saç</button>
@@ -133,7 +139,7 @@ button:hover{
 
 <!-- LIBRARY -->
 <div id="library" class="hidden">
-  <h2>Dolap</h2>
+  <h3>Dolap</h3>
   <div id="dolap-list"></div>
   <button onclick="backToMenu()">Geri</button>
 </div>
@@ -172,28 +178,44 @@ shoes:[
 let currentIndices={hair:0,top:0,bottom:0,shoes:0};
 
 // --- SAYFA ---
+const login=document.getElementById("login");
+const menu=document.getElementById("menu");
+const creator=document.getElementById("creator");
+const library=document.getElementById("library");
+
 function hideAll(){
-  login.classList.add('hidden');
-  menu.classList.add('hidden');
-  creator.classList.add('hidden');
-  library.classList.add('hidden');
+  login.classList.add("hidden");
+  menu.classList.add("hidden");
+  creator.classList.add("hidden");
+  library.classList.add("hidden");
 }
 
 function enterSite(){
   const nick=nickname.value.trim();
   if(!nick) return alert("Takma ad boş olamaz");
   localStorage.setItem("nickname",nick);
-  display-nick.textContent=nick;
+  document.getElementById("display-nick").textContent=nick;
   hideAll();
-  menu.classList.remove('hidden');
+  menu.classList.remove("hidden");
 }
 
-function openCreator(){ hideAll(); creator.classList.remove('hidden'); renderCharacter(); }
-function openLibrary(){ hideAll(); library.classList.remove('hidden'); loadLibrary(); }
-function backToMenu(){ hideAll(); menu.classList.remove('hidden'); }
+function openCreator(){
+  hideAll();
+  creator.classList.remove("hidden");
+  renderCharacter();
+}
+function openLibrary(){
+  hideAll();
+  library.classList.remove("hidden");
+  loadLibrary();
+}
+function backToMenu(){
+  hideAll();
+  menu.classList.remove("hidden");
+}
 
 function renderCharacter(){
-  character-canvas.innerHTML=`
+  document.getElementById("character-canvas").innerHTML=`
   <svg viewBox="0 0 100 160" width="100%" height="100%">
     ${bodyBase}
     ${assets.hair[currentIndices.hair]}
@@ -210,7 +232,7 @@ function change(cat){
 
 function saveCurrentCharacter(){
   const nick=localStorage.getItem("nickname");
-  const svg=character-canvas.innerHTML;
+  const svg=document.getElementById("character-canvas").innerHTML;
   const saved=JSON.parse(localStorage.getItem("savedCharacters")||"[]");
   saved.push({nick,svg});
   localStorage.setItem("savedCharacters",JSON.stringify(saved));
@@ -218,14 +240,15 @@ function saveCurrentCharacter(){
 }
 
 function loadLibrary(){
-  dolap-list.innerHTML="";
+  const list=document.getElementById("dolap-list");
+  list.innerHTML="";
   const nick=localStorage.getItem("nickname");
   const saved=JSON.parse(localStorage.getItem("savedCharacters")||"[]");
   saved.filter(c=>c.nick===nick).forEach(c=>{
     const d=document.createElement("div");
     d.className="character-card";
     d.innerHTML=c.svg;
-    dolap-list.appendChild(d);
+    list.appendChild(d);
   });
 }
 
@@ -234,13 +257,4 @@ window.onload=()=>login.classList.remove("hidden");
 
 </body>
 </html>
-
-
-
-
-
-
-
-
-
 
