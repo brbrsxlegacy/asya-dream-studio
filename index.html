@@ -3,13 +3,14 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Göz ve 20 Stil Karakter Paneli</title>
+    <title>30 Stil Karakter Paneli</title>
     <style>
         :root {
             --bg-color: #1a1a1a;
-            --eye-color: #00ffcc;
-            --outfit-color: #444;
-            --accent-color: #fff;
+            --hair-color: #442211;
+            --top-color: #ff4757;
+            --bottom-color: #2f3542;
+            --skin: #ffdbac;
         }
 
         body {
@@ -22,160 +23,148 @@
             padding: 20px;
         }
 
-        /* --- Karakter Görsel Alanı --- */
         #character-canvas {
             width: 300px;
-            height: 400px;
+            height: 450px;
             border: 4px solid #333;
             border-radius: 20px;
             position: relative;
-            background: linear-gradient(to bottom, #2c3e50, #000);
-            overflow: hidden;
-            transition: all 0.5s ease;
-        }
-
-        /* Sabit Gözler */
-        .eyes {
-            position: absolute;
-            top: 30%;
-            width: 100%;
-            display: flex;
-            justify-content: center;
-            gap: 40px;
-            z-index: 10;
-        }
-
-        .eye {
-            width: 50px;
-            height: 20px;
-            background: white;
-            border-radius: 50% / 100% 100% 0 0; /* Göz kapağı formu */
-            box-shadow: 0 0 20px var(--eye-color);
-            position: relative;
+            background: #222;
             overflow: hidden;
         }
 
-        .eye::after {
-            content: '';
-            position: absolute;
-            width: 20px;
-            height: 20px;
-            background: var(--eye-color);
-            left: 50%;
-            transform: translateX(-50%);
-            border-radius: 50%;
-            box-shadow: inset 0 0 10px #000;
+        /* --- KATMANLAR --- */
+        .layer { position: absolute; left: 50%; transform: translateX(-50%); transition: 0.3s; }
+
+        /* Saç Arkada */
+        #hair { top: 40px; z-index: 1; width: 120px; height: 100px; background: var(--hair-color); }
+
+        /* Kafa ve Mutlu Ağız */
+        .head { 
+            width: 80px; height: 100px; background: var(--skin); border-radius: 40px; 
+            top: 60px; z-index: 2; position: absolute; left: 50%; transform: translateX(-50%);
+        }
+        .mouth {
+            width: 24px; height: 12px; border-bottom: 3px solid #7d2d2d;
+            border-radius: 0 0 12px 12px; margin: 60px auto 0;
         }
 
-        /* Değişen Kıyafet Alanı */
-        #outfit {
-            position: absolute;
-            bottom: 0;
-            width: 200px;
-            height: 220px;
-            left: 50%;
-            transform: translateX(-50%);
-            background-color: var(--outfit-color);
-            border-radius: 50px 50px 0 0;
-            transition: all 0.4s ease;
-            display: flex;
-            justify-content: center;
-            align-items: center;
-            text-align: center;
-            font-weight: bold;
-            font-size: 0.8rem;
-            color: var(--accent-color);
-            border: 2px solid rgba(255,255,255,0.1);
-        }
+        /* Üst Giyim */
+        #top { top: 165px; z-index: 3; width: 100px; height: 60px; background: var(--top-color); border-radius: 10px 10px 0 0; }
 
-        /* --- Kontrol Paneli --- */
-        .controls {
+        /* Alt Giyim */
+        #bottom { top: 230px; z-index: 2; width: 90px; height: 80px; background: var(--bottom-color); }
+
+        /* --- KONTROL PANELİ --- */
+        .panel {
             margin-top: 20px;
             display: grid;
-            grid-template-columns: repeat(4, 1fr);
-            gap: 10px;
-            max-width: 600px;
+            grid-template-columns: repeat(3, 1fr);
+            gap: 15px;
+            max-width: 800px;
         }
-
-        button {
-            padding: 8px;
-            cursor: pointer;
-            background: #333;
-            color: white;
-            border: 1px solid #555;
-            border-radius: 5px;
-            font-size: 12px;
-            transition: 0.2s;
-        }
-
-        button:hover {
-            background: var(--eye-color);
-            color: #000;
-        }
-
-        .active-style { font-size: 1.2rem; margin-top: 10px; color: var(--eye-color); }
+        .group { display: flex; flex-direction: column; gap: 5px; }
+        label { font-size: 0.8rem; color: #00ffcc; font-weight: bold; }
+        select { background: #333; color: white; border: 1px solid #555; padding: 5px; border-radius: 4px; }
+        
     </style>
 </head>
 <body>
 
-    <h2>Karakter Stil Laboratuvarı</h2>
+    <h2>Karakter Tasarım Laboratuvarı</h2>
+
     <div id="character-canvas">
-        <div class="eyes">
-            <div class="eye"></div>
-            <div class="eye"></div>
+        <div id="hair" class="layer"></div>
+        <div class="head">
+            <div class="mouth"></div>
         </div>
-        <div id="outfit">Kıyafet Seçilmedi</div>
+        <div id="top" class="layer"></div>
+        <div id="bottom" class="layer"></div>
     </div>
 
-    <div class="active-style" id="style-name">Stil: Standart</div>
-
-    <div class="controls" id="button-container">
+    <div class="panel">
+        <div class="group">
+            <label>SAÇ STİLİ</label>
+            <select onchange="applyHair(this.value)">
+                <option value="long">Uzun Düz</option>
+                <option value="bob">Küt Kesim</option>
+                <option value="spike">Dikenli</option>
+                <option value="afro">Afro</option>
+                <option value="bald">Kel</option>
+                <option value="mohawk">Mohawk</option>
+                <option value="ponytail">At Kuyruğu</option>
+                <option value="side">Yana Yatık</option>
+                <option value="shaved">Yanlar Sıfır</option>
+                <option value="square">Kutu Kesim</option>
+            </select>
         </div>
 
+        <div class="group">
+            <label>ÜST GİYİM</label>
+            <select onchange="applyTop(this.value)">
+                <option value="tshirt">T-Shirt</option>
+                <option value="crop">Crop Top</option>
+                <option value="tank">Atlet</option>
+                <option value="bikini">Bikini</option>
+                <option value="hoodie">Hoodie</option>
+                <option value="armor">Zırh</option>
+                <option value="kimono">Kimono</option>
+                <option value="strapless">Straplez</option>
+                <option value="vneck">V-Yaka</option>
+                <option value="jacket">Açık Ceket</option>
+            </select>
+        </div>
+
+        <div class="group">
+            <label>ALT GİYİM</label>
+            <select onchange="applyBottom(this.value)">
+                <option value="jeans">Pantolon</option>
+                <option value="shorts">Mini Şort</option>
+                <option value="skirt">Mini Etek</option>
+                <option value="vcut">V-Kesim Alt</option>
+                <option value="cargo">Kargo</option>
+                <option value="leggings">Tayt</option>
+                <option value="robotic">Mekanik</option>
+                <option value="swim">Yüzme Şortu</option>
+                <option value="wide">Bol Kesim</option>
+                <option value="torn">Yırtık Kot</option>
+            </select>
+        </div>
+    </div>
+
     <script>
-        const outfitData = [
-            { name: "Siberpunk", color: "#ff00ff", border: "neon", text: "NEON CEKET" },
-            { name: "Steampunk", color: "#8b4513", border: "leather", text: "DİŞLİ YELEK" },
-            { name: "Minimalist", color: "#ffffff", border: "none", text: "BEYAZ TULUM" },
-            { name: "Gotik", color: "#000000", border: "lace", text: "SİYAH PELERİN" },
-            { name: "Techwear", color: "#2f4f4f", border: "cargo", text: "STRAP YELEK" },
-            { name: "Samuray", color: "#b22222", border: "kimono", text: "KIRMIZI KİMONO" },
-            { name: "Buz Büyücüsü", color: "#add8e6", border: "frost", text: "KRİSTAL ZIRH" },
-            { name: "Orman Korucusu", color: "#228b22", border: "leaf", text: "YAPRAK ZIRH" },
-            { name: "Astronot", color: "#f5f5f5", border: "suit", text: "NASA TULUMU" },
-            { name: "Kraliyet", color: "#ffd700", border: "gold", text: "ALTIN KAFTAN" },
-            { name: "Post-Apokaliptik", color: "#556b2f", border: "torn", text: "YIRTIK DERİ" },
-            { name: "Derin Deniz", color: "#00008b", border: "glow", text: "BASINÇ KOSTÜMÜ" },
-            { name: "Retro Futurist", color: "#ff6347", border: "plastic", text: "PLASTİK CEKET" },
-            { name: "Gölge Suikastçı", color: "#121212", border: "shadow", text: "GİZLİLİK ÖRTÜSÜ" },
-            { name: "Hacker", color: "#00ff00", border: "code", text: "MATRIX HOODIE" },
-            { name: "Çöl Gezgini", color: "#edc9af", border: "sand", text: "KETEN SARGILAR" },
-            { name: "Cyber Angel", color: "#e6e6fa", border: "wing", text: "IŞIK KANATLAR" },
-            { name: "Mafya Boss", color: "#333", border: "suit", text: "STRİPED TAKIM" },
-            { name: "Punk Rocker", color: "#800000", border: "studs", text: "ZIMBALI CEKET" },
-            { name: "Yapay Zeka", color: "#00ffff", border: "glass", text: "SAYDAM GÖVDE" }
-        ];
+        const hair = document.getElementById('hair');
+        const topPart = document.getElementById('top');
+        const bottomPart = document.getElementById('bottom');
 
-        const outfitEl = document.getElementById('outfit');
-        const styleNameEl = document.getElementById('style-name');
-        const btnContainer = document.getElementById('button-container');
+        // --- STİL FONKSİYONLARI ---
+        function applyHair(style) {
+            hair.style.borderRadius = "0";
+            hair.style.clipPath = "none";
+            if(style === 'long') hair.style.borderRadius = "40px 40px 0 0";
+            if(style === 'bob') { hair.style.height = "70px"; hair.style.borderRadius = "40px 40px 5px 5px"; }
+            if(style === 'spike') hair.style.clipPath = "polygon(0% 100%, 20% 0%, 40% 100%, 60% 0%, 80% 100%, 100% 0%, 100% 100%)";
+            if(style === 'bald') hair.style.background = "transparent"; else hair.style.background = "var(--hair-color)";
+            if(style === 'afro') hair.style.borderRadius = "50% 50% 20% 20%";
+            if(style === 'mohawk') { hair.style.width = "30px"; hair.style.borderRadius = "10px"; } else { hair.style.width = "120px"; }
+        }
 
-        outfitData.forEach((style, index) => {
-            const btn = document.createElement('button');
-            btn.innerText = style.name;
-            btn.onclick = () => {
-                // Kıyafeti Güncelle
-                outfitEl.style.backgroundColor = style.color;
-                outfitEl.innerText = style.text;
-                styleNameEl.innerText = `Stil: ${style.name}`;
-                
-                // Bazı özel efektler
-                if(style.name === "Siberpunk") outfitEl.style.boxShadow = "0 0 30px #ff00ff";
-                else if(style.name === "Kraliyet") outfitEl.style.boxShadow = "0 0 30px #ffd700";
-                else outfitEl.style.boxShadow = "none";
-            };
-            btnContainer.appendChild(btn);
-        });
+        function applyTop(style) {
+            topPart.style.clipPath = "none";
+            topPart.style.height = "60px";
+            if(style === 'crop') topPart.style.height = "35px";
+            if(style === 'tank') topPart.style.clipPath = "polygon(20% 0%, 80% 0%, 100% 100%, 0% 100%)";
+            if(style === 'bikini') { topPart.style.height = "30px"; topPart.style.clipPath = "polygon(0 0, 45% 0, 50% 100%, 55% 0, 100% 0, 100% 100%, 0 100%)"; }
+            if(style === 'strapless') topPart.style.borderRadius = "0";
+        }
+
+        function applyBottom(style) {
+            bottomPart.style.clipPath = "none";
+            bottomPart.style.height = "80px";
+            if(style === 'shorts') bottomPart.style.height = "35px";
+            if(style === 'vcut') { bottomPart.style.height = "40px"; bottomPart.style.clipPath = "polygon(0 0, 100% 0, 50% 100%)"; }
+            if(style === 'skirt') { bottomPart.style.height = "40px"; bottomPart.style.borderRadius = "0 0 20px 20px"; }
+        }
     </script>
 </body>
 </html>
