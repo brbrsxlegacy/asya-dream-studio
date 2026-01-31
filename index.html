@@ -174,7 +174,37 @@
                 }
                 if(style === 'cargo') leg.style.width = "42px";
             });
+
+        <style>
+    .character-container {
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+        margin-top: 50px; /* Üstteki içeriklerle arasına mesafe koyar */
+        padding-bottom: 50px;
+    }
+    .c-head { width: 50px; height: 60px; background: #e0ac69; border-radius: 50%; margin-bottom: 5px; }
+    .c-middle { display: flex; }
+    .c-torso { width: 70px; height: 100px; background: #2c3e50; border-radius: 10px; }
+    .c-arm { width: 20px; height: 80px; background: #e0ac69; border-radius: 10px; margin-top: 5px; }
+    .c-leg-container { display: flex; gap: 10px; }
+    .c-leg { width: 25px; height: 90px; background: #e0ac69; border-radius: 0 0 10px 10px; }
+</style>
+
+<div class="character-container">
+    <div class="c-head"></div>
+    <div class="c-middle">
+        <div class="c-arm" style="margin-right: 5px;"></div>
+        <div class="c-torso"></div>
+        <div class="c-arm" style="margin-left: 5px;"></div>
+    </div>
+    <div class="c-leg-container">
+        <div class="c-leg"></div>
+        <div class="c-leg"></div>
+    </div>
+</div>    
         }
     </script>
 </body>
 </html>
+
