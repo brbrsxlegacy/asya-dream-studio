@@ -1,117 +1,118 @@
 <!DOCTYPE html>
 <html lang="tr">
 <head>
-<meta charset="UTF-8">
-<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0" />
 <title>Pixel Master + Mini Oyun</title>
 <link href="https://fonts.googleapis.com/css2?family=Press+Start+2P&display=swap" rel="stylesheet">
 <style>
-:root {
-  --neon-pink: #ff00ff;
-  --neon-blue: #00ffff;
-}
-/* NEON FADE-IN & GLOW ANİMASYONU */
-@keyframes neonFadeIn {
-  0% {opacity: 0; filter: drop-shadow(0 0 0px #ff00ff);}
-  50% {opacity: 0.5; filter: drop-shadow(0 0 8px #ff00ff);}
-  100% {opacity: 1; filter: drop-shadow(0 0 20px #ff00ff);}
-}
+:root { --neon-pink:#ff00ff; --neon-blue:#00ffff; }
 
-.neon-show {
-  animation: neonFadeIn 0.8s ease forwards;
+@keyframes neonFadeIn{
+  0%{opacity:0; filter:drop-shadow(0 0 0px #ff00ff);}
+  50%{opacity:.5; filter:drop-shadow(0 0 8px #ff00ff);}
+  100%{opacity:1; filter:drop-shadow(0 0 20px #ff00ff);}
 }
+.neon-show{ animation:neonFadeIn .8s ease forwards; }
+.hidden{ display:none !important; }
 
-.hidden{
-  display: none !important;
-}
 *{box-sizing:border-box;margin:0;padding:0;}
-body, html{width:100%;height:100%;font-family:'Press Start 2P', cursive;background:radial-gradient(circle at 50% 50%,#1a1a2e 0%,#000 100%);color:white;display:flex;flex-direction:column;align-items:center;justify-content:flex-start;}
-.hidden{display:none;}
-button{padding:10px 18px;cursor:pointer;font-family:'Press Start 2P';border:2px solid var(--neon-pink);color:var(--neon-pink);background:transparent;border-radius:8px;transition:.3s;}
-button:hover{background:var(--neon-pink);color:black;box-shadow:0 0 15px var(--neon-pink);}
-#character-canvas {
-  width: 350px;
-  height: 480px;
-  background: linear-gradient(145deg,#111,#222);
-  border: 2px solid #00ffff;
-  border-radius: 15px;
-  display: flex;
-  justify-content: center;
-  align-items: center;
-  box-shadow: 0 0 15px #ff00ff;
-  margin: 10px 0;
+body,html{
+  width:100%;height:100%;
+  font-family:'Press Start 2P', cursive;
+  background:radial-gradient(circle at 50% 50%,#1a1a2e 0%,#000 100%);
+  color:white;
+  display:flex;flex-direction:column;
+  align-items:center;justify-content:flex-start;
+  padding:18px 10px;
 }
+
+button{
+  padding:10px 18px;cursor:pointer;
+  font-family:'Press Start 2P';
+  border:2px solid var(--neon-pink);
+  color:var(--neon-pink);
+  background:transparent;
+  border-radius:8px;
+  transition:.3s;
+}
+button:hover{ background:var(--neon-pink); color:black; box-shadow:0 0 15px var(--neon-pink); }
+
+input{
+  padding:10px 12px;
+  border-radius:8px;
+  border:2px solid var(--neon-blue);
+  background:#111;
+  color:white;
+  font-family:'Press Start 2P';
+  outline:none;
+}
+
 .controls{
-  display:flex;
-  justify-content:center;
+  display:flex;justify-content:center;align-items:center;
+  gap:12px;flex-wrap:wrap;margin-top:10px;
+}
+
+#character-canvas{
+  width:350px;height:480px;
+  background:linear-gradient(145deg,#111,#222);
+  border:2px solid var(--neon-blue);
+  border-radius:15px;
+  display:flex;justify-content:center;align-items:center;
+  box-shadow:0 0 15px #ff00ff;
+  margin:10px 0;
+}
+
+#dolap-list{
+  display:flex;flex-wrap:wrap;gap:15px;justify-content:center;
+  padding:10px;max-width:90vw;
+  overflow-y:auto;max-height:50vh;
+}
+.character-card{
+  background:rgba(0,0,0,0.7);
+  padding:10px;border:2px solid var(--neon-blue);
+  border-radius:10px;text-align:center;width:140px;
+  display:flex;flex-direction:column;align-items:center;gap:8px;
+}
+.character-card svg{width:90px;height:110px;}
+
+#game-canvas{
+  border:2px solid var(--neon-pink);
+  border-radius:10px;margin-top:12px;
+  background:#111;
+  box-shadow:0 0 15px rgba(255,0,255,.35);
+}
+
+#login,#menu,#creator,#library,#game{
+  width:min(900px, 95vw);
+  display:flex;flex-direction:column;
   align-items:center;
-  gap:15px;
-  flex-wrap:wrap;
+  gap:10px;
 }
-
-#dolap-list{display:flex;flex-wrap:wrap;gap:15px;justify-content:center;padding:10px;max-width:90vw;overflow-y:auto;max-height:50vh;}
-.character-card{background:rgba(0,0,0,0.7);padding:10px;border:2px solid var(--neon-blue);border-radius:10px;text-align:center;width:120px;display:flex;flex-direction:column;align-items:center;}
-.character-card svg{width:80px;height:100px;}
-#game-canvas{border:2px solid var(--neon-pink);border-radius:10px;margin-top:10px;background:#111;}
-  /* TÜM METİNLERİ ORTALA */
-h2, p {
-  text-align: center;
-}
-
-/* GİRİŞ (LOGIN) ORTALAMA */
-#login {
-  display: flex;
-  flex-direction: column;
-  align-items: center;
-  justify-content: center;
-  gap: 10px;
-}
-
-
-/* ALT SAYFALAR BAŞLIKLAR */
-#creator, #library, #game {
-  display: flex;
-  flex-direction: column;
-  align-items: center;
-}
-
-#menu{
-  display:flex;
-  flex-direction:column;
-  align-items:center;
-  justify-content:center;
-}
-
-#creator{
-  display:flex;
-  flex-direction:column;
-  align-items:center;
-}
-
+h2,p{ text-align:center; }
 </style>
 </head>
+
 <body>
 
-<!-- Takma ad -->
+<!-- LOGIN -->
 <div id="login">
   <p>Takma adını gir</p>
   <input id="nickname" placeholder="Takma ad">
-  <button onclick="enterSite()">GİR</button>
+  <button id="btn-enter">GİR</button>
 </div>
 
-
-<!-- Ana Menü -->
+<!-- MENU -->
 <div id="menu" class="hidden">
-<h2>Merhaba <span id="display-nick"></span>!</h2>
-<div class="controls">
-<button onclick="openLibrary()">Dolap</button>
-<button onclick="openCreator()">Oluştur</button>
-<button onclick="openGame()">Oyun Modu</button>
-<button onclick="openGame()">OYUNLAR</button>
-</div>
+  <h2>Merhaba <span id="display-nick"></span>!</h2>
+  <div class="controls">
+    <button id="btn-library">Dolap</button>
+    <button id="btn-creator">Oluştur</button>
+    <button id="btn-game">Oyun Modu</button>
+  </div>
 </div>
 
-<!-- Karakter Oluştur -->
+<!-- CREATOR -->
 <div id="creator" class="hidden">
   <h2>Karakter Oluştur</h2>
   <div id="character-canvas"></div>
@@ -125,7 +126,27 @@ h2, p {
   </div>
 </div>
 
+<!-- LIBRARY -->
+<div id="library" class="hidden">
+  <h2>Dolap</h2>
+  <div id="dolap-list"></div>
+  <div class="controls">
+    <button onclick="backToMenu()">Geri</button>
+  </div>
+</div>
+
+<!-- GAME -->
+<div id="game" class="hidden">
+  <h2>Mini Oyun</h2>
+  <p>Topa tıkla: yön değiştir</p>
+  <canvas id="game-canvas" width="320" height="420"></canvas>
+  <div class="controls">
+    <button onclick="backToMenu()">Geri</button>
+  </div>
+</div>
+
 <script>
+/* ---------- KARAKTER VERİLERİ ---------- */
 const bodyBase = `
 <rect x="35" y="30" width="30" height="30" fill="#ffdbac"/>
 <rect x="40" y="60" width="20" height="40" fill="#ffdbac"/>
@@ -134,7 +155,7 @@ const bodyBase = `
 `;
 
 const assets = {
-  hair:[ /* 10 farklı saç */ 
+  hair:[
     `<rect x="35" y="25" width="30" height="10" fill="#4d2600"/>`,
     `<rect x="32" y="20" width="36" height="20" fill="#ffd700"/>`,
     `<rect x="30" y="18" width="40" height="22" fill="#00ffff"/>`,
@@ -146,7 +167,7 @@ const assets = {
     `<rect x="35" y="22" width="30" height="15" fill="#ffa500"/>`,
     `<rect x="31" y="19" width="38" height="18" fill="#adff2f"/>`
   ],
-  top:[ /* 10 farklı üst */ 
+  top:[
     `<rect x="40" y="60" width="20" height="35" fill="#ff0055"/>`,
     `<rect x="40" y="60" width="20" height="35" fill="#222"/>`,
     `<rect x="40" y="60" width="20" height="35" fill="#00ff00"/>`,
@@ -158,7 +179,7 @@ const assets = {
     `<rect x="40" y="60" width="20" height="35" fill="#ff4500"/>`,
     `<rect x="40" y="60" width="20" height="35" fill="#ff1493"/>`
   ],
-  bottom:[ /* 10 farklı alt */ 
+  bottom:[
     `<rect x="40" y="95" width="9" height="45" fill="#2b2b80"/><rect x="51" y="95" width="9" height="45" fill="#2b2b80"/>`,
     `<rect x="40" y="95" width="20" height="15" fill="#555"/>`,
     `<rect x="40" y="95" width="9" height="45" fill="#ff00ff"/><rect x="51" y="95" width="9" height="45" fill="#ff00ff"/>`,
@@ -170,7 +191,7 @@ const assets = {
     `<rect x="40" y="95" width="9" height="45" fill="#ff4500"/><rect x="51" y="95" width="9" height="45" fill="#ff4500"/>`,
     `<rect x="40" y="95" width="9" height="45" fill="#adff2f"/><rect x="51" y="95" width="9" height="45" fill="#adff2f"/>`
   ],
-  shoes:[ /* 10 farklı ayakkabı */ 
+  shoes:[
     `<rect x="38" y="140" width="14" height="6" fill="#000"/><rect x="52" y="140" width="14" height="6" fill="#000"/>`,
     `<rect x="38" y="140" width="14" height="6" fill="red"/><rect x="52" y="140" width="14" height="6" fill="red"/>`,
     `<rect x="38" y="140" width="14" height="6" fill="blue"/><rect x="52" y="140" width="14" height="6" fill="blue"/>`,
@@ -184,7 +205,7 @@ const assets = {
   ]
 };
 
-let currentIndices = {hair:0, top:0, bottom:0, shoes:0};
+let currentIndices = { hair:0, top:0, bottom:0, shoes:0 };
 
 function renderCharacter(){
   const canvas = document.getElementById('character-canvas');
@@ -204,93 +225,197 @@ function change(cat){
   renderCharacter();
 }
 
-// sayfa açıldığında otomatik render
-window.onload = () => renderCharacter();
-</script>
+/* ---------- SAYFA GEZİNME ---------- */
+function hideAll(){
+  document.getElementById('login').classList.add('hidden');
+  document.getElementById('menu').classList.add('hidden');
+  document.getElementById('creator').classList.add('hidden');
+  document.getElementById('library').classList.add('hidden');
+  document.getElementById('game').classList.add('hidden');
+}
 
+function enterSite(){
+  const nick = document.getElementById('nickname').value.trim();
+  if(!nick) return alert('Takma ad boş olamaz!');
+  localStorage.setItem('nickname', nick);
+  document.getElementById('display-nick').textContent = nick;
+  hideAll();
+  document.getElementById('menu').classList.remove('hidden');
+}
 
-
-// --- SAYFA FONKSİYONLARI ---
-function hideAll(){ document.getElementById('login').classList.add('hidden'); document.getElementById('menu').classList.add('hidden'); document.getElementById('creator').classList.add('hidden'); document.getElementById('library').classList.add('hidden'); document.getElementById('game').classList.add('hidden'); }
-function enterSite(){ const nick=document.getElementById('nickname').value.trim(); if(!nick)return alert('Takma ad boş olamaz!'); localStorage.setItem('nickname',nick); document.getElementById('display-nick').textContent=nick; hideAll(); document.getElementById('menu').classList.remove('hidden'); }
 function openCreator(){
+  stopGame(); // oyundan gelindiyse dursun
   hideAll();
   const creator = document.getElementById('creator');
   creator.classList.remove('hidden');
-  creator.classList.remove('neon-show'); // reset
-  void creator.offsetWidth; // restart animation
+
+  creator.classList.remove('neon-show');
+  void creator.offsetWidth;
   creator.classList.add('neon-show');
+
   renderCharacter();
 }
-function openLibrary(){ hideAll(); document.getElementById('library').classList.remove('hidden'); loadLibrary(); }
-function openGame(){ hideAll(); document.getElementById('game').classList.remove('hidden'); startGame(); }
-function backToMenu(){ hideAll(); document.getElementById('menu').classList.remove('hidden'); }
 
-// --- KARAKTER ---
-function renderCharacter(){
-  const canvas = document.getElementById('character-canvas');
-  
-  // SVG oluştur
-  const svgContent = `
-  <svg viewBox="0 0 100 160" xmlns="http://www.w3.org/2000/svg">
-    ${bodyBase}
-    ${assets.hair[currentIndices.hair]}
-    ${assets.top[currentIndices.top]}
-    ${assets.bottom[currentIndices.bottom]}
-    ${assets.shoes[currentIndices.shoes]}
-  </svg>`;
-
-  canvas.innerHTML = svgContent;
+function openLibrary(){
+  stopGame();
+  hideAll();
+  document.getElementById('library').classList.remove('hidden');
+  loadLibrary();
 }
 
+function openGame(){
+  hideAll();
+  const game = document.getElementById('game');
+  game.classList.remove('hidden');
 
-function saveCurrentCharacter(){ const nick=localStorage.getItem('nickname'); const svgContent=bodyBase + assets.hair[currentIndices.hair] + assets.top[currentIndices.top] + assets.bottom[currentIndices.bottom]; const saved=JSON.parse(localStorage.getItem('savedCharacters')||'[]'); saved.push({svg:`<svg viewBox="0 0 100 150">${svgContent}</svg>`,nick}); localStorage.setItem('savedCharacters',JSON.stringify(saved)); alert('Karakter kaydedildi!'); }
-function loadLibrary(){ const nick=localStorage.getItem('nickname'); const container=document.getElementById('dolap-list'); container.innerHTML=''; const saved=JSON.parse(localStorage.getItem('savedCharacters')||'[]'); const myChars=saved.filter(c=>c.nick===nick); if(myChars.length===0){ const div=document.createElement('div'); div.textContent='Henüz karakter yok.'; container.appendChild(div); return;} myChars.forEach(c=>{ const card=document.createElement('div'); card.className='character-card'; card.innerHTML=`${c.svg}<p>${c.nick}</p>`; container.appendChild(card); }); }
+  game.classList.remove('neon-show');
+  void game.offsetWidth;
+  game.classList.add('neon-show');
+
+  startGame();
+}
+
+function backToMenu(){
+  stopGame();
+  hideAll();
+  document.getElementById('menu').classList.remove('hidden');
+}
+
+/* ---------- DOLAP ---------- */
+function saveCurrentCharacter(){
+  const nick = localStorage.getItem('nickname') || 'anon';
+  const svgContent = `
+    <svg viewBox="0 0 100 160" xmlns="http://www.w3.org/2000/svg">
+      ${bodyBase}
+      ${assets.hair[currentIndices.hair]}
+      ${assets.top[currentIndices.top]}
+      ${assets.bottom[currentIndices.bottom]}
+      ${assets.shoes[currentIndices.shoes]}
+    </svg>
+  `;
+  const saved = JSON.parse(localStorage.getItem('savedCharacters') || '[]');
+  saved.push({ svg: svgContent, nick });
+  localStorage.setItem('savedCharacters', JSON.stringify(saved));
+  alert('Karakter kaydedildi!');
+}
+
+function loadLibrary(){
+  const nick = localStorage.getItem('nickname');
+  const container = document.getElementById('dolap-list');
+  container.innerHTML = '';
+
+  const saved = JSON.parse(localStorage.getItem('savedCharacters') || '[]');
+  const myChars = saved.filter(c => c.nick === nick);
+
+  if(myChars.length === 0){
+    const div = document.createElement('div');
+    div.textContent = 'Henüz karakter yok.';
+    container.appendChild(div);
+    return;
+  }
+
+  myChars.forEach(c => {
+    const card = document.createElement('div');
+    card.className = 'character-card';
+    card.innerHTML = `${c.svg}<p>${c.nick}</p>`;
+    container.appendChild(card);
+  });
+}
+
+/* ---------- OYUN (DÜZELTİLMİŞ) ---------- */
+let gameInterval = null;
+let ball = { x:160, y:210, dx:2.2, dy:-2.8, r:10 };
+
+function startGame(){
+  const canvas = document.getElementById('game-canvas');
+  const ctx = canvas.getContext('2d');
+
+  // önceki döngü varsa kapat
+  if(gameInterval) clearInterval(gameInterval);
+
+  // reset
+  ball.x = canvas.width / 2;
+  ball.y = canvas.height / 2;
+  ball.dx = 2.2;
+  ball.dy = -2.8;
+
+  // tıkla -> yön değiştir + biraz hız random (daha eğlenceli)
+  canvas.onclick = () => {
+    ball.dy *= -1;
+    ball.dx += (Math.random() - 0.5) * 0.6;
+  };
+
+  const wallHeight = 12;
+
+  gameInterval = setInterval(() => {
+    ctx.clearRect(0,0,canvas.width,canvas.height);
+
+    // duvar
+    ctx.fillStyle = 'red';
+    ctx.fillRect(0, 0, canvas.width, wallHeight);
+
+    // top
+    ctx.fillStyle = 'yellow';
+    ctx.beginPath();
+    ctx.arc(ball.x, ball.y, ball.r, 0, Math.PI * 2);
+    ctx.fill();
+
+    // hareket
+    ball.x += ball.dx;
+    ball.y += ball.dy;
+
+    // sağ/sol çarpma
+    if(ball.x + ball.r > canvas.width){ ball.x = canvas.width - ball.r; ball.dx *= -1; }
+    if(ball.x - ball.r < 0){ ball.x = ball.r; ball.dx *= -1; }
+
+    // üst (duvar) çarpma
+    if(ball.y - ball.r < wallHeight){
+      ball.y = wallHeight + ball.r;
+      ball.dy *= -1;
+    }
+
+    // alt çarpma
+    if(ball.y + ball.r > canvas.height){
+      ball.y = canvas.height - ball.r;
+      ball.dy *= -1;
+    }
+  }, 16);
+}
+
+function stopGame(){
+  if(gameInterval){
+    clearInterval(gameInterval);
+    gameInterval = null;
+  }
+  const canvas = document.getElementById('game-canvas');
+  if(canvas) canvas.onclick = null;
+}
+
+/* ---------- BAŞLAT ---------- */
 window.onload = () => {
   hideAll();
   document.getElementById('login').classList.remove('hidden');
-};
 
-// --- OYUN ---
-let gameInterval, ball={x:150,y:200,dx:2,dy:-3,r:10};
-function startGame(){
-  const canvas=document.getElementById('game-canvas');
-  const ctx=canvas.getContext('2d');
-  const wallY=0, wallHeight=10;
-  if(gameInterval) clearInterval(gameInterval);
-  ball.x=canvas.width/2; ball.y=canvas.height/2; ball.dx=2; ball.dy=-3;
-  canvas.onclick=()=>{ball.dy*=-1;};
-  gameInterval=setInterval(()=>{
-    ctx.clearRect(0,0,canvas.width,canvas.height);
-    // duvar
-    ctx.fillStyle='red';
-    ctx.fillRect(0,wallY,canvas.width,wallHeight);
-    // top
-    ctx.fillStyle='yellow';
-    ctx.beginPath();
-    ctx.arc(ball.x,ball.y,ball.r,0,Math.PI*2);
-    ctx.fill();
-    // hareket
-    ball.x+=ball.dx; ball.y+=ball.dy;
-    // çarpma
-    if(ball.x+ball.r>canvas.width || ball.x-ball.r<0) ball.dx*=-1;
-    if(ball.y-ball.r<wallY+wallHeight || ball.y+ball.r>canvas.height) ball.dy*=-1;
-  },16);
-}
+  // buton eventleri
+  document.getElementById('btn-enter').onclick = enterSite;
+  document.getElementById('btn-creator').onclick = openCreator;
+  document.getElementById('btn-library').onclick = openLibrary;
+  document.getElementById('btn-game').onclick = openGame;
+
+  // Enter ile giriş
+  document.getElementById('nickname').addEventListener('keydown', (e) => {
+    if(e.key === 'Enter') enterSite();
+  });
+
+  // login'de önceden kayıtlı nick varsa otomatik yaz
+  const savedNick = localStorage.getItem('nickname');
+  if(savedNick){
+    document.getElementById('nickname').value = savedNick;
+  }
+
+  renderCharacter();
+};
 </script>
 
 </body>
 </html>
-
-
-
-
-
-
-
-
-
-
-
-
-
