@@ -50,8 +50,10 @@ button:hover{background:var(--neon-pink);color:black;box-shadow:0 0 15px var(--n
 <div id="character-canvas"></div>
 <div class="controls">
 <button onclick="change('hair')">Saç</button>
+<button onclick="change('face')">Yüz</button>
 <button onclick="change('top')">Üst</button>
 <button onclick="change('bottom')">Alt</button>
+<button onclick="change('shoes')">Ayakkabı</button>
 <button onclick="saveCurrentCharacter()">Kaydet</button>
 <button onclick="backToMenu()">Geri</button>
 </div>
@@ -73,16 +75,21 @@ button:hover{background:var(--neon-pink);color:black;box-shadow:0 0 15px var(--n
 
 <script>
 // --- KARAKTER ---
-const bodyBase=`<rect x="35" y="30" width="30" height="30" fill="#ffdbac"/>
-<rect x="40" y="60" width="20" height="40" fill="#ffdbac"/>
-<rect x="40" y="100" width="9" height="40" fill="#ffdbac"/>
-<rect x="51" y="100" width="9" height="40" fill="#ffdbac"/>`;
+const svgContent =
+bodyBase +
+assets.hair[currentIndices.hair] +
+assets.face[currentIndices.face] +
+assets.top[currentIndices.top] +
+assets.bottom[currentIndices.bottom] +
+assets.shoes[currentIndices.shoes];
 
 const assets={
 hair:[
 `<rect x="35" y="25" width="30" height="10" fill="#4d2600"/>`,
 `<rect x="32" y="20" width="36" height="20" fill="#ffd700"/>`,
-`<rect x="30" y="18" width="40" height="22" fill="#00ffff"/>`
+`<rect x="30" y="18" width="40" height="22" fill="#00ffff"/>`,
+face:[ ...10 yüz aksesuarı... ],
+shoes:[ ...10 ayakkabı... ]
 ],
 top:[
 `<rect x="40" y="60" width="20" height="35" fill="#ff0055"/>`,
@@ -96,7 +103,13 @@ bottom:[
 ]
 };
 
-let currentIndices={hair:0,top:0,bottom:0};
+let currentIndices={
+  hair:0,
+  face:0,
+  top:0,
+  bottom:0,
+  shoes:0
+};
 
 // --- SAYFA FONKSİYONLARI ---
 function hideAll(){ document.getElementById('login').classList.add('hidden'); document.getElementById('menu').classList.add('hidden'); document.getElementById('creator').classList.add('hidden'); document.getElementById('library').classList.add('hidden'); document.getElementById('game').classList.add('hidden'); }
@@ -143,5 +156,6 @@ function startGame(){
 
 </body>
 </html>
+
 
 
