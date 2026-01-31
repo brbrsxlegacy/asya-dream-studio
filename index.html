@@ -189,22 +189,102 @@
     .c-arm { width: 20px; height: 80px; background: #e0ac69; border-radius: 10px; margin-top: 5px; }
     .c-leg-container { display: flex; gap: 10px; }
     .c-leg { width: 25px; height: 90px; background: #e0ac69; border-radius: 0 0 10px 10px; }
+<div id="ozel-karakter-konteynir">
+    <div class="k-karakter">
+        <div class="k-kafa"></div>
+        <div class="k-boyun"></div>
+        
+        <div class="k-gogus-govde">
+            <div class="k-kol k-sol-kol"></div>
+            <div class="k-kol k-sag-kol"></div>
+        </div>
+
+        <div class="k-bacak-grubu">
+            <div class="k-bacak">
+                <div class="k-ayak k-sol-ayak"></div>
+            </div>
+            <div class="k-bacak">
+                <div class="k-ayak k-sag-ayak"></div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<style>
+    /* Diğer CSS'lerle çakışmaması için sınıfların başına 'k-' ekledim */
+    #ozel-karakter-konteynir {
+        display: flex;
+        justify-content: center;
+        padding: 50px 0;
+        background: transparent; /* Sayfanın en altında temiz durması için */
+        clear: both;
+    }
+
+    .k-karakter {
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+        position: relative;
+        width: 150px;
+    }
+
+    .k-kafa {
+        width: 45px;
+        height: 55px;
+        background-color: #ffdbac;
+        border-radius: 50% 50% 40% 40%;
+        z-index: 5;
+        border: 1px solid #d4a373;
+    }
+
+    .k-boyun {
+        width: 12px;
+        height: 8px;
+        background-color: #ffdbac;
+        margin-top: -3px;
+    }
+
+    .k-gogus-govde {
+        width: 70px;
+        height: 90px;
+        background-color: #e74c3c;
+        border-radius: 10px 10px 5px 5px;
+        position: relative;
+    }
+
+    .k-kol {
+        width: 18px;
+        height: 85px;
+        background-color: #ffdbac;
+        position: absolute;
+        top: 5px;
+        border-radius: 10px;
+    }
+
+    .k-sol-kol { left: -22px; }
+    .k-sag-kol { right: -22px; }
+
+    .k-bacak-grubu {
+        display: flex;
+        gap: 2px;
+        margin-top: -2px;
+    }
+
+    .k-bacak {
+        width: 32px;
+        height: 110px; /* Bacak boyu torsoya göre orantılı */
+        background-color: #2c3e50;
+        position: relative;
+    }
+
+    .k-ayak {
+        width: 40px;
+        height: 12px;
+        background-color: #333;
+        position: absolute;
+        bottom: 0;
+    }
+
+    .k-sol-ayak { left: -4px; border-radius: 5px 0 0 5px; }
+    .k-sag-ayak { right: -4px; border-radius: 0 5px 5px 0; }
 </style>
-
-<div class="character-container">
-    <div class="c-head"></div>
-    <div class="c-middle">
-        <div class="c-arm" style="margin-right: 5px;"></div>
-        <div class="c-torso"></div>
-        <div class="c-arm" style="margin-left: 5px;"></div>
-    </div>
-    <div class="c-leg-container">
-        <div class="c-leg"></div>
-        <div class="c-leg"></div>
-    </div>
-</div>    
-        }
-    </script>
-</body>
-</html>
-
