@@ -144,6 +144,7 @@ canvas{
     <button id="btn-library">Dolap</button>
     <button id="btn-creator">Oluştur</button>
     <button id="btn-games">OYUNLAR</button>
+    <button onclick="openOnline()">ONLINE MOD</button>
   </div>
 </div>
 
@@ -173,6 +174,23 @@ canvas{
 </div>
 
 <!-- GAMES HUB -->
+
+
+  
+<!-- ONLINE MOD -->
+<div id="online" class="panel hidden">
+  <h2>Online Mod</h2>
+
+  <button onclick="createRoom()">Oda Oluştur</button>
+
+  <p>— veya —</p>
+
+  <input id="joinCode" placeholder="5 haneli kod">
+  <button onclick="joinRoom()">Odaya Gir</button>
+
+  <button onclick="backToMenu()">Geri</button>
+</div>
+
 <div id="games" class="panel hidden">
   <h2>OYUNLAR</h2>
 
@@ -1045,5 +1063,6 @@ window.openGamesHub = openGamesHub;
 
 </body>
 </html>
+
 
 
