@@ -2,142 +2,168 @@
 <html lang="tr">
 <head>
     <meta charset="UTF-8">
-    <title>Pro Character Creator - No Emojis</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>30 Stil Karakter Paneli</title>
     <style>
         :root {
+            --bg-color: #1a1a1a;
+            --hair-color: #442211;
+            --top-color: #ff4757;
+            --bottom-color: #2f3542;
             --skin: #ffdbac;
-            --eye: #00ffcc;
-            --hair: #442211;
-            --top: #ff4757;
-            --bottom: #2f3542;
         }
 
-        body { background: #0a0a0a; color: white; font-family: 'Arial', sans-serif; display: flex; flex-direction: column; align-items: center; margin: 0; padding: 20px; }
-
-        /* --- KARAKTER VİTRİNİ --- */
-        #container {
-            width: 320px; height: 480px; background: radial-gradient(circle, #222, #000);
-            border-radius: 30px; position: relative; border: 4px solid #333; overflow: hidden;
+        body {
+            background-color: var(--bg-color);
+            color: white;
+            font-family: 'Segoe UI', sans-serif;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            padding: 20px;
         }
 
-        /* SAÇ (Kafanın Arkasında Kalması İçin z-index: 1) */
-        .hair-back { position: absolute; left: 50%; transform: translateX(-50%); top: 50px; z-index: 1; transition: 0.3s; }
-        
-        /* KAFA (z-index: 2) */
+        #character-canvas {
+            width: 300px;
+            height: 450px;
+            border: 4px solid #333;
+            border-radius: 20px;
+            position: relative;
+            background: #222;
+            overflow: hidden;
+        }
+
+        /* --- KATMANLAR --- */
+        .layer { position: absolute; left: 50%; transform: translateX(-50%); transition: 0.3s; }
+
+        /* Saç Arkada */
+        #hair { top: 40px; z-index: 1; width: 120px; height: 100px; background: var(--hair-color); }
+
+        /* Kafa ve Mutlu Ağız */
         .head { 
-            width: 90px; height: 110px; background: var(--skin); border-radius: 40px 40px 35px 35px;
-            position: absolute; left: 115px; top: 60px; z-index: 2; border-bottom: 2px solid rgba(0,0,0,0.1);
+            width: 80px; height: 100px; background: var(--skin); border-radius: 40px; 
+            top: 60px; z-index: 2; position: absolute; left: 50%; transform: translateX(-50%);
+        }
+        .mouth {
+            width: 24px; height: 12px; border-bottom: 3px solid #7d2d2d;
+            border-radius: 0 0 12px 12px; margin: 60px auto 0;
         }
 
-        /* GÖZLER */
-        .eye-wrap { display: flex; justify-content: space-around; width: 65px; margin: 45px auto 0; }
-        .eye { width: 16px; height: 10px; background: white; border-radius: 50%; position: relative; border: 1px solid #333; }
-        .pupil { width: 7px; height: 7px; background: var(--eye); border-radius: 50%; position: absolute; left: 4px; box-shadow: 0 0 8px var(--eye); }
+        /* Üst Giyim */
+        #top { top: 165px; z-index: 3; width: 100px; height: 60px; background: var(--top-color); border-radius: 10px 10px 0 0; }
 
-        /* ÜST GİYİM (z-index: 3) */
-        .top-wrap { position: absolute; left: 50%; transform: translateX(-50%); top: 170px; z-index: 3; transition: 0.3s; }
-        
-        /* ALT GİYİM (z-index: 3) */
-        .bottom-wrap { position: absolute; left: 50%; transform: translateX(-50%); top: 285px; z-index: 3; transition: 0.3s; }
+        /* Alt Giyim */
+        #bottom { top: 230px; z-index: 2; width: 90px; height: 80px; background: var(--bottom-color); }
 
-        /* --- CSS ÇİZİM MODELLERİ (SAÇ) --- */
-        .h-long { width: 120px; height: 180px; background: var(--hair); border-radius: 40px 40px 20px 20px; }
-        .h-ponytail { width: 30px; height: 120px; background: var(--hair); border-radius: 15px; margin-left: 50px; }
-        .h-bob { width: 110px; height: 80px; background: var(--hair); border-radius: 30px 30px 5px 5px; }
-        .h-wave { width: 130px; height: 150px; background: var(--hair); border-radius: 50% 50% 20% 20%; clip-path: polygon(0% 0%, 100% 0%, 100% 100%, 80% 90%, 50% 100%, 20% 90%, 0% 100%); }
-        .h-shaved { width: 85px; height: 40px; background: var(--hair); border-radius: 40px 40px 0 0; }
-
-        /* --- CSS ÇİZİM MODELLERİ (ÜST - AÇIK) --- */
-        .t-bikini { width: 100px; height: 40px; display: flex; justify-content: space-between; }
-        .t-bikini::before, .t-bikini::after { content: ''; width: 45px; height: 40px; background: var(--top); clip-path: polygon(50% 0%, 0% 100%, 100% 100%); }
+        /* --- KONTROL PANELİ --- */
+        .panel {
+            margin-top: 20px;
+            display: grid;
+            grid-template-columns: repeat(3, 1fr);
+            gap: 15px;
+            max-width: 800px;
+        }
+        .group { display: flex; flex-direction: column; gap: 5px; }
+        label { font-size: 0.8rem; color: #00ffcc; font-weight: bold; }
+        select { background: #333; color: white; border: 1px solid #555; padding: 5px; border-radius: 4px; }
         
-        .t-crop { width: 90px; height: 45px; background: var(--top); border-radius: 5px 5px 0 0; }
-        
-        .t-tank { width: 80px; height: 70px; background: var(--top); clip-path: polygon(20% 0%, 80% 0%, 100% 100%, 0% 100%); }
-        
-        .t-strapless { width: 90px; height: 35px; background: var(--top); }
-
-        /* --- CSS ÇİZİM MODELLERİ (ALT) --- */
-        .b-shorts { width: 100px; height: 40px; display: flex; justify-content: space-between; }
-        .b-shorts div { width: 48px; height: 100%; background: var(--bottom); border-radius: 0 0 5px 5px; }
-        
-        .b-mini { width: 95px; height: 35px; background: var(--bottom); border-radius: 0 0 10px 10px; }
-        
-        .b-bikini { width: 80px; height: 40px; background: var(--bottom); clip-path: polygon(0 0, 100% 0, 50% 100%); }
-
-        /* PANEL */
-        .panel { display: grid; grid-template-columns: repeat(3, 1fr); gap: 15px; background: #1e1e1e; padding: 20px; border-radius: 20px; margin-top: 20px; width: 90%; max-width: 800px; }
-        .group { display: flex; flex-direction: column; gap: 8px; }
-        select, input { background: #333; color: #00ffcc; border: 1px solid #444; padding: 10px; border-radius: 8px; }
     </style>
 </head>
 <body>
 
-    <div id="container">
-        <div id="hair-box" class="hair-back h-long"></div>
-        
+    <h2>Karakter Tasarım Laboratuvarı</h2>
+
+    <div id="character-canvas">
+        <div id="hair" class="layer"></div>
         <div class="head">
-            <div class="eye-wrap">
-                <div class="eye"><div class="pupil"></div></div>
-                <div class="eye"><div class="pupil"></div></div>
-            </div>
+            <div class="mouth"></div>
         </div>
-
-        <div id="top-box" class="top-wrap t-bikini"></div>
-
-        <div id="bottom-box" class="bottom-wrap b-shorts">
-            <div></div><div></div>
-        </div>
+        <div id="top" class="layer"></div>
+        <div id="bottom" class="layer"></div>
     </div>
 
     <div class="panel">
         <div class="group">
-            <label>SAÇ STİLİ (Arkada)</label>
-            <select onchange="changeClass('hair-box', 'hair-back ' + this.value)">
-                <option value="h-long">Uzun Düz</option>
-                <option value="h-bob">Küt / Bob</option>
-                <option value="h-ponytail">At Kuyruğu</option>
-                <option value="h-wave">Dalgalı</option>
-                <option value="h-shaved">Kısa / Modern</option>
+            <label>SAÇ STİLİ</label>
+            <select onchange="applyHair(this.value)">
+                <option value="long">Uzun Düz</option>
+                <option value="bob">Küt Kesim</option>
+                <option value="spike">Dikenli</option>
+                <option value="afro">Afro</option>
+                <option value="bald">Kel</option>
+                <option value="mohawk">Mohawk</option>
+                <option value="ponytail">At Kuyruğu</option>
+                <option value="side">Yana Yatık</option>
+                <option value="shaved">Yanlar Sıfır</option>
+                <option value="square">Kutu Kesim</option>
             </select>
-            <input type="color" onchange="updateColor('--hair', this.value)" value="#442211">
         </div>
 
         <div class="group">
-            <label>AÇIK ÜSTLER</label>
-            <select onchange="changeClass('top-box', 'top-wrap ' + this.value)">
-                <option value="t-bikini">Bikini Üstü</option>
-                <option value="t-crop">Crop Top</option>
-                <option value="t-tank">Spor Atlet</option>
-                <option value="t-strapless">Straplez</option>
+            <label>ÜST GİYİM</label>
+            <select onchange="applyTop(this.value)">
+                <option value="tshirt">T-Shirt</option>
+                <option value="crop">Crop Top</option>
+                <option value="tank">Atlet</option>
+                <option value="bikini">Bikini</option>
+                <option value="hoodie">Hoodie</option>
+                <option value="armor">Zırh</option>
+                <option value="kimono">Kimono</option>
+                <option value="strapless">Straplez</option>
+                <option value="vneck">V-Yaka</option>
+                <option value="jacket">Açık Ceket</option>
             </select>
-            <input type="color" onchange="updateColor('--top', this.value)" value="#ff4757">
         </div>
 
         <div class="group">
-            <label>AÇIK ALTLAR</label>
-            <select onchange="changeClass('bottom-box', 'bottom-wrap ' + this.value)">
-                <option value="b-shorts">Mini Şort</option>
-                <option value="b-mini">Mini Etek</option>
-                <option value="b-bikini">V-Kesim Alt</option>
+            <label>ALT GİYİM</label>
+            <select onchange="applyBottom(this.value)">
+                <option value="jeans">Pantolon</option>
+                <option value="shorts">Mini Şort</option>
+                <option value="skirt">Mini Etek</option>
+                <option value="vcut">V-Kesim Alt</option>
+                <option value="cargo">Kargo</option>
+                <option value="leggings">Tayt</option>
+                <option value="robotic">Mekanik</option>
+                <option value="swim">Yüzme Şortu</option>
+                <option value="wide">Bol Kesim</option>
+                <option value="torn">Yırtık Kot</option>
             </select>
-            <input type="color" onchange="updateColor('--bottom', this.value)" value="#2f3542">
         </div>
     </div>
 
     <script>
-        function changeClass(id, newClass) {
-            const el = document.getElementById(id);
-            el.className = newClass;
-            // Alt giyim çekmecesi için iç divleri kontrol et
-            if(id === 'bottom-box' && (newClass.includes('b-shorts'))) {
-                el.innerHTML = '<div></div><div></div>';
-            } else if (id === 'bottom-box') {
-                el.innerHTML = '';
-            }
+        const hair = document.getElementById('hair');
+        const topPart = document.getElementById('top');
+        const bottomPart = document.getElementById('bottom');
+
+        // --- STİL FONKSİYONLARI ---
+        function applyHair(style) {
+            hair.style.borderRadius = "0";
+            hair.style.clipPath = "none";
+            if(style === 'long') hair.style.borderRadius = "40px 40px 0 0";
+            if(style === 'bob') { hair.style.height = "70px"; hair.style.borderRadius = "40px 40px 5px 5px"; }
+            if(style === 'spike') hair.style.clipPath = "polygon(0% 100%, 20% 0%, 40% 100%, 60% 0%, 80% 100%, 100% 0%, 100% 100%)";
+            if(style === 'bald') hair.style.background = "transparent"; else hair.style.background = "var(--hair-color)";
+            if(style === 'afro') hair.style.borderRadius = "50% 50% 20% 20%";
+            if(style === 'mohawk') { hair.style.width = "30px"; hair.style.borderRadius = "10px"; } else { hair.style.width = "120px"; }
         }
-        function updateColor(prop, val) {
-            document.documentElement.style.setProperty(prop, val);
+
+        function applyTop(style) {
+            topPart.style.clipPath = "none";
+            topPart.style.height = "60px";
+            if(style === 'crop') topPart.style.height = "35px";
+            if(style === 'tank') topPart.style.clipPath = "polygon(20% 0%, 80% 0%, 100% 100%, 0% 100%)";
+            if(style === 'bikini') { topPart.style.height = "30px"; topPart.style.clipPath = "polygon(0 0, 45% 0, 50% 100%, 55% 0, 100% 0, 100% 100%, 0 100%)"; }
+            if(style === 'strapless') topPart.style.borderRadius = "0";
+        }
+
+        function applyBottom(style) {
+            bottomPart.style.clipPath = "none";
+            bottomPart.style.height = "80px";
+            if(style === 'shorts') bottomPart.style.height = "35px";
+            if(style === 'vcut') { bottomPart.style.height = "40px"; bottomPart.style.clipPath = "polygon(0 0, 100% 0, 50% 100%)"; }
+            if(style === 'skirt') { bottomPart.style.height = "40px"; bottomPart.style.borderRadius = "0 0 20px 20px"; }
         }
     </script>
 </body>
