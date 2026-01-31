@@ -33,10 +33,6 @@ button:hover{background:var(--neon-pink);color:black;box-shadow:0 0 15px var(--n
 </div>
 
 
-
-  <h1 style="color:red">TEST</h1>
-
-
 <!-- Ana Menü -->
 <div id="menu" class="hidden">
 <h2>Merhaba <span id="display-nick"></span>!</h2>
@@ -54,7 +50,6 @@ button:hover{background:var(--neon-pink);color:black;box-shadow:0 0 15px var(--n
 <div id="character-canvas"></div>
 <div class="controls">
 <button onclick="change('hair')">Saç</button>
-<button onclick="change('face')">Yüz</button>
 <button onclick="change('top')">Üst</button>
 <button onclick="change('bottom')">Alt</button>
 <button onclick="change('shoes')">Ayakkabı</button>
@@ -92,19 +87,6 @@ hair:[
 `<rect x="35" y="25" width="30" height="10" fill="#4d2600"/>`,
 `<rect x="32" y="20" width="36" height="20" fill="#ffd700"/>`,
 `<rect x="30" y="18" width="40" height="22" fill="#00ffff"/>`
-],
-
-face:[
-`<circle cx="45" cy="45" r="3" fill="#000"/><circle cx="55" cy="45" r="3" fill="#000"/>`,
-`<rect x="42" y="50" width="16" height="3" fill="#000"/>`,
-`<circle cx="50" cy="45" r="8" fill="none" stroke="#000"/>`,
-`<path d="M44 52 Q50 55 56 52" stroke="#000" fill="none"/>`,
-`<circle cx="50" cy="48" r="2" fill="#000"/>`,
-`<rect x="43" y="42" width="14" height="2" fill="#000"/>`,
-`<circle cx="47" cy="44" r="2" fill="blue"/><circle cx="53" cy="44" r="2" fill="blue"/>`,
-`<line x1="45" y1="52" x2="55" y2="52" stroke="#000"/>`,
-`<rect x="44" y="53" width="12" height="2" fill="#000"/>`,
-`<circle cx="50" cy="46" r="6" fill="none" stroke="red"/>`
 ],
 
 top:[
@@ -157,7 +139,6 @@ function renderCharacter(){
   canvas.innerHTML = `
   <svg viewBox="0 0 100 160" width="100%" height="100%">
     ${bodyBase}
-    ${assets.face[currentIndices.face]}
     ${assets.hair[currentIndices.hair]}
     ${assets.top[currentIndices.top]}
     ${assets.bottom[currentIndices.bottom]}
@@ -201,6 +182,7 @@ function startGame(){
 
 </body>
 </html>
+
 
 
 
