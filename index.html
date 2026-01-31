@@ -169,13 +169,12 @@
 
     function updateLayer(category) {
         const layer = document.getElementById(`${category}-layer`);
-        if (layer) {
-            layer.innerHTML = assets[category][currentIndices[category]];
-            // Animasyon efekti
-            layer.classList.remove('pop');
-            void layer.offsetWidth; 
-            layer.classList.add('pop');
-        }
+        layer.innerHTML = assets[category][currentIndices[category]];
+        
+        // Animasyon tetikleme
+        layer.classList.remove('pop');
+        void layer.offsetWidth; 
+        layer.classList.add('pop');
     }
 
     function change(category) {
@@ -190,15 +189,14 @@
         });
     }
 
-    // Sayfa yüklendiğinde karakteri oluştur
     window.onload = () => {
-        const bodyLayer = document.getElementById('body-layer');
-        if (bodyLayer) bodyLayer.innerHTML = bodyBase;
+        document.getElementById('body-layer').innerHTML = bodyBase;
         randomize();
     };
 </script>
 
 </body>
 </html>
+
 
 
