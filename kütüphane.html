@@ -150,6 +150,7 @@ function backToMenu(){ hideAll(); document.getElementById('menu').classList.remo
 function renderCharacter(){
   const canvas=document.getElementById('character-canvas');
   const svgContent=
+    <svg viewBox="0 0 100 160">
     bodyBase +
     assets.hair[currentIndices.hair] +
     assets.face[currentIndices.face] +
@@ -194,6 +195,7 @@ function startGame(){
 
 </body>
 </html>
+
 
 
 
