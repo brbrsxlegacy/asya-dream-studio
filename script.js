@@ -57,5 +57,13 @@ function enterSite(){
 }
 
 
+function hideAll(){
+  document.getElementById("login")?.classList.add("hidden");
+  document.getElementById("menu")?.classList.add("hidden");
+  document.getElementById("creator")?.classList.add("hidden");
+  document.getElementById("library")?.classList.add("hidden");
+  document.getElementById("game")?.classList.add("hidden");
+}
+
 
 
