@@ -3,7 +3,7 @@
 <head>
 <meta charset="UTF-8" />
 <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-<title>Pixel Master + Online Room + Chat</title>
+<title>Pixel Master + Online Room + Chat + Games + Dolap</title>
 <link href="https://fonts.googleapis.com/css2?family=Press+Start+2P&display=swap" rel="stylesheet">
 
 <style>
@@ -91,7 +91,7 @@ input{
 .character-card{
   background:rgba(0,0,0,0.65);
   padding:10px;border:2px solid var(--neon-blue);
-  border-radius:12px;text-align:center;width:190px;
+  border-radius:12px;text-align:center;width:200px;
   display:flex;flex-direction:column;align-items:center;gap:10px;
 }
 .character-card svg{width:92px;height:120px;}
@@ -148,6 +148,33 @@ input{
   margin:8px 0;
 }
 
+/* GAMES */
+.grid3{
+  display:grid;
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+  gap:10px;
+  width:min(820px, 95vw);
+}
+@media (max-width:900px){
+  .grid3{ grid-template-columns: 1fr; }
+}
+.game-btn{
+  padding:14px 12px;
+  border:2px solid var(--neon-blue);
+  color:var(--neon-blue);
+}
+.game-btn:hover{ background:var(--neon-blue); color:#000; box-shadow:0 0 15px var(--neon-blue); }
+
+#game-canvas{
+  width:min(360px, 92vw);
+  height:auto;
+  border:2px solid var(--neon-pink);
+  border-radius:12px;
+  background:#0a0a0f;
+  box-shadow:0 0 15px rgba(255,0,255,.28);
+  touch-action: manipulation;
+}
+
 /* CHAT */
 .chat-wrap{
   width:min(900px,95vw);
@@ -202,7 +229,6 @@ input{
 <!-- MENU -->
 <div id="menu" class="panel hidden">
   <h2>Merhaba <span id="display-nick"></span>!</h2>
-
   <div class="controls">
     <button id="btn-library">Dolap</button>
     <button id="btn-creator">Karakter Oluştur</button>
@@ -222,17 +248,45 @@ input{
     <button id="btn-bottom">Alt</button>
     <button id="btn-shoes">Ayakkabı</button>
     <button id="btn-save">Kaydet</button>
-    <button id="btn-back1">Geri</button>
+    <button id="btn-back1">Menü</button>
   </div>
 </div>
 
 <!-- LIBRARY -->
 <div id="library" class="panel hidden">
   <h2>Dolap</h2>
-  <p><small>AKTİF yapınca online odada da o karakter gider.</small></p>
+  <p><small>AKTİF yapınca oyunlarda + online odada o karakter gider.</small></p>
   <div id="dolap-list"></div>
   <div class="controls">
-    <button id="btn-back2">Geri</button>
+    <button id="btn-back2">Menü</button>
+  </div>
+</div>
+
+<!-- GAMES HUB -->
+<div id="games" class="panel hidden">
+  <h2>OYUNLAR</h2>
+  <div class="badge" id="quest-box"></div>
+
+  <div class="grid3">
+    <button class="game-btn" id="btn-g1">Neon Bounce</button>
+    <button class="game-btn" id="btn-g2">Reaction Rush</button>
+    <button class="game-btn" id="btn-g3">Neon Runner</button>
+  </div>
+
+  <div class="controls">
+    <button id="btn-back-games">Menü</button>
+  </div>
+</div>
+
+<!-- GAME SCREEN -->
+<div id="game" class="panel hidden">
+  <h2 id="game-title">Oyun</h2>
+  <div class="badge" id="hud"></div>
+  <canvas id="game-canvas" width="360" height="520"></canvas>
+  <div class="controls">
+    <button id="btn-restart">Yeniden</button>
+    <button id="btn-back-games2">Oyunlar</button>
+    <button id="btn-back-menu2">Menü</button>
   </div>
 </div>
 
@@ -241,23 +295,8 @@ input{
   <h2>ONLINE MOD + CHAT</h2>
   <div class="badge">
     <p>Oda oluştur veya koda gir.</p>
-    <p><small>NET ON olunca Auth + DB tamam demek.</small></p>
+    <p><small>NET ON = Auth + DB bağlantısı tamam.</small></p>
   </div>
-
-<!-- GAMES HUB -->
-<div id="games" class="panel hidden">
-  <h2>OYUNLAR</h2>
-
-  <div class="grid3">
-    <button class="game-btn" onclick="openGame('bounce')">Neon Bounce</button>
-    <button class="game-btn" onclick="openGame('reaction')">Reaction Rush</button>
-    <button class="game-btn" onclick="openGame('runner')">Neon Runner</button>
-  </div>
-
-  <div class="controls">
-    <button onclick="backToMenu()">Menüye Dön</button>
-  </div>
-</div>
 
   <div class="controls">
     <button id="btn-create-room" style="border-color:var(--neon-blue);color:var(--neon-blue)">ODA OLUŞTUR</button>
@@ -306,7 +345,7 @@ input{
 </div>
 
 <script type="module">
-/* -------------------- STORAGE -------------------- */
+/* -------------------- HELPERS -------------------- */
 const LS = {
   get(k, def){ try{ return JSON.parse(localStorage.getItem(k)) ?? def; }catch{ return def; } },
   set(k, v){ localStorage.setItem(k, JSON.stringify(v)); },
@@ -314,26 +353,59 @@ const LS = {
   setStr(k, v){ localStorage.setItem(k, v); }
 };
 const $ = (id)=>document.getElementById(id);
-  
 
+/* -------------------- NAV -------------------- */
 function hideAll(){
   ["login","menu","creator","library","games","game","online"].forEach(id=>{
-    const el = document.getElementById(id);
+    const el = $(id);
     if(el) el.classList.add("hidden");
   });
 }
-
 function showPanel(id){
-  const el = document.getElementById(id);
-  if(!el) return console.error("Panel yok:", id);
+  const el = $(id);
+  if(!el) return;
   el.classList.remove("hidden");
+  el.classList.remove("neon-show");
+  void el.offsetWidth;
+  el.classList.add("neon-show");
 }
-
-function openGamesHub(){
+function backToMenu(){
+  stopAnyGame();
   hideAll();
-  showPanel("games");
+  $("display-nick").textContent = LS.getStr("nickname","");
+  showPanel("menu");
+}
+function openCreator(){
+  stopAnyGame();
+  hideAll(); showPanel("creator");
+  updateUnlockBadge();
+  renderCharacter();
+}
+function openLibrary(){
+  stopAnyGame();
+  hideAll(); showPanel("library");
+  loadLibrary();
+}
+function openGamesHub(){
+  stopAnyGame();
+  hideAll(); showPanel("games");
+  updateQuestUI();
+}
+function openOnline(){
+  stopAnyGame();
+  hideAll(); showPanel("online");
+  renderOnlinePreviews();
+  refreshChatUI();
 }
 
+/* -------------------- LOGIN -------------------- */
+function enterSite(){
+  const nick = $("nickname").value.trim();
+  if(!nick) return alert("Takma ad boş olamaz!");
+  LS.setStr("nickname", nick);
+  $("display-nick").textContent = nick;
+  hideAll(); showPanel("menu");
+}
 
 /* -------------------- DAILY QUEST / UNLOCK -------------------- */
 function todayKey(){
@@ -354,17 +426,68 @@ function getProgress(){
   return p;
 }
 function saveProgress(p){ LS.set("dailyProgress", p); }
+
+function addScoreToDaily(amount){
+  const p = getProgress();
+  if(p.completed) return;
+  p.score = Math.max(0, (p.score||0) + amount);
+  if(p.score >= 20){
+    p.score = 20;
+    p.completed = true;
+  }
+  saveProgress(p);
+  updateQuestUI();
+  updateUnlockBadge();
+}
+
 function claimReward(){
   const p = getProgress();
   if(!p.completed || p.claimed) return;
   p.claimed = true;
   saveProgress(p);
   LS.set("neonPackUnlocked", true);
+  updateQuestUI();
   updateUnlockBadge();
-  alert("NEON PACK açıldı!");
+  alert("NEON PACK açıldı! (ekstra saç/üst/alt/ayakkabı)");
 }
 
-/* -------------------- CHARACTER -------------------- */
+function neonUnlocked(){ return !!LS.get("neonPackUnlocked", false); }
+
+function updateUnlockBadge(){
+  const b = $("unlock-badge");
+  if(neonUnlocked()){
+    b.innerHTML = `Neon Pack: <b>AÇIK</b> ✅`;
+  }else{
+    const p = getProgress();
+    b.innerHTML = `Neon Pack: <b>KİLİTLİ</b> 🔒 | Günlük: <b>${p.score}/20</b>`;
+  }
+}
+
+function updateQuestUI(){
+  const box = $("quest-box");
+  const p = getProgress();
+  let status = `Günlük görev: <b>20 puan</b> yap (${p.score}/20)`;
+  if(p.completed) status = `Günlük görev: <b>TAMAM</b> ✅ (20/20)`;
+
+  let claim = "";
+  if(p.completed && !p.claimed){
+    claim = `<div class="controls" style="margin-top:10px">
+      <button id="btn-claim" style="border-color:var(--good);color:var(--good)">ÖDÜLÜ AL</button>
+    </div>`;
+  }else if(p.claimed || neonUnlocked()){
+    claim = `<p style="margin-top:10px;color:var(--good)">Ödül alındı: Neon Pack ✅</p>`;
+  }
+
+  box.innerHTML = `
+    <p>${status}</p>
+    <p><small>Not: Herhangi bir oyunda puan kazanman yeter.</small></p>
+    ${claim}
+  `;
+  const btn = $("btn-claim");
+  if(btn) btn.onclick = claimReward;
+}
+
+/* -------------------- CHARACTER ASSETS -------------------- */
 const bodyBase = `
 <rect x="35" y="30" width="30" height="30" fill="#ffdbac"/>
 <rect x="40" y="60" width="20" height="40" fill="#ffdbac"/>
@@ -454,11 +577,11 @@ const neonPack = {
   ]
 };
 
-function neonUnlocked(){ return !!LS.get("neonPackUnlocked", false); }
 function getAssetList(cat){
   const base = baseAssets[cat];
   return neonUnlocked() ? base.concat(neonPack[cat]) : base;
 }
+
 let currentIndices = { hair:0, top:0, bottom:0, shoes:0 };
 
 function makeSvgFromIndices(indices){
@@ -485,52 +608,20 @@ function makeSvgFromIndices(indices){
 function renderCharacter(){
   $("character-canvas").innerHTML = makeSvgFromIndices(currentIndices);
 }
-function updateUnlockBadge(){
-  const b = $("unlock-badge");
-  if(neonUnlocked()){
-    b.innerHTML = `Neon Pack: <b>AÇIK</b> ✅`;
-  }else{
-    const p = getProgress();
-    b.innerHTML = `Neon Pack: <b>KİLİTLİ</b> 🔒 | Günlük: <b>${p.score}/20</b> <button id="claimBtn" style="margin-left:10px;border-color:var(--good);color:var(--good)">ÖDÜL</button>`;
-    const btn = $("claimBtn");
-    if(btn) btn.onclick = claimReward;
-  }
-}
+
 function change(cat){
   const list = getAssetList(cat);
   currentIndices[cat] = (currentIndices[cat] + 1) % list.length;
   renderCharacter();
   if(roomState.inRoom) pushMyState().catch(()=>{});
 }
+
 function getMyDisplaySvg(){
   const active = LS.getStr("activeCharacterSVG","");
   return active || makeSvgFromIndices(currentIndices);
 }
 
-/* -------------------- LOGIN/MENU -------------------- */
-function enterSite(){
-  const nick = $("nickname").value.trim();
-  if(!nick) return alert("Takma ad boş olamaz!");
-  LS.setStr("nickname", nick);
-  $("display-nick").textContent = nick;
-  hideAll(); showPanel("menu");
-}
-function openCreator(){
-  hideAll(); showPanel("creator");
-  updateUnlockBadge();
-  renderCharacter();
-}
-function openLibrary(){
-  hideAll(); showPanel("library");
-  loadLibrary();
-}
-function openOnline(){
-  hideAll(); showPanel("online");
-  renderOnlinePreviews();
-  refreshChatUI();
-}
-
-/* -------------------- DOLAP (HATASIZ) -------------------- */
+/* -------------------- DOLAP -------------------- */
 function saveCurrentCharacter(){
   const nick = LS.getStr("nickname","anon");
   const svg = makeSvgFromIndices(currentIndices);
@@ -539,6 +630,7 @@ function saveCurrentCharacter(){
   LS.set("savedCharacters", saved);
   alert("Karakter kaydedildi!");
 }
+
 function loadLibrary(){
   const nick = LS.getStr("nickname","");
   const container = $("dolap-list");
@@ -568,6 +660,8 @@ function loadLibrary(){
       ev.stopPropagation();
       LS.setStr("activeCharacterSVG", c.svg);
       alert("Aktif karakter ayarlandı!");
+      // online açıksa anında gönder
+      if(roomState.inRoom) pushMyState().catch(()=>{});
     };
 
     card.querySelector(".btnDel").onclick = (ev) => {
@@ -582,15 +676,13 @@ function loadLibrary(){
   }
 }
 
-/* -------------------- FIREBASE ONLINE + CHAT -------------------- */
+/* -------------------- FIREBASE (ONLINE + CHAT) -------------------- */
 import { initializeApp } from "https://www.gstatic.com/firebasejs/10.12.5/firebase-app.js";
 import {
   getDatabase, ref, set, update, onValue, get, remove, onDisconnect,
   push, onChildAdded, query, limitToLast
 } from "https://www.gstatic.com/firebasejs/10.12.5/firebase-database.js";
-import {
-  getAuth, signInAnonymously, onAuthStateChanged
-} from "https://www.gstatic.com/firebasejs/10.12.5/firebase-auth.js";
+import { getAuth, signInAnonymously, onAuthStateChanged } from "https://www.gstatic.com/firebasejs/10.12.5/firebase-auth.js";
 
 const firebaseConfig = {
   apiKey: "AIzaSyABqkhpL1SMRzRJ9GQLjjZE2IryqpAvMPw",
@@ -729,8 +821,8 @@ function listenRoom(roomId){
       refreshChatUI();
       return;
     }
-    const data = snap.val();
 
+    const data = snap.val();
     if(roomState.role === "p1"){
       $("p1Preview").innerHTML = getMyDisplaySvg();
       $("p2Preview").innerHTML = (data.p2 && data.p2.svg) ? data.p2.svg : "<small>Arkadaş bekleniyor…</small>";
@@ -795,6 +887,9 @@ function stopChatListen(){
   if(roomState.unsubChat) roomState.unsubChat();
   roomState.unsubChat = null;
 }
+function escapeHtml(s){
+  return String(s).replace(/[&<>"']/g, (c)=>({ "&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;","'":"&#39;" }[c]));
+}
 function addMsgToUI(nick, text){
   const div = document.createElement("div");
   div.className = "msg";
@@ -802,10 +897,6 @@ function addMsgToUI(nick, text){
   $("chatList").appendChild(div);
   $("chatList").scrollTop = $("chatList").scrollHeight;
 }
-function escapeHtml(s){
-  return String(s).replace(/[&<>"']/g, (c)=>({ "&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;","'":"&#39;" }[c]));
-}
-
 function refreshChatUI(){
   $("chatList").innerHTML = "";
   if(!roomState.inRoom || !roomState.roomId){
@@ -815,7 +906,6 @@ function refreshChatUI(){
   $("chatList").innerHTML = `<div class="msg"><small>Chat hazır. Mesaj yaz.</small></div>`;
   startChatListen();
 }
-
 function startChatListen(){
   stopChatListen();
   if(!roomState.inRoom || !roomState.roomId) return;
@@ -823,134 +913,33 @@ function startChatListen(){
   const chatRef = ref(db, `rooms/${roomState.roomId}/chat`);
   const q = query(chatRef, limitToLast(40));
 
-  $("chatList").innerHTML = ""; // temizle
+  $("chatList").innerHTML = "";
   const unsubscribe = onChildAdded(q, (snap)=>{
     const m = snap.val();
     if(!m || !m.text) return;
     addMsgToUI(m.nick || "anon", m.text);
   });
-
   roomState.unsubChat = unsubscribe;
 }
-
 async function sendChat(){
   if(!roomState.inRoom || !roomState.roomId) return alert("Önce odaya gir!");
   const txt = $("chatInput").value.trim();
   if(!txt) return;
 
   await ensureAuth();
-
   const nick = LS.getStr("nickname","anon");
   const chatRef = ref(db, `rooms/${roomState.roomId}/chat`);
   await push(chatRef, { uid: roomState.uid, nick, text: txt, ts: Date.now() });
-
   $("chatInput").value = "";
 }
 
-/* -------------------- INIT UI -------------------- */
-function backToMenu(){
-  hideAll();
-  $("display-nick").textContent = LS.getStr("nickname","");
-  showPanel("menu");
-}
-
-function init(){
-  hideAll(); showPanel("login");
-
-  document.getElementById("btn-library").onclick = openLibrary;
-  document.getElementById("btn-creator").onclick = openCreator;
-  document.getElementById("btn-games").onclick = openGamesHub;
-  document.getElementById("btn-online").onclick = openOnline;
-
-  
-
-  // login
-  $("btn-enter").onclick = enterSite;
-  $("nickname").addEventListener("keydown", (e)=>{ if(e.key==="Enter") enterSite(); });
-
-  const savedNick = LS.getStr("nickname","");
-  if(savedNick) $("nickname").value = savedNick;
-  $("nickname").focus();
-
-  // menu
-  $("btn-creator").onclick = openCreator;
-  $("btn-library").onclick = openLibrary;
-  $("btn-online").onclick = openOnline;
-
-  // creator
-  $("btn-hair").onclick = ()=>change("hair");
-  $("btn-top").onclick = ()=>change("top");
-  $("btn-bottom").onclick = ()=>change("bottom");
-  $("btn-shoes").onclick = ()=>change("shoes");
-  $("btn-save").onclick = saveCurrentCharacter;
-  $("btn-back1").onclick = backToMenu;
-
-  // library
-  $("btn-back2").onclick = backToMenu;
-
-  // online
-  $("btn-back3").onclick = backToMenu;
-  $("btn-create-room").onclick = createRoom;
-  $("btn-join-room").onclick = ()=>joinRoom($("roomCodeInput").value);
-  $("btn-leave-room").onclick = leaveRoom;
-  $("btn-sync").onclick = pushMyState;
-
-  $("btn-hair2").onclick = ()=>change("hair");
-  $("btn-top2").onclick = ()=>change("top");
-  $("btn-bottom2").onclick = ()=>change("bottom");
-  $("btn-shoes2").onclick = ()=>change("shoes");
-
-  $("btn-send").onclick = sendChat;
-  $("chatInput").addEventListener("keydown", (e)=>{ if(e.key==="Enter") sendChat(); });
-
-  /* -------------------- GAME SYSTEM (3 oyun) -------------------- */
-const canvas = document.getElementById("game-canvas");
-const ctx = canvas.getContext("2d");
+/* -------------------- GAMES (3 oyun) -------------------- */
+let canvas, ctx;
 let currentGame = null;
 
-function openGame(which){
-  hideAll();
-  showPanel("game");
-  document.getElementById("btn-restart").onclick = () => startGame(which);
-  startGame(which);
-}
-
-function startGame(which){
-  stopAnyGame();
-  currentGame = which;
-  if(which === "bounce") startBounce();
-  else if(which === "reaction") startReaction();
-  else if(which === "runner") startRunner();
-}
-
-function stopAnyGame(){
-  stopBounce();
-  stopReaction();
-  stopRunner();
-  currentGame = null;
-  canvas.onclick = null;
-  particles = [];
-  shake = 0;
-}
-
-/* köşede "aktif var/yok" yazısı */
-function drawActiveAvatar(){
-  const svg = LS.getStr("activeCharacterSVG","");
-  ctx.save();
-  ctx.globalAlpha = 0.9;
-  ctx.fillStyle = "rgba(0,0,0,0.35)";
-  ctx.fillRect(8, 8, 92, 62);
-  ctx.strokeStyle = "#00ffff";
-  ctx.lineWidth = 2;
-  ctx.strokeRect(8, 8, 92, 62);
-  ctx.fillStyle = "#00ffff";
-  ctx.font = "10px 'Press Start 2P'";
-  ctx.fillText(svg ? "AKTIF" : "YOK", 18, 34);
-  ctx.restore();
-}
-
-/* EFFECTS */
 let particles = [];
+let shake = 0;
+
 function spawnParticles(x,y, count=14){
   for(let i=0;i<count;i++){
     particles.push({
@@ -982,15 +971,54 @@ function drawParticles(){
     ctx.restore();
   }
 }
-let shake = 0;
 function addShake(power=7){ shake = Math.max(shake, power); }
+
+function drawActiveAvatar(){
+  const svg = LS.getStr("activeCharacterSVG","");
+  ctx.save();
+  ctx.globalAlpha = 0.9;
+  ctx.fillStyle = "rgba(0,0,0,0.35)";
+  ctx.fillRect(8, 8, 92, 62);
+  ctx.strokeStyle = "#00ffff";
+  ctx.lineWidth = 2;
+  ctx.strokeRect(8, 8, 92, 62);
+  ctx.fillStyle = "#00ffff";
+  ctx.font = "10px 'Press Start 2P'";
+  ctx.fillText(svg ? "AKTIF" : "YOK", 18, 34);
+  ctx.restore();
+}
+
+function openGame(which){
+  hideAll();
+  showPanel("game");
+  $("btn-restart").onclick = () => startGame(which);
+  startGame(which);
+}
+
+function startGame(which){
+  stopAnyGame();
+  currentGame = which;
+  if(which === "bounce") startBounce();
+  else if(which === "reaction") startReaction();
+  else if(which === "runner") startRunner();
+}
+
+function stopAnyGame(){
+  stopBounce();
+  stopReaction();
+  stopRunner();
+  currentGame = null;
+  if(canvas) canvas.onclick = null;
+  particles = [];
+  shake = 0;
+}
 
 /* GAME 1: NEON BOUNCE */
 let bounceInterval = null;
 let bounce = null;
 
 function startBounce(){
-  document.getElementById("game-title").textContent = "Neon Bounce";
+  $("game-title").textContent = "Neon Bounce";
   bounce = {
     score:0,
     lives:3,
@@ -1057,7 +1085,7 @@ function startBounce(){
         bounce.lives = 0;
         canvas.onclick = null;
         stopBounce();
-        document.getElementById("hud").innerHTML =
+        $("hud").innerHTML =
           `SKOR: <b>${bounce.score}</b> | CAN: <b style="color:var(--bad)">0</b><br><small>Yeniden’e bas</small>`;
         ctx.restore();
         return;
@@ -1077,11 +1105,10 @@ function startBounce(){
     drawActiveAvatar();
     ctx.restore();
 
-    document.getElementById("hud").innerHTML =
+    $("hud").innerHTML =
       `SKOR: <b>${bounce.score}</b> | CAN: <b>${bounce.lives}</b><br><small>Topa tıkla: yön değiştir</small>`;
   }, 16);
 }
-
 function stopBounce(){
   if(bounceInterval){
     clearInterval(bounceInterval);
@@ -1095,7 +1122,7 @@ let reactionTimer = null;
 let reactionStateTimer = null;
 
 function startReaction(){
-  document.getElementById("game-title").textContent = "Reaction Rush";
+  $("game-title").textContent = "Reaction Rush";
   reaction = {
     best: LS.get("bestReactionMs", null),
     startedAt: null,
@@ -1144,7 +1171,7 @@ function startReaction(){
       ctx.font = "10px 'Press Start 2P'";
       ctx.fillText("TIKLA", tx-22, ty+4);
 
-      document.getElementById("hud").innerHTML =
+      $("hud").innerHTML =
         `ROUND: <b>${reaction.round}</b> | PUAN: <b>${reaction.score}</b><br><small>Hedef çıkınca tıkla</small>`;
     }, delay);
   }
@@ -1158,7 +1185,7 @@ function startReaction(){
       reaction.score = Math.max(0, reaction.score - 1);
       spawnParticles(mx,my,18);
       addShake(10);
-      document.getElementById("hud").innerHTML =
+      $("hud").innerHTML =
         `ERKEN! PUAN: <b>${reaction.score}</b><br><small>Hedef çıkınca bas</small>`;
       return;
     }
@@ -1196,7 +1223,7 @@ function startReaction(){
       ctx.fillText(`TEPKİ: ${ms}ms`, 85, 260);
       ctx.fillText(`BEST: ${reaction.best}ms`, 85, 290);
 
-      document.getElementById("hud").innerHTML =
+      $("hud").innerHTML =
         `PUAN: <b>${reaction.score}</b> | SON: <b>${ms}ms</b> | BEST: <b>${reaction.best}ms</b>`;
 
       reaction.canClick = false;
@@ -1206,14 +1233,13 @@ function startReaction(){
       reaction.score = Math.max(0, reaction.score - 1);
       spawnParticles(mx,my,14);
       addShake(6);
-      document.getElementById("hud").innerHTML =
+      $("hud").innerHTML =
         `ISKA! PUAN: <b>${reaction.score}</b><br><small>Hedefe bas</small>`;
     }
   };
 
   scheduleRound();
 }
-
 function stopReaction(){
   if(reactionStateTimer){ clearTimeout(reactionStateTimer); reactionStateTimer = null; }
   if(reactionTimer){ clearTimeout(reactionTimer); reactionTimer = null; }
@@ -1224,7 +1250,7 @@ let runnerInterval = null;
 let runner = null;
 
 function startRunner(){
-  document.getElementById("game-title").textContent = "Neon Runner";
+  $("game-title").textContent = "Neon Runner";
   runner = {
     score: 0,
     lives: 3,
@@ -1314,7 +1340,7 @@ function startRunner(){
           runner.lives = 0;
           stopRunner();
           canvas.onclick = null;
-          document.getElementById("hud").innerHTML =
+          $("hud").innerHTML =
             `SKOR: <b>${runner.score}</b> | CAN: <b style="color:var(--bad)">0</b><br><small>Yeniden’e bas</small>`;
           ctx.restore();
           return;
@@ -1333,11 +1359,10 @@ function startRunner(){
     drawActiveAvatar();
     ctx.restore();
 
-    document.getElementById("hud").innerHTML =
+    $("hud").innerHTML =
       `SKOR: <b>${runner.score}</b> | CAN: <b>${runner.lives}</b><br><small>Tıkla: zıpla</small>`;
   }, 16);
 }
-
 function stopRunner(){
   if(runnerInterval){
     clearInterval(runnerInterval);
@@ -1345,16 +1370,76 @@ function stopRunner(){
   }
 }
 
+/* -------------------- INIT -------------------- */
+function init(){
+  hideAll();
+  showPanel("login");
 
+  // canvas init (null olmasın diye burada)
+  canvas = $("game-canvas");
+  ctx = canvas.getContext("2d");
+
+  // Login
+  $("btn-enter").onclick = enterSite;
+  $("nickname").addEventListener("keydown", (e)=>{ if(e.key==="Enter") enterSite(); });
+  const savedNick = LS.getStr("nickname","");
+  if(savedNick) $("nickname").value = savedNick;
+  $("nickname").focus();
+
+  // Menu
+  $("btn-library").onclick = openLibrary;
+  $("btn-creator").onclick = openCreator;
+  $("btn-games").onclick = openGamesHub;
+  $("btn-online").onclick = openOnline;
+
+  // Creator
+  $("btn-hair").onclick = ()=>change("hair");
+  $("btn-top").onclick = ()=>change("top");
+  $("btn-bottom").onclick = ()=>change("bottom");
+  $("btn-shoes").onclick = ()=>change("shoes");
+  $("btn-save").onclick = saveCurrentCharacter;
+  $("btn-back1").onclick = backToMenu;
+
+  // Library
+  $("btn-back2").onclick = backToMenu;
+
+  // Games
+  $("btn-g1").onclick = ()=>openGame("bounce");
+  $("btn-g2").onclick = ()=>openGame("reaction");
+  $("btn-g3").onclick = ()=>openGame("runner");
+  $("btn-back-games").onclick = backToMenu;
+
+  // Game screen
+  $("btn-back-games2").onclick = openGamesHub;
+  $("btn-back-menu2").onclick = backToMenu;
+
+  // Online
+  $("btn-back3").onclick = backToMenu;
+  $("btn-create-room").onclick = createRoom;
+  $("btn-join-room").onclick = ()=>joinRoom($("roomCodeInput").value);
+  $("btn-leave-room").onclick = leaveRoom;
+  $("btn-sync").onclick = pushMyState;
+
+  $("btn-hair2").onclick = ()=>change("hair");
+  $("btn-top2").onclick = ()=>change("top");
+  $("btn-bottom2").onclick = ()=>change("bottom");
+  $("btn-shoes2").onclick = ()=>change("shoes");
+
+  // Chat
+  $("btn-send").onclick = sendChat;
+  $("chatInput").addEventListener("keydown", (e)=>{ if(e.key==="Enter") sendChat(); });
+
+  // UI initial
   updateRoomUI();
+  updateQuestUI();
   updateUnlockBadge();
   renderCharacter();
   renderOnlinePreviews();
+  refreshChatUI();
 
-  // auth dene (NET ON için)
+  // Auth (NET ON için)
   ensureAuth().catch((e)=>{
     console.log("AUTH FAIL:", e);
-    alert("Firebase Auth çalışmadı: " + (e?.message || e));
   });
 }
 
@@ -1364,9 +1449,3 @@ else init();
 
 </body>
 </html>
-
-
-
-
-
-
