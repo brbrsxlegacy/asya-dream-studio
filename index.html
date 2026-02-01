@@ -3,7 +3,7 @@
 <head>
 <meta charset="UTF-8" />
 <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-<title>Pixel Master + Mini Oyun</title>
+<title>Pixel Master + Online Room</title>
 <link href="https://fonts.googleapis.com/css2?family=Press+Start+2P&display=swap" rel="stylesheet">
 
 <style>
@@ -63,6 +63,15 @@ input{
   gap:10px;
 }
 
+.badge{
+  border:1px solid rgba(255,255,255,.25);
+  padding:8px 10px;
+  border-radius:12px;
+  background:rgba(0,0,0,.35);
+  width:min(900px, 95vw);
+}
+.badge b{ color:var(--neon-blue); }
+
 #character-canvas{
   width:350px;height:480px;
   background:linear-gradient(145deg,#0c0c12,#1a1a2a);
@@ -71,37 +80,6 @@ input{
   display:flex;justify-content:center;align-items:center;
   box-shadow:0 0 15px rgba(255,0,255,.35);
   margin:10px 0;
-}
-
-#dolap-list{
-  display:flex;flex-wrap:wrap;gap:14px;justify-content:center;
-  padding:10px;max-width:95vw;
-  overflow-y:auto;max-height:55vh;
-}
-.character-card{
-  background:rgba(0,0,0,0.65);
-  padding:10px;border:2px solid var(--neon-blue);
-  border-radius:12px;text-align:center;width:170px;
-  display:flex;flex-direction:column;align-items:center;gap:8px;
-}
-.character-card svg{width:92px;height:120px;}
-.character-card .row{display:flex;gap:8px;flex-wrap:wrap;justify-content:center}
-
-.badge{
-  border:1px solid rgba(255,255,255,.25);
-  padding:8px 10px;
-  border-radius:12px;
-  background:rgba(0,0,0,.35);
-  width:min(820px, 95vw);
-}
-.badge b{ color:var(--neon-blue); }
-
-canvas{
-  border:2px solid var(--neon-pink);
-  border-radius:12px;
-  background:#0a0a0f;
-  box-shadow:0 0 15px rgba(255,0,255,.28);
-  touch-action: manipulation;
 }
 
 .grid3{
@@ -119,16 +97,95 @@ canvas{
   color:var(--neon-blue);
 }
 .game-btn:hover{ background:var(--neon-blue); color:#000; box-shadow:0 0 15px var(--neon-blue); }
+
+#dolap-list{
+  display:flex;flex-wrap:wrap;gap:14px;justify-content:center;
+  padding:10px;max-width:95vw;
+  overflow-y:auto;max-height:55vh;
+}
+.character-card{
+  background:rgba(0,0,0,0.65);
+  padding:10px;border:2px solid var(--neon-blue);
+  border-radius:12px;text-align:center;width:170px;
+  display:flex;flex-direction:column;align-items:center;gap:8px;
+}
+.character-card svg{width:92px;height:120px;}
+.character-card .row{display:flex;gap:8px;flex-wrap:wrap;justify-content:center}
+
+canvas{
+  border:2px solid var(--neon-pink);
+  border-radius:12px;
+  background:#0a0a0f;
+  box-shadow:0 0 15px rgba(255,0,255,.28);
+  touch-action: manipulation;
+}
+
+/* ONLINE */
+.topbar{
+  position:fixed;
+  top:10px; left:10px; right:10px;
+  display:flex; align-items:center; justify-content:space-between;
+  pointer-events:none;
+  z-index:999;
+}
+.net-badge, .room-badge{
+  pointer-events:none;
+  padding:8px 10px;
+  border-radius:12px;
+  border:1px solid rgba(255,255,255,.25);
+  background:rgba(0,0,0,.45);
+  font-size:10px;
+}
+.net-badge b{ color:var(--good); }
+.net-badge.off b{ color:var(--bad); }
+.room-badge b{ color:var(--neon-blue); }
+
+.online-stage{
+  width:min(900px, 95vw);
+  display:flex; gap:18px; justify-content:center; flex-wrap:wrap;
+  margin-top:8px;
+}
+.avatar-box{
+  width:380px; max-width:95vw;
+  border:2px solid var(--neon-blue);
+  border-radius:16px;
+  background:rgba(0,0,0,.35);
+  padding:12px;
+  display:flex; flex-direction:column; align-items:center; gap:10px;
+  box-shadow:0 0 15px rgba(0,255,255,.18);
+}
+.avatar-box h3{ font-size:12px; }
+.avatar-preview{
+  width:220px; height:300px;
+  border:2px solid var(--neon-pink);
+  border-radius:14px;
+  display:flex; justify-content:center; align-items:center;
+  background:linear-gradient(145deg,#0c0c12,#1a1a2a);
+  box-shadow:0 0 15px rgba(255,0,255,.22);
+}
+.avatar-preview svg{ width:100%; height:100%; }
+.sep{
+  width:min(900px, 95vw);
+  height:1px;
+  background:rgba(255,255,255,.12);
+  margin:8px 0;
+}
 </style>
 </head>
 
 <body>
+
+<div class="topbar">
+  <div class="room-badge" id="roomHud">ROOM: <b>---</b></div>
+  <div class="net-badge off" id="netHud">NET: <b>OFF</b> ❌</div>
+</div>
 
 <!-- LOGIN -->
 <div id="login" class="panel neon-show">
   <p>Takma adını gir</p>
   <input id="nickname" placeholder="Takma ad" autocomplete="off" autocapitalize="off" spellcheck="false" />
   <button id="btn-enter" onclick="enterSite()">GİR</button>
+  <p><small>Not: Offline mod + Online oda birlikte.</small></p>
 </div>
 
 <!-- MENU -->
@@ -138,8 +195,8 @@ canvas{
     <button id="btn-library">Dolap</button>
     <button id="btn-creator">Oluştur</button>
     <button id="btn-games">OYUNLAR</button>
+    <button id="btn-online">ONLINE MOD</button>
   </div>
-  <p><small>Not: Online modu ayrı yapacağız. Bu dosya %100 offline çalışır.</small></p>
 </div>
 
 <!-- CREATOR -->
@@ -160,7 +217,7 @@ canvas{
 <!-- LIBRARY -->
 <div id="library" class="panel hidden">
   <h2>Dolap</h2>
-  <p><small>Karta tıkla: aktif karakter yapar (oyunlarda köşede çıkar).</small></p>
+  <p><small>Butona bas: aktif karakter yapar (oyunlarda + online odada görünür).</small></p>
   <div id="dolap-list"></div>
   <div class="controls">
     <button onclick="backToMenu()">Geri</button>
@@ -195,7 +252,52 @@ canvas{
   </div>
 </div>
 
-<script>
+<!-- ONLINE -->
+<div id="online" class="panel hidden">
+  <h2>ONLINE MOD</h2>
+  <div class="badge" id="onlineInfo">
+    <p>Oda oluştur veya koda gir.</p>
+    <p><small>Sen kıyafet değiştirince diğerine anında gider.</small></p>
+  </div>
+
+  <div class="controls">
+    <button id="btn-create-room" style="border-color:var(--neon-blue);color:var(--neon-blue)">ODA OLUŞTUR</button>
+    <input id="roomCodeInput" placeholder="5 haneli oda kodu" maxlength="5" />
+    <button id="btn-join-room" style="border-color:var(--neon-blue);color:var(--neon-blue)">KATIL</button>
+  </div>
+
+  <div class="sep"></div>
+
+  <div class="online-stage">
+    <div class="avatar-box">
+      <h3>Sen (p1)</h3>
+      <div class="avatar-preview" id="p1Preview"></div>
+      <div class="controls">
+        <button onclick="change('hair')">Saç</button>
+        <button onclick="change('top')">Üst</button>
+        <button onclick="change('bottom')">Alt</button>
+        <button onclick="change('shoes')">Ayakkabı</button>
+        <button id="btn-sync" style="border-color:var(--good);color:var(--good)">SENKRONLA</button>
+      </div>
+      <p><small>Not: Aktif karakter yoksa, şu anki editördeki görünüm gider.</small></p>
+    </div>
+
+    <div class="avatar-box">
+      <h3>Arkadaş (p2)</h3>
+      <div class="avatar-preview" id="p2Preview"><small>Bağlanınca gelecek…</small></div>
+      <p><small>Gerçek zamanlı güncellenir.</small></p>
+    </div>
+  </div>
+
+  <div class="controls">
+    <button id="btn-leave-room" style="border-color:var(--bad);color:var(--bad)">ODADAN ÇIK</button>
+    <button onclick="backToMenu()">Menü</button>
+  </div>
+</div>
+
+
+<!-- FIREBASE + APP -->
+<script type="module">
 /* -------------------- STORAGE HELPERS -------------------- */
 const LS = {
   get(k, def){ try{ return JSON.parse(localStorage.getItem(k)) ?? def; }catch{ return def; } },
@@ -308,7 +410,6 @@ const baseAssets = {
   ]
 };
 
-// Neon Pack – ekstra 5’er tane
 const neonPack = {
   hair:[
     `<rect x="29" y="18" width="42" height="20" fill="#9b5cff"/><rect x="31" y="22" width="38" height="6" fill="#00ffff"/>`,
@@ -348,38 +449,50 @@ function getAssetList(cat){
 
 let currentIndices = { hair:0, top:0, bottom:0, shoes:0 };
 
-function renderCharacter(){
-  const canvasEl = document.getElementById('character-canvas');
+function makeSvgFromIndices(indices){
   const hairList = getAssetList("hair");
   const topList = getAssetList("top");
   const bottomList = getAssetList("bottom");
   const shoesList = getAssetList("shoes");
 
-  currentIndices.hair = ((currentIndices.hair % hairList.length) + hairList.length) % hairList.length;
-  currentIndices.top = ((currentIndices.top % topList.length) + topList.length) % topList.length;
-  currentIndices.bottom = ((currentIndices.bottom % bottomList.length) + bottomList.length) % bottomList.length;
-  currentIndices.shoes = ((currentIndices.shoes % shoesList.length) + shoesList.length) % shoesList.length;
+  const h = ((indices.hair % hairList.length)+hairList.length)%hairList.length;
+  const t = ((indices.top % topList.length)+topList.length)%topList.length;
+  const b = ((indices.bottom % bottomList.length)+bottomList.length)%bottomList.length;
+  const s = ((indices.shoes % shoesList.length)+shoesList.length)%shoesList.length;
 
-  canvasEl.innerHTML = `
-    <svg viewBox="0 0 100 160" xmlns="http://www.w3.org/2000/svg" width="100%" height="100%">
-      ${bodyBase}
-      ${hairList[currentIndices.hair]}
-      ${topList[currentIndices.top]}
-      ${bottomList[currentIndices.bottom]}
-      ${shoesList[currentIndices.shoes]}
-    </svg>
-  `;
+  return `
+  <svg viewBox="0 0 100 160" xmlns="http://www.w3.org/2000/svg">
+    ${bodyBase}
+    ${hairList[h]}
+    ${topList[t]}
+    ${bottomList[b]}
+    ${shoesList[s]}
+  </svg>`;
+}
+
+function renderCharacter(){
+  const canvasEl = document.getElementById('character-canvas');
+  canvasEl.innerHTML = makeSvgFromIndices(currentIndices);
 }
 
 function change(cat){
   const list = getAssetList(cat);
   currentIndices[cat] = (currentIndices[cat] + 1) % list.length;
   renderCharacter();
+
+  // ONLINE açıksa anında gönder (sync)
+  if(roomState.inRoom) pushMyState();
+}
+
+function getMyDisplaySvg(){
+  // Eğer aktif karakter varsa onu gönder, yoksa editör halini gönder
+  const active = LS.getStr("activeCharacterSVG","");
+  return active || makeSvgFromIndices(currentIndices);
 }
 
 /* -------------------- PAGES -------------------- */
 function hideAll(){
-  ["login","menu","creator","library","games","game"].forEach(id=>{
+  ["login","menu","creator","library","games","game","online"].forEach(id=>{
     const el = document.getElementById(id);
     if(el) el.classList.add("hidden");
   });
@@ -424,9 +537,20 @@ function openGamesHub(){
   updateQuestUI();
 }
 
+function openOnline(){
+  stopAnyGame();
+  hideAll();
+  showPanel("online");
+  updateNetUI();
+  updateRoomUI();
+  renderOnlinePreviews();
+}
+
 function backToMenu(){
   stopAnyGame();
   hideAll();
+  const nick = LS.getStr("nickname","");
+  document.getElementById("display-nick").textContent = nick || "";
   showPanel("menu");
 }
 
@@ -471,19 +595,7 @@ function updateQuestUI(){
 /* -------------------- DOLAP -------------------- */
 function saveCurrentCharacter(){
   const nick = LS.getStr("nickname","anon");
-  const hairList = getAssetList("hair");
-  const topList = getAssetList("top");
-  const bottomList = getAssetList("bottom");
-  const shoesList = getAssetList("shoes");
-
-  const svg = `
-  <svg viewBox="0 0 100 160" xmlns="http://www.w3.org/2000/svg">
-    ${bodyBase}
-    ${hairList[currentIndices.hair]}
-    ${topList[currentIndices.top]}
-    ${bottomList[currentIndices.bottom]}
-    ${shoesList[currentIndices.shoes]}
-  </svg>`;
+  const svg = makeSvgFromIndices(currentIndices);
 
   const saved = LS.get("savedCharacters", []);
   saved.push({ nick, svg, ts: Date.now() });
@@ -517,9 +629,11 @@ function loadLibrary(){
       </div>
     `;
 
-    card.onclick = () => {
+    const btn = card.querySelector("button");
+    btn.onclick = (ev) => {
+      ev.stopPropagation();
       LS.setStr("activeCharacterSVG", c.svg);
-      alert("Aktif karakter ayarlandı! (oyunlarda köşede görünecek)");
+      alert("Aktif karakter ayarlandı!");
     };
 
     container.appendChild(card);
@@ -558,7 +672,6 @@ function stopAnyGame(){
 
 function drawActiveAvatar(){
   const svg = LS.getStr("activeCharacterSVG","");
-  if(!svg) return;
   ctx.save();
   ctx.globalAlpha = 0.9;
   ctx.fillStyle = "rgba(0,0,0,0.35)";
@@ -568,7 +681,7 @@ function drawActiveAvatar(){
   ctx.strokeRect(8, 8, 92, 62);
   ctx.fillStyle = "#00ffff";
   ctx.font = "10px 'Press Start 2P'";
-  ctx.fillText("AKTİF", 16, 34);
+  ctx.fillText(svg ? "AKTIF" : "YOK", 18, 34);
   ctx.restore();
 }
 
@@ -964,57 +1077,288 @@ function stopRunner(){
   }
 }
 
+/* -------------------- FIREBASE (ONLINE) -------------------- */
+import { initializeApp } from "https://www.gstatic.com/firebasejs/10.12.5/firebase-app.js";
+import {
+  getDatabase, ref, set, update, onValue, get, remove, onDisconnect
+} from "https://www.gstatic.com/firebasejs/10.12.5/firebase-database.js";
+import {
+  getAuth, signInAnonymously, onAuthStateChanged
+} from "https://www.gstatic.com/firebasejs/10.12.5/firebase-auth.js";
+
+const firebaseConfig = {
+  apiKey: "AIzaSyABqkhpL1SMRzRJ9GQLjjZE2IryqpAvMPw",
+  authDomain: "pixelroom-ae218.firebaseapp.com",
+  databaseURL: "https://pixelroom-ae218-default-rtdb.europe-west1.firebasedatabase.app",
+  projectId: "pixelroom-ae218",
+  storageBucket: "pixelroom-ae218.firebasestorage.app",
+  messagingSenderId: "720297722320",
+  appId: "1:720297722320:web:c815edae99d1efa7ff39d5",
+  measurementId: "G-HD8901B19M"
+};
+
+const app = initializeApp(firebaseConfig);
+const db = getDatabase(app);
+const auth = getAuth(app);
+
+const netHud = document.getElementById("netHud");
+const roomHud = document.getElementById("roomHud");
+
+const roomState = {
+  uid: null,
+  inRoom: false,
+  roomId: null,
+  role: null, // "p1" | "p2"
+  unsubRoom: null,
+  isOnline: false
+};
+
+function setNet(on){
+  roomState.isOnline = !!on;
+  if(on){
+    netHud.classList.remove("off");
+    netHud.innerHTML = `NET: <b>ON</b> ✅`;
+  }else{
+    netHud.classList.add("off");
+    netHud.innerHTML = `NET: <b>OFF</b> ❌`;
+  }
+}
+function updateRoomUI(){
+  roomHud.innerHTML = `ROOM: <b>${roomState.roomId ?? "---"}</b>`;
+}
+function updateNetUI(){
+  setNet(!!roomState.uid);
+}
+
+function randomRoomCode(){
+  return String(Math.floor(10000 + Math.random()*90000));
+}
+
+async function ensureAuth(){
+  if(roomState.uid) return roomState.uid;
+  await signInAnonymously(auth);
+  return new Promise((resolve) => {
+    const off = onAuthStateChanged(auth, (u)=>{
+      if(u){
+        roomState.uid = u.uid;
+        setNet(true);
+        off();
+        resolve(u.uid);
+      }
+    });
+  });
+}
+
+function renderOnlinePreviews(){
+  const p1 = document.getElementById("p1Preview");
+  const p2 = document.getElementById("p2Preview");
+  p1.innerHTML = getMyDisplaySvg();
+  if(!roomState.inRoom){
+    p2.innerHTML = `<small>Bağlanınca gelecek…</small>`;
+  }
+}
+
+async function createRoom(){
+  await ensureAuth();
+
+  const roomId = randomRoomCode();
+  const roomRef = ref(db, `rooms/${roomId}`);
+
+  // oluştur
+  const nick = LS.getStr("nickname","anon");
+  await set(roomRef, {
+    createdAt: Date.now(),
+    p1: { uid: roomState.uid, nick, svg: getMyDisplaySvg(), ts: Date.now() }
+  });
+
+  roomState.inRoom = true;
+  roomState.roomId = roomId;
+  roomState.role = "p1";
+  updateRoomUI();
+
+  // p1 giderse oda kapansın
+  onDisconnect(roomRef).remove().catch(()=>{});
+
+  listenRoom(roomId);
+  alert(`Oda kuruldu: ${roomId}`);
+  renderOnlinePreviews();
+}
+
+async function joinRoom(roomId){
+  await ensureAuth();
+  roomId = String(roomId || "").trim();
+  if(!/^\d{5}$/.test(roomId)) return alert("Oda kodu 5 haneli olmalı!");
+
+  const roomRef = ref(db, `rooms/${roomId}`);
+  const snap = await get(roomRef);
+  if(!snap.exists()) return alert("Oda bulunamadı!");
+
+  const data = snap.val();
+  if(!data.p1) return alert("Oda bozuk (p1 yok).");
+
+  // oda dolu mu
+  if(data.p2 && data.p2.uid && data.p2.uid !== roomState.uid){
+    return alert("Oda dolu!");
+  }
+
+  const nick = LS.getStr("nickname","anon");
+  await update(roomRef, {
+    p2: { uid: roomState.uid, nick, svg: getMyDisplaySvg(), ts: Date.now() }
+  });
+
+  roomState.inRoom = true;
+  roomState.roomId = roomId;
+  roomState.role = "p2";
+  updateRoomUI();
+
+  // p2 koparsa p2 silinsin
+  const p2Ref = ref(db, `rooms/${roomId}/p2`);
+  onDisconnect(p2Ref).remove().catch(()=>{});
+
+  listenRoom(roomId);
+  alert(`Odaya girdin: ${roomId}`);
+  renderOnlinePreviews();
+}
+
+function listenRoom(roomId){
+  if(roomState.unsubRoom) roomState.unsubRoom();
+  const roomRef = ref(db, `rooms/${roomId}`);
+
+  // onValue unsubscribe fonksiyonunu döndürür
+  const unsubscribe = onValue(roomRef, (snap)=>{
+    if(!snap.exists()){
+      // oda kapandı
+      if(roomState.inRoom){
+        roomState.inRoom = false;
+        roomState.roomId = null;
+        roomState.role = null;
+        updateRoomUI();
+        document.getElementById("p2Preview").innerHTML = `<small>Oda kapandı.</small>`;
+      }
+      return;
+    }
+
+    const data = snap.val();
+    // kendi rolüne göre diğerini çiz
+    const p2Preview = document.getElementById("p2Preview");
+
+    if(roomState.role === "p1"){
+      if(data.p2 && data.p2.svg){
+        p2Preview.innerHTML = data.p2.svg;
+      }else{
+        p2Preview.innerHTML = `<small>Arkadaş bekleniyor…</small>`;
+      }
+      // p1 preview her zaman bizim
+      document.getElementById("p1Preview").innerHTML = getMyDisplaySvg();
+    }else if(roomState.role === "p2"){
+      // p2 için "diğer" p1
+      if(data.p1 && data.p1.svg){
+        p2Preview.innerHTML = data.p1.svg;
+      }else{
+        p2Preview.innerHTML = `<small>p1 yok…</small>`;
+      }
+      document.getElementById("p1Preview").innerHTML = getMyDisplaySvg();
+    }
+
+    // room hud
+    updateRoomUI();
+  });
+
+  roomState.unsubRoom = unsubscribe;
+}
+
+async function pushMyState(){
+  if(!roomState.inRoom || !roomState.roomId || !roomState.role) return;
+  const roomId = roomState.roomId;
+  const role = roomState.role;
+  const nick = LS.getStr("nickname","anon");
+  const svg = getMyDisplaySvg();
+
+  const meRef = ref(db, `rooms/${roomId}/${role}`);
+  await update(meRef, { uid: roomState.uid, nick, svg, ts: Date.now() });
+
+  // preview güncelle
+  document.getElementById("p1Preview").innerHTML = svg;
+}
+
+async function leaveRoom(){
+  if(!roomState.inRoom || !roomState.roomId) return;
+
+  const roomId = roomState.roomId;
+  const role = roomState.role;
+
+  try{
+    if(role === "p1"){
+      await remove(ref(db, `rooms/${roomId}`));
+    }else{
+      await remove(ref(db, `rooms/${roomId}/p2`));
+    }
+  }catch(e){
+    // yut
+  }
+
+  if(roomState.unsubRoom) roomState.unsubRoom();
+  roomState.unsubRoom = null;
+  roomState.inRoom = false;
+  roomState.roomId = null;
+  roomState.role = null;
+  updateRoomUI();
+  renderOnlinePreviews();
+  alert("Odadan çıktın.");
+}
+
 /* -------------------- INIT -------------------- */
 function initApp(){
   hideAll();
   showPanel("login");
 
-  const btnEnter = document.getElementById("btn-enter");
-  if(btnEnter) btnEnter.onclick = enterSite;
+  // Menu buttons
+  document.getElementById("btn-enter").onclick = enterSite;
+  document.getElementById("btn-creator").onclick = openCreator;
+  document.getElementById("btn-library").onclick = openLibrary;
+  document.getElementById("btn-games").onclick = openGamesHub;
+  document.getElementById("btn-online").onclick = openOnline;
 
-  const btnCreator = document.getElementById("btn-creator");
-  if(btnCreator) btnCreator.onclick = openCreator;
+  // Online buttons
+  document.getElementById("btn-create-room").onclick = createRoom;
+  document.getElementById("btn-join-room").onclick = () => joinRoom(document.getElementById("roomCodeInput").value);
+  document.getElementById("btn-leave-room").onclick = leaveRoom;
+  document.getElementById("btn-sync").onclick = pushMyState;
 
-  const btnLibrary = document.getElementById("btn-library");
-  if(btnLibrary) btnLibrary.onclick = openLibrary;
-
-  const btnGames = document.getElementById("btn-games");
-  if(btnGames) btnGames.onclick = openGamesHub;
-
+  // Nick enter
   const nickInput = document.getElementById("nickname");
-  if(nickInput){
-    nickInput.addEventListener("keydown", (e)=>{
-      if(e.key === "Enter") enterSite();
-    });
+  nickInput.addEventListener("keydown", (e)=>{ if(e.key === "Enter") enterSite(); });
 
-    const savedNick = LS.getStr("nickname","");
-    if(savedNick) nickInput.value = savedNick;
-
-    nickInput.focus();
-  }
+  const savedNick = LS.getStr("nickname","");
+  if(savedNick) nickInput.value = savedNick;
+  nickInput.focus();
 
   updateQuestUI();
   updateUnlockBadge();
   renderCharacter();
+  renderOnlinePreviews();
+
+  // Auth state (net)
+  onAuthStateChanged(auth, (u)=>{
+    roomState.uid = u ? u.uid : null;
+    setNet(!!u);
+  });
 }
 
-/* DOM hazır olunca çalıştır */
 if(document.readyState === "loading"){
   document.addEventListener("DOMContentLoaded", initApp);
 }else{
   initApp();
 }
 
-
-/* globals (onclick için) */
-window.change = change;
-window.saveCurrentCharacter = saveCurrentCharacter;
+/* globals */
+window.enterSite = enterSite;
+window.openGamesHub = openGamesHub;
 window.backToMenu = backToMenu;
 window.openGame = openGame;
-window.openGamesHub = openGamesHub;
+window.change = change;
+window.saveCurrentCharacter = saveCurrentCharacter;
 </script>
 
 </body>
 </html>
-
-
