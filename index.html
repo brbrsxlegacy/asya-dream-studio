@@ -29,6 +29,33 @@ body,html{
 h2,p{ text-align:center; line-height:1.45; }
 small{ opacity:.85; }
 
+/* ONLINE üst kontrol barı */
+.online-top-controls{
+  position: sticky;
+  top: 62px;              /* en üstteki NET/ROOM barına çarpmasın */
+  z-index: 50;
+  width: min(900px, 95vw);
+  display: flex;
+  gap: 10px;
+  flex-wrap: wrap;
+  justify-content: space-between;
+  align-items: center;
+  padding: 10px;
+  border-radius: 14px;
+  border: 1px solid rgba(255,255,255,.18);
+  background: rgba(0,0,0,.55);
+  backdrop-filter: blur(6px);
+}
+
+.online-top-controls .left,
+.online-top-controls .right{
+  display:flex;
+  gap:10px;
+  flex-wrap:wrap;
+  align-items:center;
+  justify-content:center;
+}
+
 button{
   padding:10px 14px; cursor:pointer;
   font-family:'Press Start 2P';
@@ -298,11 +325,14 @@ input{
     <p><small>NET ON = Auth + DB bağlantısı tamam.</small></p>
   </div>
 
-  <div class="controls">
-    <button id="btn-create-room" style="border-color:var(--neon-blue);color:var(--neon-blue)">ODA OLUŞTUR</button>
-    <input id="roomCodeInput" placeholder="5 haneli oda kodu" maxlength="5" />
-    <button id="btn-join-room" style="border-color:var(--neon-blue);color:var(--neon-blue)">KATIL</button>
+<div class="online-top-controls">
+  <div class="left">
+    <button id="btn-back3">Menü</button>
   </div>
+  <div class="right">
+    <button id="btn-leave-room" style="border-color:var(--bad);color:var(--bad)">ODADAN ÇIK</button>
+  </div>
+</div>
 
   <div class="sep"></div>
 
@@ -1449,3 +1479,4 @@ else init();
 
 </body>
 </html>
+
