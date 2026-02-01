@@ -127,8 +127,8 @@ canvas{
 <!-- LOGIN -->
 <div id="login" class="panel neon-show">
   <p>Takma adını gir</p>
-  <input id="nickname" placeholder="Takma ad">
-  <button id="btn-enter">GİR</button>
+  <input id="nickname" placeholder="Takma ad" autocomplete="off" autocapitalize="off" spellcheck="false" />
+  <button id="btn-enter" onclick="enterSite()">GİR</button>
 </div>
 
 <!-- MENU -->
@@ -965,26 +965,46 @@ function stopRunner(){
 }
 
 /* -------------------- INIT -------------------- */
-window.onload = () => {
+function initApp(){
   hideAll();
   showPanel("login");
 
-  document.getElementById("btn-enter").onclick = enterSite;
-  document.getElementById("btn-creator").onclick = openCreator;
-  document.getElementById("btn-library").onclick = openLibrary;
-  document.getElementById("btn-games").onclick = openGamesHub;
+  const btnEnter = document.getElementById("btn-enter");
+  if(btnEnter) btnEnter.onclick = enterSite;
 
-  document.getElementById("nickname").addEventListener("keydown", (e)=>{
-    if(e.key === "Enter") enterSite();
-  });
+  const btnCreator = document.getElementById("btn-creator");
+  if(btnCreator) btnCreator.onclick = openCreator;
 
-  const savedNick = LS.getStr("nickname","");
-  if(savedNick) document.getElementById("nickname").value = savedNick;
+  const btnLibrary = document.getElementById("btn-library");
+  if(btnLibrary) btnLibrary.onclick = openLibrary;
+
+  const btnGames = document.getElementById("btn-games");
+  if(btnGames) btnGames.onclick = openGamesHub;
+
+  const nickInput = document.getElementById("nickname");
+  if(nickInput){
+    nickInput.addEventListener("keydown", (e)=>{
+      if(e.key === "Enter") enterSite();
+    });
+
+    const savedNick = LS.getStr("nickname","");
+    if(savedNick) nickInput.value = savedNick;
+
+    nickInput.focus();
+  }
 
   updateQuestUI();
   updateUnlockBadge();
   renderCharacter();
-};
+}
+
+/* DOM hazır olunca çalıştır */
+if(document.readyState === "loading"){
+  document.addEventListener("DOMContentLoaded", initApp);
+}else{
+  initApp();
+}
+
 
 /* globals (onclick için) */
 window.change = change;
@@ -996,4 +1016,5 @@ window.openGamesHub = openGamesHub;
 
 </body>
 </html>
+
 
