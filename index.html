@@ -849,6 +849,13 @@ function backToMenu(){
 function init(){
   hideAll(); showPanel("login");
 
+  document.getElementById("btn-library").onclick = openLibrary;
+  document.getElementById("btn-creator").onclick = openCreator;
+  document.getElementById("btn-games").onclick = openGamesHub;
+  document.getElementById("btn-online").onclick = openOnline;
+
+  
+
   // login
   $("btn-enter").onclick = enterSite;
   $("nickname").addEventListener("keydown", (e)=>{ if(e.key==="Enter") enterSite(); });
@@ -1349,5 +1356,6 @@ else init();
 
 </body>
 </html>
+
 
 
