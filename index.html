@@ -1452,17 +1452,6 @@ const firebaseConfig = {
 </div>
 
 
-let fbApp = null;
-let db = null;
-
-function initFirebaseOnce(){
-  if(db) return;
-  fbApp = firebase.initializeApp(firebaseConfig);
-  db = firebase.firestore();
-}
-function code5(){
-  return String(Math.floor(10000 + Math.random()*90000)); // 5 haneli
-}
 
 // room state
 let roomCode = null;
@@ -1633,6 +1622,7 @@ window.leaveRoom = leaveRoom;
 
 </body>
 </html>
+
 
 
 
