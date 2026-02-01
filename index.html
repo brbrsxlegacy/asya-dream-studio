@@ -3,7 +3,7 @@
 <head>
 <meta charset="UTF-8" />
 <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-<title>Pixel Master + Online Room</title>
+<title>Pixel Master + Online Room + Chat</title>
 <link href="https://fonts.googleapis.com/css2?family=Press+Start+2P&display=swap" rel="stylesheet">
 
 <style>
@@ -81,6 +81,7 @@ input{
   box-shadow:0 0 15px rgba(255,0,255,.35);
   margin:10px 0;
 }
+#character-canvas svg{ width:100%; height:100%; }
 
 .grid3{
   display:grid;
@@ -106,7 +107,7 @@ input{
 .character-card{
   background:rgba(0,0,0,0.65);
   padding:10px;border:2px solid var(--neon-blue);
-  border-radius:12px;text-align:center;width:170px;
+  border-radius:12px;text-align:center;width:190px;
   display:flex;flex-direction:column;align-items:center;gap:8px;
 }
 .character-card svg{width:92px;height:120px;}
@@ -164,11 +165,46 @@ canvas{
   box-shadow:0 0 15px rgba(255,0,255,.22);
 }
 .avatar-preview svg{ width:100%; height:100%; }
+
 .sep{
   width:min(900px, 95vw);
   height:1px;
   background:rgba(255,255,255,.12);
   margin:8px 0;
+}
+
+/* CHAT */
+.chat-wrap{
+  width:min(900px, 95vw);
+  border:2px solid var(--neon-pink);
+  border-radius:16px;
+  background:rgba(0,0,0,.35);
+  box-shadow:0 0 15px rgba(255,0,255,.18);
+  padding:10px;
+  display:flex;
+  flex-direction:column;
+  gap:10px;
+}
+#chatBox{
+  width:100%;
+  height:220px;
+  overflow:auto;
+  border:2px solid var(--neon-blue);
+  border-radius:12px;
+  background:rgba(0,0,0,.35);
+  padding:10px;
+  font-size:10px;
+  line-height:1.6;
+}
+.chat-row{
+  width:100%;
+  display:flex;
+  gap:10px;
+  flex-wrap:wrap;
+  justify-content:center;
+}
+#chatInput{
+  width:min(650px, 95vw);
 }
 </style>
 </head>
@@ -185,7 +221,7 @@ canvas{
   <p>Takma adını gir</p>
   <input id="nickname" placeholder="Takma ad" autocomplete="off" autocapitalize="off" spellcheck="false" />
   <button id="btn-enter" onclick="enterSite()">GİR</button>
-  <p><small>Not: Offline mod + Online oda birlikte.</small></p>
+  <p><small>Offline + Online tek dosya.</small></p>
 </div>
 
 <!-- MENU -->
@@ -217,7 +253,7 @@ canvas{
 <!-- LIBRARY -->
 <div id="library" class="panel hidden">
   <h2>Dolap</h2>
-  <p><small>Butona bas: aktif karakter yapar (oyunlarda + online odada görünür).</small></p>
+  <p><small>AKTİF butonuna bas: oyunlarda + online’da görünür.</small></p>
   <div id="dolap-list"></div>
   <div class="controls">
     <button onclick="backToMenu()">Geri</button>
@@ -257,20 +293,21 @@ canvas{
   <h2>ONLINE MOD</h2>
   <div class="badge" id="onlineInfo">
     <p>Oda oluştur veya koda gir.</p>
-    <p><small>Sen kıyafet değiştirince diğerine anında gider.</small></p>
+    <p><small>Kıyafet değişince anında diğerine gider.</small></p>
   </div>
 
   <div class="controls">
     <button id="btn-create-room" style="border-color:var(--neon-blue);color:var(--neon-blue)">ODA OLUŞTUR</button>
     <input id="roomCodeInput" placeholder="5 haneli oda kodu" maxlength="5" />
     <button id="btn-join-room" style="border-color:var(--neon-blue);color:var(--neon-blue)">KATIL</button>
+    <button id="btn-net-test" style="border-color:var(--good);color:var(--good)">NET TEST</button>
   </div>
 
   <div class="sep"></div>
 
   <div class="online-stage">
     <div class="avatar-box">
-      <h3>Sen (p1)</h3>
+      <h3>Sen</h3>
       <div class="avatar-preview" id="p1Preview"></div>
       <div class="controls">
         <button onclick="change('hair')">Saç</button>
@@ -279,13 +316,24 @@ canvas{
         <button onclick="change('shoes')">Ayakkabı</button>
         <button id="btn-sync" style="border-color:var(--good);color:var(--good)">SENKRONLA</button>
       </div>
-      <p><small>Not: Aktif karakter yoksa, şu anki editördeki görünüm gider.</small></p>
+      <p><small>Aktif karakter varsa o gider, yoksa editördeki görünüm gider.</small></p>
     </div>
 
     <div class="avatar-box">
-      <h3>Arkadaş (p2)</h3>
+      <h3>Diğer kişi</h3>
       <div class="avatar-preview" id="p2Preview"><small>Bağlanınca gelecek…</small></div>
       <p><small>Gerçek zamanlı güncellenir.</small></p>
+    </div>
+  </div>
+
+  <div class="sep"></div>
+
+  <div class="chat-wrap">
+    <p style="text-align:center"><small>CHAT</small></p>
+    <div id="chatBox"><small>Mesajlar burada görünecek…</small></div>
+    <div class="chat-row">
+      <input id="chatInput" placeholder="Mesaj yaz..." maxlength="120" />
+      <button id="btnSendChat" style="border-color:var(--neon-blue);color:var(--neon-blue)">GÖNDER</button>
     </div>
   </div>
 
@@ -295,8 +343,6 @@ canvas{
   </div>
 </div>
 
-
-<!-- FIREBASE + APP -->
 <script type="module">
 /* -------------------- STORAGE HELPERS -------------------- */
 const LS = {
@@ -311,7 +357,7 @@ function todayKey(){
   const y = d.getFullYear();
   const m = String(d.getMonth()+1).padStart(2,'0');
   const day = String(d.getDate()).padStart(2,'0');
-  return `${y}-${m}-${day}`;
+  return \`\${y}-\${m}-\${day}\`;
 }
 
 /* -------------------- DAILY QUEST / UNLOCK -------------------- */
@@ -475,17 +521,7 @@ function renderCharacter(){
   canvasEl.innerHTML = makeSvgFromIndices(currentIndices);
 }
 
-function change(cat){
-  const list = getAssetList(cat);
-  currentIndices[cat] = (currentIndices[cat] + 1) % list.length;
-  renderCharacter();
-
-  // ONLINE açıksa anında gönder (sync)
-  if(roomState.inRoom) pushMyState();
-}
-
 function getMyDisplaySvg(){
-  // Eğer aktif karakter varsa onu gönder, yoksa editör halini gönder
   const active = LS.getStr("activeCharacterSVG","");
   return active || makeSvgFromIndices(currentIndices);
 }
@@ -541,16 +577,15 @@ function openOnline(){
   stopAnyGame();
   hideAll();
   showPanel("online");
-  updateNetUI();
-  updateRoomUI();
   renderOnlinePreviews();
+  updateRoomUI();
+  refreshNetBadge();
 }
 
 function backToMenu(){
   stopAnyGame();
   hideAll();
-  const nick = LS.getStr("nickname","");
-  document.getElementById("display-nick").textContent = nick || "";
+  document.getElementById("display-nick").textContent = LS.getStr("nickname","");
   showPanel("menu");
 }
 
@@ -625,22 +660,25 @@ function loadLibrary(){
       <div class="preview">${c.svg}</div>
       <p>${c.nick}</p>
       <div class="row">
-        <button style="border-color:var(--neon-blue);color:var(--neon-blue)">AKTİF</button>
+        <button class="btnActive" style="border-color:var(--neon-blue);color:var(--neon-blue)">AKTİF</button>
       </div>
+      <small style="opacity:.75">Kaydedildi</small>
     `;
 
-    const btn = card.querySelector("button");
+    const btn = card.querySelector(".btnActive");
     btn.onclick = (ev) => {
       ev.stopPropagation();
       LS.setStr("activeCharacterSVG", c.svg);
       alert("Aktif karakter ayarlandı!");
+      // Online açıksa anında gönder
+      if(roomState.inRoom) pushMyState();
     };
 
     container.appendChild(card);
   });
 }
 
-/* -------------------- GAME SYSTEM (3 oyun) -------------------- */
+/* -------------------- GAMES (3 mini oyun) -------------------- */
 const canvas = document.getElementById("game-canvas");
 const ctx = canvas.getContext("2d");
 let currentGame = null;
@@ -721,16 +759,14 @@ function drawParticles(){
 let shake = 0;
 function addShake(power=7){ shake = Math.max(shake, power); }
 
-/* GAME 1: NEON BOUNCE */
+/* GAME 1 */
 let bounceInterval = null;
 let bounce = null;
 
 function startBounce(){
   document.getElementById("game-title").textContent = "Neon Bounce";
   bounce = {
-    score:0,
-    lives:3,
-    wallH: 14,
+    score:0, lives:3, wallH: 14,
     ball:{ x:canvas.width/2, y:canvas.height/2, dx:2.4, dy:-3.1, r:10 },
     speedUpEvery: 10
   };
@@ -750,8 +786,7 @@ function startBounce(){
       shake *= 0.82;
       if(shake < 0.7) shake = 0;
     }
-    ctx.save();
-    ctx.translate(sx, sy);
+    ctx.save(); ctx.translate(sx, sy);
 
     ctx.fillStyle = "red";
     ctx.fillRect(0,0,canvas.width,bounce.wallH);
@@ -762,8 +797,7 @@ function startBounce(){
     ctx.fill();
 
     const b = bounce.ball;
-    b.x += b.dx;
-    b.y += b.dy;
+    b.x += b.dx; b.y += b.dy;
 
     let bounced = false;
 
@@ -778,8 +812,7 @@ function startBounce(){
       addScoreToDaily(1);
 
       if(bounce.score % bounce.speedUpEvery === 0){
-        b.dx *= 1.08;
-        b.dy *= 1.08;
+        b.dx *= 1.08; b.dy *= 1.08;
       }
     }
 
@@ -802,14 +835,9 @@ function startBounce(){
       }
     }
 
-    if(bounced){
-      spawnParticles(b.x, b.y, 14);
-      addShake(7);
-    }
+    if(bounced){ spawnParticles(b.x, b.y, 14); addShake(7); }
 
-    updateParticles();
-    drawParticles();
-    drawActiveAvatar();
+    updateParticles(); drawParticles(); drawActiveAvatar();
     ctx.restore();
 
     document.getElementById("hud").innerHTML =
@@ -824,20 +852,14 @@ function stopBounce(){
   }
 }
 
-/* GAME 2: REACTION RUSH */
+/* GAME 2 */
 let reaction = null;
 let reactionTimer = null;
 let reactionStateTimer = null;
 
 function startReaction(){
   document.getElementById("game-title").textContent = "Reaction Rush";
-  reaction = {
-    best: LS.get("bestReactionMs", null),
-    startedAt: null,
-    canClick:false,
-    round: 0,
-    score: 0
-  };
+  reaction = { best: LS.get("bestReactionMs", null), startedAt: null, canClick:false, round: 0, score: 0 };
 
   ctx.fillStyle = "rgba(10,10,15,1)";
   ctx.fillRect(0,0,canvas.width,canvas.height);
@@ -892,8 +914,7 @@ function startReaction(){
       reaction.score = Math.max(0, reaction.score - 1);
       spawnParticles(mx,my,18);
       addShake(10);
-      document.getElementById("hud").innerHTML =
-        `ERKEN! PUAN: <b>${reaction.score}</b><br><small>Hedef çıkınca bas</small>`;
+      document.getElementById("hud").innerHTML = `ERKEN! PUAN: <b>${reaction.score}</b><br><small>Hedef çıkınca bas</small>`;
       return;
     }
 
@@ -940,8 +961,7 @@ function startReaction(){
       reaction.score = Math.max(0, reaction.score - 1);
       spawnParticles(mx,my,14);
       addShake(6);
-      document.getElementById("hud").innerHTML =
-        `ISKA! PUAN: <b>${reaction.score}</b><br><small>Hedefe bas</small>`;
+      document.getElementById("hud").innerHTML = `ISKA! PUAN: <b>${reaction.score}</b><br><small>Hedefe bas</small>`;
     }
   };
 
@@ -953,22 +973,13 @@ function stopReaction(){
   if(reactionTimer){ clearTimeout(reactionTimer); reactionTimer = null; }
 }
 
-/* GAME 3: NEON RUNNER */
+/* GAME 3 */
 let runnerInterval = null;
 let runner = null;
 
 function startRunner(){
   document.getElementById("game-title").textContent = "Neon Runner";
-  runner = {
-    score: 0,
-    lives: 3,
-    y: canvas.height - 70,
-    vy: 0,
-    onGround: true,
-    obstacles: [],
-    t: 0,
-    speed: 3.2
-  };
+  runner = { score: 0, lives: 3, y: canvas.height - 70, vy: 0, onGround: true, obstacles: [], t: 0, speed: 3.2 };
 
   canvas.onclick = () => {
     if(runner.onGround){
@@ -990,8 +1001,7 @@ function startRunner(){
       shake*=0.82;
       if(shake<0.7) shake=0;
     }
-    ctx.save();
-    ctx.translate(sx, sy);
+    ctx.save(); ctx.translate(sx, sy);
 
     ctx.strokeStyle = "#00ffff";
     ctx.lineWidth = 2;
@@ -1033,9 +1043,7 @@ function startRunner(){
       ctx.restore();
 
       const ox = ob.x, oy = canvas.height-40 - ob.h, ow = ob.w, oh = ob.h;
-      const hit =
-        px < ox+ow && px+pw > ox &&
-        runner.y < oy+oh && runner.y+ph > oy;
+      const hit = px < ox+ow && px+pw > ox && runner.y < oy+oh && runner.y+ph > oy;
 
       if(hit){
         runner.lives -= 1;
@@ -1060,9 +1068,7 @@ function startRunner(){
     if(runner.score % 120 === 0) runner.speed *= 1.06;
     if(runner.score % 30 === 0) addScoreToDaily(1);
 
-    updateParticles();
-    drawParticles();
-    drawActiveAvatar();
+    updateParticles(); drawParticles(); drawActiveAvatar();
     ctx.restore();
 
     document.getElementById("hud").innerHTML =
@@ -1077,10 +1083,11 @@ function stopRunner(){
   }
 }
 
-/* -------------------- FIREBASE (ONLINE) -------------------- */
+/* -------------------- FIREBASE (ONLINE + CHAT) -------------------- */
 import { initializeApp } from "https://www.gstatic.com/firebasejs/10.12.5/firebase-app.js";
 import {
-  getDatabase, ref, set, update, onValue, get, remove, onDisconnect
+  getDatabase, ref, set, update, onValue, get, remove, onDisconnect,
+  push, query, limitToLast
 } from "https://www.gstatic.com/firebasejs/10.12.5/firebase-database.js";
 import {
   getAuth, signInAnonymously, onAuthStateChanged
@@ -1106,16 +1113,20 @@ const roomHud = document.getElementById("roomHud");
 
 const roomState = {
   uid: null,
+  connected: false,
   inRoom: false,
   roomId: null,
-  role: null, // "p1" | "p2"
+  role: null,
   unsubRoom: null,
-  isOnline: false
+  unsubChat: null
 };
 
-function setNet(on){
-  roomState.isOnline = !!on;
-  if(on){
+function updateRoomUI(){
+  roomHud.innerHTML = `ROOM: <b>${roomState.roomId ?? "---"}</b>`;
+}
+
+function setNetUI(isOn){
+  if(isOn){
     netHud.classList.remove("off");
     netHud.innerHTML = `NET: <b>ON</b> ✅`;
   }else{
@@ -1123,38 +1134,49 @@ function setNet(on){
     netHud.innerHTML = `NET: <b>OFF</b> ❌`;
   }
 }
-function updateRoomUI(){
-  roomHud.innerHTML = `ROOM: <b>${roomState.roomId ?? "---"}</b>`;
-}
-function updateNetUI(){
-  setNet(!!roomState.uid);
+
+function refreshNetBadge(){
+  // NET ON olması için hem auth hem de connected lazım
+  const on = !!roomState.uid && !!roomState.connected;
+  setNetUI(on);
 }
 
 function randomRoomCode(){
   return String(Math.floor(10000 + Math.random()*90000));
 }
 
+// HTML escape (chat güvenliği)
+function escapeHtml(s){
+  return String(s ?? "")
+    .replaceAll("&","&amp;")
+    .replaceAll("<","&lt;")
+    .replaceAll(">","&gt;")
+    .replaceAll('"',"&quot;")
+    .replaceAll("'","&#039;");
+}
+
 async function ensureAuth(){
   if(roomState.uid) return roomState.uid;
-  await signInAnonymously(auth);
-  return new Promise((resolve) => {
-    const off = onAuthStateChanged(auth, (u)=>{
-      if(u){
-        roomState.uid = u.uid;
-        setNet(true);
-        off();
-        resolve(u.uid);
-      }
-    });
-  });
+  try{
+    console.log("Auth: signInAnonymously starting...");
+    const cred = await signInAnonymously(auth);
+    roomState.uid = cred.user.uid;
+    console.log("Auth: OK uid=", roomState.uid);
+    refreshNetBadge();
+    return roomState.uid;
+  }catch(err){
+    console.log("AUTH ERROR:", err);
+    roomState.uid = null;
+    refreshNetBadge();
+    alert("NET OFF: Anonymous auth kapalı olabilir (Firebase Console -> Auth -> Anonymous Enable).");
+    throw err;
+  }
 }
 
 function renderOnlinePreviews(){
-  const p1 = document.getElementById("p1Preview");
-  const p2 = document.getElementById("p2Preview");
-  p1.innerHTML = getMyDisplaySvg();
+  document.getElementById("p1Preview").innerHTML = getMyDisplaySvg();
   if(!roomState.inRoom){
-    p2.innerHTML = `<small>Bağlanınca gelecek…</small>`;
+    document.getElementById("p2Preview").innerHTML = `<small>Bağlanınca gelecek…</small>`;
   }
 }
 
@@ -1164,7 +1186,6 @@ async function createRoom(){
   const roomId = randomRoomCode();
   const roomRef = ref(db, `rooms/${roomId}`);
 
-  // oluştur
   const nick = LS.getStr("nickname","anon");
   await set(roomRef, {
     createdAt: Date.now(),
@@ -1176,10 +1197,11 @@ async function createRoom(){
   roomState.role = "p1";
   updateRoomUI();
 
-  // p1 giderse oda kapansın
   onDisconnect(roomRef).remove().catch(()=>{});
 
   listenRoom(roomId);
+  listenChat(roomId);
+
   alert(`Oda kuruldu: ${roomId}`);
   renderOnlinePreviews();
 }
@@ -1196,7 +1218,6 @@ async function joinRoom(roomId){
   const data = snap.val();
   if(!data.p1) return alert("Oda bozuk (p1 yok).");
 
-  // oda dolu mu
   if(data.p2 && data.p2.uid && data.p2.uid !== roomState.uid){
     return alert("Oda dolu!");
   }
@@ -1211,21 +1232,21 @@ async function joinRoom(roomId){
   roomState.role = "p2";
   updateRoomUI();
 
-  // p2 koparsa p2 silinsin
   const p2Ref = ref(db, `rooms/${roomId}/p2`);
   onDisconnect(p2Ref).remove().catch(()=>{});
 
   listenRoom(roomId);
+  listenChat(roomId);
+
   alert(`Odaya girdin: ${roomId}`);
   renderOnlinePreviews();
 }
 
 function listenRoom(roomId){
   if(roomState.unsubRoom) roomState.unsubRoom();
-  const roomRef = ref(db, `rooms/${roomId}`);
 
-  // onValue unsubscribe fonksiyonunu döndürür
-  const unsubscribe = onValue(roomRef, (snap)=>{
+  const roomRef = ref(db, `rooms/${roomId}`);
+  const unsub = onValue(roomRef, (snap)=>{
     if(!snap.exists()){
       // oda kapandı
       if(roomState.inRoom){
@@ -1234,41 +1255,32 @@ function listenRoom(roomId){
         roomState.role = null;
         updateRoomUI();
         document.getElementById("p2Preview").innerHTML = `<small>Oda kapandı.</small>`;
+        stopChatListener();
+        document.getElementById("chatBox").innerHTML = `<small>Oda kapandı.</small>`;
       }
       return;
     }
 
     const data = snap.val();
-    // kendi rolüne göre diğerini çiz
-    const p2Preview = document.getElementById("p2Preview");
+    const otherBox = document.getElementById("p2Preview");
 
     if(roomState.role === "p1"){
-      if(data.p2 && data.p2.svg){
-        p2Preview.innerHTML = data.p2.svg;
-      }else{
-        p2Preview.innerHTML = `<small>Arkadaş bekleniyor…</small>`;
-      }
-      // p1 preview her zaman bizim
-      document.getElementById("p1Preview").innerHTML = getMyDisplaySvg();
+      otherBox.innerHTML = (data.p2 && data.p2.svg) ? data.p2.svg : `<small>Arkadaş bekleniyor…</small>`;
     }else if(roomState.role === "p2"){
-      // p2 için "diğer" p1
-      if(data.p1 && data.p1.svg){
-        p2Preview.innerHTML = data.p1.svg;
-      }else{
-        p2Preview.innerHTML = `<small>p1 yok…</small>`;
-      }
-      document.getElementById("p1Preview").innerHTML = getMyDisplaySvg();
+      otherBox.innerHTML = (data.p1 && data.p1.svg) ? data.p1.svg : `<small>p1 yok…</small>`;
     }
 
-    // room hud
+    // ben
+    document.getElementById("p1Preview").innerHTML = getMyDisplaySvg();
     updateRoomUI();
   });
 
-  roomState.unsubRoom = unsubscribe;
+  roomState.unsubRoom = unsub;
 }
 
 async function pushMyState(){
   if(!roomState.inRoom || !roomState.roomId || !roomState.role) return;
+
   const roomId = roomState.roomId;
   const role = roomState.role;
   const nick = LS.getStr("nickname","anon");
@@ -1276,8 +1288,6 @@ async function pushMyState(){
 
   const meRef = ref(db, `rooms/${roomId}/${role}`);
   await update(meRef, { uid: roomState.uid, nick, svg, ts: Date.now() });
-
-  // preview güncelle
   document.getElementById("p1Preview").innerHTML = svg;
 }
 
@@ -1288,23 +1298,111 @@ async function leaveRoom(){
   const role = roomState.role;
 
   try{
-    if(role === "p1"){
-      await remove(ref(db, `rooms/${roomId}`));
-    }else{
-      await remove(ref(db, `rooms/${roomId}/p2`));
-    }
-  }catch(e){
-    // yut
-  }
+    if(role === "p1") await remove(ref(db, `rooms/${roomId}`));
+    else await remove(ref(db, `rooms/${roomId}/p2`));
+  }catch(e){}
 
   if(roomState.unsubRoom) roomState.unsubRoom();
   roomState.unsubRoom = null;
+
+  stopChatListener();
+  document.getElementById("chatBox").innerHTML = `<small>Mesajlar burada görünecek…</small>`;
+  document.getElementById("chatInput").value = "";
+
   roomState.inRoom = false;
   roomState.roomId = null;
   roomState.role = null;
+
   updateRoomUI();
   renderOnlinePreviews();
   alert("Odadan çıktın.");
+}
+
+/* -------------------- CHAT -------------------- */
+function renderChatMessages(msgs){
+  const box = document.getElementById("chatBox");
+  const atBottom = (box.scrollTop + box.clientHeight) >= (box.scrollHeight - 20);
+
+  if(!msgs || msgs.length === 0){
+    box.innerHTML = `<small>Henüz mesaj yok…</small>`;
+    return;
+  }
+
+  box.innerHTML = msgs.map(m=>{
+    const nick = escapeHtml(m.nick || "anon");
+    const text = escapeHtml(m.text || "");
+    const time = new Date(m.ts || Date.now());
+    const hh = String(time.getHours()).padStart(2,"0");
+    const mm = String(time.getMinutes()).padStart(2,"0");
+    return `<div style="margin:6px 0">
+      <span style="color:var(--neon-blue)">[${hh}:${mm}]</span>
+      <span style="color:var(--neon-pink)">${nick}:</span>
+      <span>${text}</span>
+    </div>`;
+  }).join("");
+
+  if(atBottom) box.scrollTop = box.scrollHeight;
+}
+
+function stopChatListener(){
+  if(roomState.unsubChat){
+    roomState.unsubChat();
+    roomState.unsubChat = null;
+  }
+}
+
+function listenChat(roomId){
+  stopChatListener();
+  const chatRef = query(ref(db, `rooms/${roomId}/chat`), limitToLast(40));
+  const unsub = onValue(chatRef, (snap)=>{
+    const msgs = [];
+    snap.forEach(child=> msgs.push(child.val()));
+    msgs.sort((a,b)=>(a.ts||0)-(b.ts||0));
+    renderChatMessages(msgs);
+  });
+  roomState.unsubChat = unsub;
+}
+
+async function sendChat(){
+  if(!roomState.inRoom || !roomState.roomId) return alert("Odaya girmen lazım!");
+  const input = document.getElementById("chatInput");
+  const text = (input.value || "").trim();
+  if(!text) return;
+
+  const msg = {
+    uid: roomState.uid || "noauth",
+    nick: LS.getStr("nickname","anon"),
+    text: text.slice(0,120),
+    ts: Date.now()
+  };
+
+  const mref = push(ref(db, `rooms/${roomState.roomId}/chat`));
+  await set(mref, msg);
+  input.value = "";
+}
+
+/* -------------------- ONLINE CHANGE -------------------- */
+function change(cat){
+  const list = getAssetList(cat);
+  currentIndices[cat] = (currentIndices[cat] + 1) % list.length;
+  renderCharacter();
+  if(roomState.inRoom) pushMyState(); // anında sync
+}
+
+/* -------------------- CONNECTED + AUTH WATCH -------------------- */
+function initFirebaseWatchers(){
+  // bağlantı (internet + firebase)
+  const connRef = ref(db, ".info/connected");
+  onValue(connRef, (snap)=>{
+    roomState.connected = !!snap.val();
+    refreshNetBadge();
+  });
+
+  // auth state
+  onAuthStateChanged(auth, (u)=>{
+    roomState.uid = u ? u.uid : null;
+    refreshNetBadge();
+  });
 }
 
 /* -------------------- INIT -------------------- */
@@ -1312,20 +1410,29 @@ function initApp(){
   hideAll();
   showPanel("login");
 
-  // Menu buttons
   document.getElementById("btn-enter").onclick = enterSite;
   document.getElementById("btn-creator").onclick = openCreator;
   document.getElementById("btn-library").onclick = openLibrary;
   document.getElementById("btn-games").onclick = openGamesHub;
   document.getElementById("btn-online").onclick = openOnline;
 
-  // Online buttons
   document.getElementById("btn-create-room").onclick = createRoom;
   document.getElementById("btn-join-room").onclick = () => joinRoom(document.getElementById("roomCodeInput").value);
   document.getElementById("btn-leave-room").onclick = leaveRoom;
   document.getElementById("btn-sync").onclick = pushMyState;
 
-  // Nick enter
+  document.getElementById("btnSendChat").onclick = sendChat;
+  document.getElementById("btn-net-test").onclick = async () => {
+    try{
+      const uid = await ensureAuth();
+      alert("NET ON ✅ uid: " + uid.slice(0,8));
+    }catch(e){
+      alert("NET OFF ❌ (Firebase -> Auth Anonymous enable lazım)");
+    }
+  };
+
+  document.getElementById("chatInput").addEventListener("keydown", (e)=>{ if(e.key === "Enter") sendChat(); });
+
   const nickInput = document.getElementById("nickname");
   nickInput.addEventListener("keydown", (e)=>{ if(e.key === "Enter") enterSite(); });
 
@@ -1337,12 +1444,9 @@ function initApp(){
   updateUnlockBadge();
   renderCharacter();
   renderOnlinePreviews();
+  updateRoomUI();
 
-  // Auth state (net)
-  onAuthStateChanged(auth, (u)=>{
-    roomState.uid = u ? u.uid : null;
-    setNet(!!u);
-  });
+  initFirebaseWatchers();
 }
 
 if(document.readyState === "loading"){
@@ -1358,7 +1462,10 @@ window.backToMenu = backToMenu;
 window.openGame = openGame;
 window.change = change;
 window.saveCurrentCharacter = saveCurrentCharacter;
+window.openCreator = openCreator;
+window.openLibrary = openLibrary;
+window.openOnline = openOnline;
 </script>
-
 </body>
 </html>
+
