@@ -6,7 +6,7 @@
 <title>Pixel Master + Mini Oyun</title>
 <link href="https://fonts.googleapis.com/css2?family=Press+Start+2P&display=swap" rel="stylesheet">
 
-<!-- Firebase compat (inline onclick bozulmasın) -->
+<!-- Firebase compat -->
 <script src="https://www.gstatic.com/firebasejs/10.7.1/firebase-app-compat.js"></script>
 <script src="https://www.gstatic.com/firebasejs/10.7.1/firebase-auth-compat.js"></script>
 <script src="https://www.gstatic.com/firebasejs/10.7.1/firebase-database-compat.js"></script>
@@ -128,6 +128,9 @@ canvas{
 </head>
 
 <body>
+
+<!-- NET BADGE -->
+<div id="net-badge" style="position:fixed;top:10px;right:10px;color:#00ffff;font-size:10px;z-index:9999;">NET: ...</div>
 
 <!-- LOGIN -->
 <div id="login" class="panel neon-show">
@@ -353,7 +356,6 @@ const baseAssets = {
   ]
 };
 
-// Reward pack
 const neonPack = {
   hair:[
     `<rect x="29" y="18" width="42" height="20" fill="#9b5cff"/><rect x="31" y="22" width="38" height="6" fill="#00ffff"/>`,
@@ -395,17 +397,19 @@ let currentIndices = { hair:0, top:0, bottom:0, shoes:0 };
 
 function renderCharacter(){
   const canvasEl = document.getElementById('character-canvas');
+  if(!canvasEl) return;
+
   const hairList = getAssetList("hair");
   const topList = getAssetList("top");
   const bottomList = getAssetList("bottom");
   const shoesList = getAssetList("shoes");
 
-  currentIndices.hair = ((currentIndices.hair % hairList.length) + hairList.length) % hairList.length;
-  currentIndices.top = ((currentIndices.top % topList.length) + topList.length) % topList.length;
-  currentIndices.bottom = ((currentIndices.bottom % bottomList.length) + bottomList.length) % bottomList.length;
-  currentIndices.shoes = ((currentIndices.shoes % shoesList.length) + shoesList.length) % shoesList.length;
+  const norm = (v, len) => ((v % len) + len) % len;
+  currentIndices.hair = norm(currentIndices.hair, hairList.length);
+  currentIndices.top = norm(currentIndices.top, topList.length);
+  currentIndices.bottom = norm(currentIndices.bottom, bottomList.length);
+  currentIndices.shoes = norm(currentIndices.shoes, shoesList.length);
 
-  if(!canvasEl) return;
   canvasEl.innerHTML = `
     <svg viewBox="0 0 100 160" xmlns="http://www.w3.org/2000/svg" width="100%" height="100%">
       ${bodyBase}
@@ -417,7 +421,21 @@ function renderCharacter(){
   `;
 }
 
-/* -------------------- FIREBASE RTDB (TEK) -------------------- */
+/* -------------------- FIREBASE RTDB (DÜZELTİLMİŞ) -------------------- */
+function setNet(txt){
+  const el = document.getElementById("net-badge");
+  if(el) el.textContent = txt;
+}
+function safeFirebaseAlert(err){
+  console.error("FIREBASE ERROR:", err);
+  const msg = err?.message || String(err);
+  if((err?.code || "").includes("permission_denied") || msg.toLowerCase().includes("permission")){
+    alert("Firebase izin hatası (permission_denied). RTDB Rules açman lazım: rooms altında read/write auth != null");
+  }else{
+    alert("Firebase hata: " + msg);
+  }
+}
+
 const firebaseConfig = {
   apiKey: "AIzaSyABqkhpL1SMRzRJ9GQLjjZE2IryqpAvMPw",
   authDomain: "pixelroom-ae218.firebaseapp.com",
@@ -431,15 +449,30 @@ const firebaseConfig = {
 
 if(!firebase.apps.length) firebase.initializeApp(firebaseConfig);
 
+const rtdb = firebase.database();
+
+// bağlantı göstergesi
+rtdb.ref(".info/connected").on("value", snap=>{
+  const ok = !!snap.val();
+  setNet(ok ? "NET: online ✅" : "NET: offline ❌");
+});
+
 let authReadyResolve;
 const authReady = new Promise(r => (authReadyResolve = r));
-firebase.auth().onAuthStateChanged(u => { if(u) authReadyResolve(u); });
-firebase.auth().signInAnonymously().catch(console.error);
-
-const rtdb = firebase.database();
+firebase.auth().onAuthStateChanged(u => {
+  if(u){
+    setNet("NET: auth ✅");
+    authReadyResolve(u);
+  }
+});
+firebase.auth().signInAnonymously().catch(e=>{
+  setNet("NET: auth ❌");
+  safeFirebaseAlert(e);
+});
 
 let roomCode = null;
 let slot = null; // "p1" / "p2"
+let roomRef = null;
 
 function generateRoomCode(){
   return String(Math.floor(10000 + Math.random()*90000));
@@ -459,10 +492,11 @@ function drawCharacterFromIndices(indices, targetId){
   const bottomList = getAssetList("bottom");
   const shoesList = getAssetList("shoes");
 
-  const h = hairList[(indices.hair ?? 0) % hairList.length];
-  const t = topList[(indices.top ?? 0) % topList.length];
-  const b = bottomList[(indices.bottom ?? 0) % bottomList.length];
-  const s = shoesList[(indices.shoes ?? 0) % shoesList.length];
+  const norm = (v, len) => ((v % len) + len) % len;
+  const h = hairList[norm(indices.hair ?? 0, hairList.length)];
+  const t = topList[norm(indices.top ?? 0, topList.length)];
+  const b = bottomList[norm(indices.bottom ?? 0, bottomList.length)];
+  const s = shoesList[norm(indices.shoes ?? 0, shoesList.length)];
 
   target.innerHTML = `
     <svg viewBox="0 0 100 160" xmlns="http://www.w3.org/2000/svg" width="220" height="320">
@@ -472,72 +506,97 @@ function drawCharacterFromIndices(indices, targetId){
   `;
 }
 
+function stopRoomListener(){
+  if(roomRef){
+    roomRef.off();
+    roomRef = null;
+  }
+}
+
 function listenRoom(){
-  rtdb.ref("rooms/" + roomCode).on("value", (snap)=>{
+  stopRoomListener();
+  if(!roomCode) return;
+
+  roomRef = rtdb.ref("rooms/" + roomCode);
+  roomRef.on("value", (snap)=>{
     const data = snap.val();
     if(!data){
       leaveRoom(true);
       return;
     }
+
     drawCharacterFromIndices(data[slot]?.character, "my-character");
     const other = (slot === "p1") ? "p2" : "p1";
     drawCharacterFromIndices(data[other]?.character, "friend-character");
+  }, (err)=>{
+    safeFirebaseAlert(err);
   });
 }
 
 async function createRoom(){
-  await authReady;
+  try{
+    await authReady;
 
-  roomCode = generateRoomCode();
-  slot = "p1";
+    roomCode = generateRoomCode();
+    slot = "p1";
 
-  await rtdb.ref("rooms/" + roomCode).set({
-    p1: { character: currentIndices },
-    p2: null,
-    createdAt: Date.now()
-  });
+    await rtdb.ref("rooms/" + roomCode).set({
+      p1: { character: currentIndices },
+      p2: null,
+      createdAt: Date.now()
+    });
 
-  const rc = document.getElementById("room-code");
-  if(rc) rc.textContent = "ODA: " + roomCode;
+    const rc = document.getElementById("room-code");
+    if(rc) rc.textContent = "ODA: " + roomCode;
 
-  hideAll();
-  showPanel("room");
-  drawCharacterFromIndices(currentIndices, "my-character");
-  drawCharacterFromIndices(null, "friend-character");
-  listenRoom();
+    hideAll();
+    showPanel("room");
+    drawCharacterFromIndices(currentIndices, "my-character");
+    drawCharacterFromIndices(null, "friend-character");
+    listenRoom();
+  }catch(err){
+    safeFirebaseAlert(err);
+  }
 }
 
 async function joinRoom(){
-  await authReady;
+  try{
+    await authReady;
 
-  const code = (document.getElementById("joinCode").value || "").trim();
-  if(!/^\d{5}$/.test(code)) return alert("5 haneli kod gir!");
+    const code = (document.getElementById("joinCode").value || "").trim();
+    if(!/^\d{5}$/.test(code)) return alert("5 haneli kod gir!");
 
-  roomCode = code;
-  slot = "p2";
+    roomCode = code;
+    slot = "p2";
 
-  const snap = await rtdb.ref("rooms/" + roomCode).once("value");
-  if(!snap.exists()) return alert("Oda yok!");
-  const data = snap.val();
-  if(data.p2) return alert("Oda dolu!");
+    const snap = await rtdb.ref("rooms/" + roomCode).once("value");
+    if(!snap.exists()) return alert("Oda yok!");
+    const data = snap.val();
+    if(data.p2) return alert("Oda dolu!");
 
-  await rtdb.ref("rooms/" + roomCode + "/p2").set({ character: currentIndices });
+    await rtdb.ref("rooms/" + roomCode + "/p2").set({ character: currentIndices });
 
-  const rc = document.getElementById("room-code");
-  if(rc) rc.textContent = "ODA: " + roomCode;
+    const rc = document.getElementById("room-code");
+    if(rc) rc.textContent = "ODA: " + roomCode;
 
-  hideAll();
-  showPanel("room");
-  drawCharacterFromIndices(currentIndices, "my-character");
-  listenRoom();
+    hideAll();
+    showPanel("room");
+    drawCharacterFromIndices(currentIndices, "my-character");
+    listenRoom();
+  }catch(err){
+    safeFirebaseAlert(err);
+  }
 }
 
 function leaveRoom(silent=false){
+  stopRoomListener();
+
   if(roomCode && slot){
-    rtdb.ref("rooms/" + roomCode).off();
-    if(slot === "p2") rtdb.ref("rooms/" + roomCode + "/p2").remove();
-    else rtdb.ref("rooms/" + roomCode).remove();
+    // not: remove() fail olursa da sorun değil, sadece dene
+    if(slot === "p2") rtdb.ref("rooms/" + roomCode + "/p2").remove().catch(()=>{});
+    else rtdb.ref("rooms/" + roomCode).remove().catch(()=>{});
   }
+
   roomCode = null;
   slot = null;
   if(!silent) backToMenu();
@@ -549,10 +608,11 @@ function change(cat){
   currentIndices[cat] = (currentIndices[cat] + 1) % list.length;
   renderCharacter();
 
-  // odadaysak anında gönder + preview güncelle
+  // odadaysak anında gönder + preview güncelle (hata yakala)
   const roomEl = document.getElementById("room");
   if(roomCode && slot){
-    rtdb.ref(`rooms/${roomCode}/${slot}`).update({ character: currentIndices });
+    rtdb.ref(`rooms/${roomCode}/${slot}`).update({ character: currentIndices })
+      .catch(safeFirebaseAlert);
   }
   if(roomEl && !roomEl.classList.contains("hidden")){
     drawCharacterFromIndices(currentIndices, "my-character");
@@ -724,7 +784,6 @@ const canvas = document.getElementById("game-canvas");
 const ctx = canvas.getContext("2d");
 let currentGame = null;
 
-// common ui
 function openGame(which){
   hideAll();
   showPanel("game");
@@ -735,7 +794,6 @@ function openGame(which){
 function startGame(which){
   stopAnyGame();
   currentGame = which;
-
   if(which === "bounce") startBounce();
   else if(which === "reaction") startReaction();
   else if(which === "runner") startRunner();
@@ -751,11 +809,9 @@ function stopAnyGame(){
   shake = 0;
 }
 
-// draw active character avatar at corner (if exists)
 function drawActiveAvatar(){
   const svg = LS.getStr("activeCharacterSVG","");
   if(!svg) return;
-
   ctx.save();
   ctx.globalAlpha = 0.9;
   ctx.fillStyle = "rgba(0,0,0,0.35)";
@@ -769,7 +825,6 @@ function drawActiveAvatar(){
   ctx.restore();
 }
 
-/* EFFECTS */
 let particles = [];
 function spawnParticles(x,y, count=14){
   for(let i=0;i<count;i++){
@@ -805,7 +860,7 @@ function drawParticles(){
 let shake = 0;
 function addShake(power=7){ shake = Math.max(shake, power); }
 
-/* GAME 1: NEON BOUNCE */
+/* GAME 1: BOUNCE */
 let bounceInterval = null;
 let bounce = null;
 
@@ -894,7 +949,6 @@ function startBounce(){
 
     updateParticles();
     drawParticles();
-
     drawActiveAvatar();
     ctx.restore();
 
@@ -910,7 +964,7 @@ function stopBounce(){
   }
 }
 
-/* GAME 2: REACTION RUSH */
+/* GAME 2: REACTION */
 let reaction = null;
 let reactionTimer = null;
 let reactionStateTimer = null;
@@ -1039,7 +1093,7 @@ function stopReaction(){
   if(reactionTimer){ clearTimeout(reactionTimer); reactionTimer = null; }
 }
 
-/* GAME 3: NEON RUNNER */
+/* GAME 3: RUNNER */
 let runnerInterval = null;
 let runner = null;
 
