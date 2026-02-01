@@ -433,177 +433,6 @@ function change(cat){
   currentIndices[cat] = (currentIndices[cat] + 1) % list.length;
   renderCharacter();
 
-  /* ===================== ONLINE (RTDB) - FIXED ===================== */
-
-// 1) Firebase init (TEK)
-const firebaseConfig = {
-  apiKey: "AIzaSyABqkhpL1SMRzRJ9GQLjjZE2IryqpAvMPw",
-  authDomain: "pixelroom-ae218.firebaseapp.com",
-  projectId: "pixelroom-ae218",
-  storageBucket: "pixelroom-ae218.firebasestorage.app",
-  messagingSenderId: "720297722320",
-  appId: "1:720297722320:web:c815edae99d1efa7ff39d5",
-  measurementId: "G-HD8901B19M",
-  databaseURL: "https://pixelroom-ae218-default-rtdb.firebaseio.com"
-};
-
-firebase.initializeApp(firebaseConfig);
-firebase.auth().signInAnonymously().catch(console.error);
-const db = firebase.database();
-
-// oda durumu
-let roomCode = null;
-let slot = null; // "p1" veya "p2"
-
-// 2) openOnline
-function openOnline(){
-  stopAnyGame();
-  hideAll();
-  showPanel("online");
-}
-
-// 3) hideAll içine online+room ekle (SENİN hideAll'INI bununla değiştir)
-function hideAll(){
-  ["login","menu","creator","library","online","room","games","game"].forEach(id=>{
-    const el = document.getElementById(id);
-    if(el) el.classList.add("hidden");
-  });
-}
-
-// 4) kod üret
-function generateRoomCode(){
-  return Math.floor(10000 + Math.random()*90000).toString();
-}
-
-// 5) karakter çiz (odadaki preview)
-function drawCharacterFromIndices(indices, targetId){
-  const target = document.getElementById(targetId);
-  if(!target) return;
-
-  if(!indices){
-    target.innerHTML = `<p><small>Bekleniyor…</small></p>`;
-    return;
-  }
-
-  const hairList = getAssetList("hair");
-  const topList = getAssetList("top");
-  const bottomList = getAssetList("bottom");
-  const shoesList = getAssetList("shoes");
-
-  target.innerHTML = `
-    <svg viewBox="0 0 100 160" xmlns="http://www.w3.org/2000/svg" width="220" height="320">
-      ${bodyBase}
-      ${hairList[(indices.hair||0) % hairList.length]}
-      ${topList[(indices.top||0) % topList.length]}
-      ${bottomList[(indices.bottom||0) % bottomList.length]}
-      ${shoesList[(indices.shoes||0) % shoesList.length]}
-    </svg>
-  `;
-}
-
-// 6) oda dinle
-function listenRoom(){
-  db.ref("rooms/" + roomCode).on("value", snap=>{
-    const data = snap.val();
-    if(!data){
-      leaveRoom(true);
-      return;
-    }
-
-    // sen
-    drawCharacterFromIndices(data[slot]?.character, "my-character");
-
-    // arkadaş
-    const other = (slot === "p1") ? "p2" : "p1";
-    drawCharacterFromIndices(data[other]?.character, "friend-character");
-  });
-}
-
-// 7) oda oluştur
-function createRoom(){
-  roomCode = generateRoomCode();
-  slot = "p1";
-
-  db.ref("rooms/" + roomCode).set({
-    p1: { character: currentIndices },
-    p2: null,
-    createdAt: Date.now()
-  });
-
-  const codeEl = document.getElementById("room-code");
-  if(codeEl) codeEl.textContent = "ODA: " + roomCode;
-
-  hideAll();
-  showPanel("room");
-  listenRoom();
-}
-
-// 8) odaya gir
-function joinRoom(){
-  const code = (document.getElementById("joinCode").value || "").trim();
-  if(code.length !== 5) return alert("5 haneli kod gir!");
-
-  roomCode = code;
-  slot = "p2";
-
-  db.ref("rooms/" + roomCode).once("value").then(snap=>{
-    if(!snap.exists()) return alert("Oda yok!");
-    const data = snap.val();
-    if(data.p2) return alert("Oda dolu!");
-
-    db.ref("rooms/" + roomCode + "/p2").set({ character: currentIndices });
-
-    const codeEl = document.getElementById("room-code");
-    if(codeEl) codeEl.textContent = "ODA: " + roomCode;
-
-    hideAll();
-    showPanel("room");
-    listenRoom();
-  });
-}
-
-// 9) odadan çık
-function leaveRoom(silent=false){
-  if(roomCode && slot){
-    // dinlemeyi kapat
-    db.ref("rooms/" + roomCode).off();
-
-    // oda temizliği
-    if(slot === "p2"){
-      db.ref("rooms/" + roomCode + "/p2").remove();
-    }else{
-      db.ref("rooms/" + roomCode).remove();
-    }
-  }
-
-  roomCode = null;
-  slot = null;
-
-  if(!silent) backToMenu();
-}
-
-// 10) change(cat) fonksiyonun içine bunu EKLE (en altına)
-const _oldChange = change;
-change = function(cat){
-  _oldChange(cat);
-
-  // odadaysan anında yaz
-  if(roomCode && slot){
-    db.ref(`rooms/${roomCode}/${slot}`).update({ character: currentIndices });
-  }
-
-  // room ekranındaysan kendi preview'u güncelle
-  if(!document.getElementById("room").classList.contains("hidden")){
-    drawCharacterFromIndices(currentIndices, "my-character");
-  }
-};
-
-// 11) onclick için global yap
-window.openOnline = openOnline;
-window.createRoom = createRoom;
-window.joinRoom = joinRoom;
-window.leaveRoom = leaveRoom;
-/* ===================== ONLINE (RTDB) - END ===================== */
 
 
   // ADDED: online odadaysa anında firebase'e gönder
@@ -1407,8 +1236,9 @@ window.openOnline = openOnline;
 window.createRoom = createRoom;
 window.joinRoom = joinRoom;
 window.leaveRoom = leaveRoom;
-/* ==================== FIREBASE ROOM (ONLINE) ==================== */
-// 1) Firebase init (senin verdiğin config)
+/* ===================== ONLINE (RTDB) - CLEAN WORKING ===================== */
+
+// 1) Firebase init (TEK ve GLOBAL)
 const firebaseConfig = {
   apiKey: "AIzaSyABqkhpL1SMRzRJ9GQLjjZE2IryqpAvMPw",
   authDomain: "pixelroom-ae218.firebaseapp.com",
@@ -1416,200 +1246,165 @@ const firebaseConfig = {
   storageBucket: "pixelroom-ae218.firebasestorage.app",
   messagingSenderId: "720297722320",
   appId: "1:720297722320:web:c815edae99d1efa7ff39d5",
-  measurementId: "G-HD8901B19M"
+  measurementId: "G-HD8901B19M",
+  databaseURL: "https://pixelroom-ae218-default-rtdb.firebaseio.com"
 };
 
-<!-- ROOM SCREEN -->
-<div id="room" class="panel hidden">
-  <h2>Oda: <span id="room-code">-----</span></h2>
+// aynı sayfada 2 kere init olmasın
+if (!firebase.apps.length) firebase.initializeApp(firebaseConfig);
 
-  <div class="grid3" style="grid-template-columns:1fr 1fr; max-width:900px">
-    <!-- SEN -->
-    <div class="badge">
-      <p>SEN: <b id="me-nick">-</b></p>
-      <div id="me-canvas" style="width:240px;height:320px;margin:10px auto;border:2px solid var(--neon-blue);border-radius:14px;display:flex;align-items:center;justify-content:center;background:#0b0b0f"></div>
+firebase.auth().signInAnonymously().catch(console.error);
+const rtdb = firebase.database();
 
-      <div class="controls">
-        <button onclick="roomChange('hair')">Saç</button>
-        <button onclick="roomChange('top')">Üst</button>
-        <button onclick="roomChange('bottom')">Alt</button>
-        <button onclick="roomChange('shoes')">Ayakkabı</button>
-      </div>
-    </div>
-
-    <!-- RAKİP -->
-    <div class="badge">
-      <p>RAKİP: <b id="op-nick">Bekleniyor...</b></p>
-      <div id="op-canvas" style="width:240px;height:320px;margin:10px auto;border:2px solid var(--neon-pink);border-radius:14px;display:flex;align-items:center;justify-content:center;background:#0b0b0f"></div>
-      <p><small id="op-status">Kodla girince burada görünecek.</small></p>
-    </div>
-  </div>
-
-  <div class="controls">
-    <button onclick="leaveRoom()">Çık</button>
-    <button onclick="backToMenu()">Menü</button>
-  </div>
-</div>
-
-
-
-// room state
+// oda durumu
 let roomCode = null;
-let myId = LS.getStr("myPlayerId", "");
-if(!myId){
-  myId = Math.random().toString(16).slice(2,10);
-  LS.setStr("myPlayerId", myId);
-}
-let unsubRoom = null;
+let slot = null; // "p1" veya "p2"
 
-// 2) sayfa geçişi
+function generateRoomCode(){
+  return String(Math.floor(10000 + Math.random() * 90000));
+}
+
 function openOnline(){
   stopAnyGame();
   hideAll();
   showPanel("online");
 }
 
-// hideAll içine online + room ekle (sende yoksa)
-const _hideAllOld = hideAll;
-hideAll = function(){
-  ["login","menu","creator","library","online","room","games","game"].forEach(id=>{
-    const el = document.getElementById(id);
-    if(el) el.classList.add("hidden");
-  });
-};
+// odadaki karakterleri çiz
+function drawCharacterFromIndices(indices, targetId){
+  const target = document.getElementById(targetId);
+  if(!target) return;
 
+  if(!indices){
+    target.innerHTML = `<p><small>Bekleniyor…</small></p>`;
+    return;
+  }
 
-// 3) room render helpers
-function svgFromIndices(idx){
   const hairList = getAssetList("hair");
   const topList = getAssetList("top");
   const bottomList = getAssetList("bottom");
   const shoesList = getAssetList("shoes");
 
-  const h = hairList[(idx?.hair ?? 0) % hairList.length];
-  const t = topList[(idx?.top ?? 0) % topList.length];
-  const b = bottomList[(idx?.bottom ?? 0) % bottomList.length];
-  const s = shoesList[(idx?.shoes ?? 0) % shoesList.length];
+  const h = hairList[(indices.hair ?? 0) % hairList.length];
+  const t = topList[(indices.top ?? 0) % topList.length];
+  const b = bottomList[(indices.bottom ?? 0) % bottomList.length];
+  const s = shoesList[(indices.shoes ?? 0) % shoesList.length];
 
-  return `
-    <svg viewBox="0 0 100 160" xmlns="http://www.w3.org/2000/svg" width="100%" height="100%">
+  target.innerHTML = `
+    <svg viewBox="0 0 100 160" xmlns="http://www.w3.org/2000/svg" width="220" height="320">
       ${bodyBase}
       ${h}${t}${b}${s}
     </svg>
   `;
 }
-function renderRoomMe(){
-  document.getElementById("me-canvas").innerHTML = svgFromIndices(currentIndices);
-}
-function renderRoomOpponent(idx){
-  document.getElementById("op-canvas").innerHTML = svgFromIndices(idx || {hair:0,top:0,bottom:0,shoes:0});
-}
 
-// 4) oda oluştur / gir
-async function createRoom(){
-  initFirebaseOnce();
-  const nick = LS.getStr("nickname","anon");
-  roomCode = code5();
-
-  const ref = db.collection("rooms").doc(roomCode);
-
-  // odayı oluştur + seni ekle
-  await ref.set({
-    createdAt: firebase.firestore.FieldValue.serverTimestamp(),
-    players: {
-      [myId]: { nick, idx: currentIndices, joinedAt: firebase.firestore.FieldValue.serverTimestamp() }
+// oda dinleme
+function listenRoom(){
+  rtdb.ref("rooms/" + roomCode).on("value", (snap)=>{
+    const data = snap.val();
+    if(!data){
+      leaveRoom(true);
+      return;
     }
-  }, { merge: true });
 
-  enterRoomUI(roomCode);
-  subscribeRoom(ref);
-}
+    // ben
+    drawCharacterFromIndices(data[slot]?.character, "my-character");
 
-async function joinRoom(){
-  initFirebaseOnce();
-  const code = (document.getElementById("joinCode").value || "").trim();
-  if(!/^\d{5}$/.test(code)) return alert("5 haneli kod gir!");
-  roomCode = code;
-
-  const ref = db.collection("rooms").doc(roomCode);
-  const snap = await ref.get();
-  if(!snap.exists) return alert("Bu kodda oda yok!");
-
-  const nick = LS.getStr("nickname","anon");
-  await ref.set({
-    players: {
-      [myId]: { nick, idx: currentIndices, joinedAt: firebase.firestore.FieldValue.serverTimestamp() }
-    }
-  }, { merge: true });
-
-  enterRoomUI(roomCode);
-  subscribeRoom(ref);
-}
-
-// 5) room ekranına geç + kendi preview
-function enterRoomUI(code){
-  stopAnyGame();
-  hideAll();
-  showPanel("room");
-  document.getElementById("room-code").textContent = code;
-
-  document.getElementById("me-nick").textContent = LS.getStr("nickname","anon");
-  renderRoomMe();
-
-  document.getElementById("op-nick").textContent = "Bekleniyor...";
-  document.getElementById("op-status").textContent = "Arkadaşın kodla girince görünecek.";
-  renderRoomOpponent(null);
-}
-
-// 6) Firestore dinle
-function subscribeRoom(ref){
-  if(unsubRoom) unsubRoom();
-  unsubRoom = ref.onSnapshot((doc)=>{
-    const data = doc.data();
-    const players = data?.players || {};
-
-    // rakibi bul (myId dışında biri)
-    const ids = Object.keys(players);
-    const oppId = ids.find(id => id !== myId);
-
-    if(oppId){
-      document.getElementById("op-nick").textContent = players[oppId]?.nick || "Rakip";
-      document.getElementById("op-status").textContent = "Bağlandı ✅";
-      renderRoomOpponent(players[oppId]?.idx);
-    }else{
-      document.getElementById("op-nick").textContent = "Bekleniyor...";
-      document.getElementById("op-status").textContent = "Henüz kimse girmedi.";
-      renderRoomOpponent(null);
-    }
+    // arkadaş
+    const other = (slot === "p1") ? "p2" : "p1";
+    drawCharacterFromIndices(data[other]?.character, "friend-character");
   });
 }
 
-// 7) room içinde kendi karakterini değiştir (ve DB’ye yaz)
-async function roomChange(cat){
-  change(cat);        // senin mevcut sistemi değiştiriyor
-  renderRoomMe();     // room preview güncelle
+function createRoom(){
+  roomCode = generateRoomCode();
+  slot = "p1";
 
-  if(!roomCode) return;
-  initFirebaseOnce();
-  const ref = db.collection("rooms").doc(roomCode);
+  rtdb.ref("rooms/" + roomCode).set({
+    p1: { character: currentIndices },
+    p2: null,
+    createdAt: Date.now()
+  });
 
-  await ref.set({
-    players: {
-      [myId]: {
-        nick: LS.getStr("nickname","anon"),
-        idx: currentIndices,
-        updatedAt: firebase.firestore.FieldValue.serverTimestamp()
-      }
+  const codeEl = document.getElementById("room-code");
+  if(codeEl) codeEl.textContent = "ODA: " + roomCode;
+
+  hideAll();
+  showPanel("room");
+  // oda ekranında en azından kendini göster
+  drawCharacterFromIndices(currentIndices, "my-character");
+  drawCharacterFromIndices(null, "friend-character");
+
+  listenRoom();
+}
+
+function joinRoom(){
+  const code = (document.getElementById("joinCode").value || "").trim();
+  if(!/^\d{5}$/.test(code)) return alert("5 haneli kod gir!");
+
+  roomCode = code;
+  slot = "p2";
+
+  rtdb.ref("rooms/" + roomCode).once("value").then((snap)=>{
+    if(!snap.exists()) return alert("Oda yok!");
+    const data = snap.val();
+    if(data.p2) return alert("Oda dolu!");
+
+    rtdb.ref("rooms/" + roomCode + "/p2").set({ character: currentIndices });
+
+    const codeEl = document.getElementById("room-code");
+    if(codeEl) codeEl.textContent = "ODA: " + roomCode;
+
+    hideAll();
+    showPanel("room");
+    drawCharacterFromIndices(currentIndices, "my-character");
+    listenRoom();
+  });
+}
+
+function leaveRoom(silent=false){
+  if(roomCode && slot){
+    // dinlemeyi kapat
+    rtdb.ref("rooms/" + roomCode).off();
+
+    // temizlik
+    if(slot === "p2"){
+      rtdb.ref("rooms/" + roomCode + "/p2").remove();
+    }else{
+      rtdb.ref("rooms/" + roomCode).remove();
     }
-  }, { merge: true });
+  }
+
+  roomCode = null;
+  slot = null;
+
+  if(!silent) backToMenu();
 }
 
-// 8) odadan çık
-function leaveRoom(){
-  if(unsubRoom){ unsubRoom(); unsubRoom = null; }
-  roomCode = null;
-  backToMenu();
-}
+// change(cat) çalışınca odadaysak RTDB'ye yaz
+const _changeOld = change;
+change = function(cat){
+  _changeOld(cat);
+
+  if(roomCode && slot){
+    rtdb.ref(`rooms/${roomCode}/${slot}`).update({ character: currentIndices });
+  }
+
+  // room ekranındaysan kendi preview güncel kalsın
+  const roomEl = document.getElementById("room");
+  if(roomEl && !roomEl.classList.contains("hidden")){
+    drawCharacterFromIndices(currentIndices, "my-character");
+  }
+};
+
+// onclick için global
+window.openOnline = openOnline;
+window.createRoom = createRoom;
+window.joinRoom = joinRoom;
+window.leaveRoom = leaveRoom;
+
+/* ===================== ONLINE (RTDB) - END ===================== */
+
 
 // global olsun (onclick için)
 window.openOnline = openOnline;
@@ -1622,6 +1417,7 @@ window.leaveRoom = leaveRoom;
 
 </body>
 </html>
+
 
 
 
