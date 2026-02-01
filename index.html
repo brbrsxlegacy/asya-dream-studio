@@ -1239,6 +1239,35 @@ window.onload = () => {
   renderCharacter();
 };
 
+// ===== FIREBASE (TEK) =====
+const firebaseConfig = {
+  apiKey: "AIzaSyABqkhpL1SMRzRJ9GQLjjZE2IryqpAvMPw",
+  authDomain: "pixelroom-ae218.firebaseapp.com",
+  projectId: "pixelroom-ae218",
+  storageBucket: "pixelroom-ae218.firebasestorage.app",
+  messagingSenderId: "720297722320",
+  appId: "1:720297722320:web:c815edae99d1efa7ff39d5",
+  measurementId: "G-HD8901B19M",
+
+  // DOĞRU BÖLGE URL (UYARIDAKİ)
+  databaseURL: "https://pixelroom-ae218-default-rtdb.europe-west1.firebasedatabase.app"
+};
+
+if (!firebase.apps.length) firebase.initializeApp(firebaseConfig);
+
+firebase.auth().onAuthStateChanged((u) => {
+  // login olmuş mu kontrol (debug)
+  // console.log("AUTH:", !!u);
+});
+firebase.auth().signInAnonymously().catch((e) => {
+  console.error("Anon auth error:", e);
+  alert("Anon giriş kapalı olabilir. Firebase Auth -> Anonymous ENABLE yap.");
+});
+
+const rtdb = firebase.database();
+// ===== FIREBASE END =====
+
+
 /* globals for inline onclick */
 window.change = change;
 window.saveCurrentCharacter = saveCurrentCharacter;
@@ -1254,5 +1283,6 @@ window.leaveRoom = leaveRoom;
 
 </body>
 </html>
+
 
 
