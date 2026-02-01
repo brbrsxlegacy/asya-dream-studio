@@ -29,32 +29,35 @@ body,html{
 h2,p{ text-align:center; line-height:1.45; }
 small{ opacity:.85; }
 
-/* ONLINE üst kontrol barı */
+/* ONLINE üst kontrol barı (oda + menü) */
 .online-top-controls{
   position: sticky;
-  top: 62px;              /* en üstteki NET/ROOM barına çarpmasın */
-  z-index: 50;
+  top: 62px; /* NET/ROOM barının altı */
+  z-index: 60;
   width: min(900px, 95vw);
   display: flex;
-  gap: 10px;
+  gap: 12px;
   flex-wrap: wrap;
   justify-content: space-between;
   align-items: center;
-  padding: 10px;
-  border-radius: 14px;
+  padding: 12px;
+  border-radius: 16px;
   border: 1px solid rgba(255,255,255,.18);
-  background: rgba(0,0,0,.55);
+  background: rgba(0,0,0,.6);
   backdrop-filter: blur(6px);
 }
 
-.online-top-controls .left,
-.online-top-controls .right{
+.online-top-controls .group{
   display:flex;
   gap:10px;
   flex-wrap:wrap;
   align-items:center;
-  justify-content:center;
 }
+
+.online-top-controls input{
+  width:160px;
+}
+
 
 button{
   padding:10px 14px; cursor:pointer;
@@ -300,10 +303,7 @@ input{
     <button class="game-btn" id="btn-g3">Neon Runner</button>
   </div>
 
-  <div class="controls">
-    <button id="btn-back-games">Menü</button>
-  </div>
-</div>
+
 
 <!-- GAME SCREEN -->
 <div id="game" class="panel hidden">
@@ -324,6 +324,41 @@ input{
     <p>Oda oluştur veya koda gir.</p>
     <p><small>NET ON = Auth + DB bağlantısı tamam.</small></p>
   </div>
+ <div class="online-top-controls">
+
+  <!-- SOL: Menü -->
+  <div class="group">
+    <button id="btn-back3">Menü</button>
+  </div>
+
+  <!-- ORTA: Oda işlemleri -->
+  <div class="group">
+    <button id="btn-create-room"
+      style="border-color:var(--neon-blue);color:var(--neon-blue)">
+      ODA OLUŞTUR
+    </button>
+
+    <input id="roomCodeInput"
+      placeholder="ODA KODU"
+      maxlength="5" />
+
+    <button id="btn-join-room"
+      style="border-color:var(--neon-blue);color:var(--neon-blue)">
+      GİR
+    </button>
+  </div>
+
+  <!-- SAĞ: Odadan çık -->
+  <div class="group">
+    <button id="btn-leave-room"
+      style="border-color:var(--bad);color:var(--bad)">
+      ODADAN ÇIK
+    </button>
+  </div>
+
+</div>
+
+
 
 <div class="online-top-controls">
   <div class="left">
@@ -368,11 +403,6 @@ input{
     </div>
   </div>
 
-  <div class="controls">
-    <button id="btn-leave-room" style="border-color:var(--bad);color:var(--bad)">ODADAN ÇIK</button>
-    <button id="btn-back3">Menü</button>
-  </div>
-</div>
 
 <script type="module">
 /* -------------------- HELPERS -------------------- */
@@ -1479,4 +1509,5 @@ else init();
 
 </body>
 </html>
+
 
