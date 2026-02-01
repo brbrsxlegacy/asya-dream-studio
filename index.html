@@ -259,7 +259,6 @@ input{
   </div>
 </div>
 
-
   <div class="controls">
     <button id="btn-create-room" style="border-color:var(--neon-blue);color:var(--neon-blue)">ODA OLUŞTUR</button>
     <input id="roomCodeInput" placeholder="5 haneli oda kodu" maxlength="5" />
@@ -330,8 +329,13 @@ function hideAll(){
 
 function showPanel(id){
   const el = document.getElementById(id);
-  if(!el) return;
+  if(!el) return console.error("Panel yok:", id);
   el.classList.remove("hidden");
+}
+
+function openGamesHub(){
+  hideAll();
+  showPanel("games");
 }
 
 
@@ -1364,6 +1368,7 @@ else init();
 
 </body>
 </html>
+
 
 
 
