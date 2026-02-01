@@ -106,6 +106,7 @@ canvas{
   border-radius:12px;
   background:#0a0a0f;
   box-shadow:0 0 15px rgba(255,0,255,.28);
+  touch-action: manipulation;
 }
 
 .grid3{
@@ -399,11 +400,12 @@ function renderCharacter(){
   const bottomList = getAssetList("bottom");
   const shoesList = getAssetList("shoes");
 
-  currentIndices.hair %= hairList.length;
-  currentIndices.top %= topList.length;
-  currentIndices.bottom %= bottomList.length;
-  currentIndices.shoes %= shoesList.length;
+  currentIndices.hair = ((currentIndices.hair % hairList.length) + hairList.length) % hairList.length;
+  currentIndices.top = ((currentIndices.top % topList.length) + topList.length) % topList.length;
+  currentIndices.bottom = ((currentIndices.bottom % bottomList.length) + bottomList.length) % bottomList.length;
+  currentIndices.shoes = ((currentIndices.shoes % shoesList.length) + shoesList.length) % shoesList.length;
 
+  if(!canvasEl) return;
   canvasEl.innerHTML = `
     <svg viewBox="0 0 100 160" xmlns="http://www.w3.org/2000/svg" width="100%" height="100%">
       ${bodyBase}
@@ -428,7 +430,12 @@ const firebaseConfig = {
 };
 
 if(!firebase.apps.length) firebase.initializeApp(firebaseConfig);
+
+let authReadyResolve;
+const authReady = new Promise(r => (authReadyResolve = r));
+firebase.auth().onAuthStateChanged(u => { if(u) authReadyResolve(u); });
 firebase.auth().signInAnonymously().catch(console.error);
+
 const rtdb = firebase.database();
 
 let roomCode = null;
@@ -478,17 +485,20 @@ function listenRoom(){
   });
 }
 
-function createRoom(){
+async function createRoom(){
+  await authReady;
+
   roomCode = generateRoomCode();
   slot = "p1";
 
-  rtdb.ref("rooms/" + roomCode).set({
+  await rtdb.ref("rooms/" + roomCode).set({
     p1: { character: currentIndices },
     p2: null,
     createdAt: Date.now()
   });
 
-  document.getElementById("room-code").textContent = "ODA: " + roomCode;
+  const rc = document.getElementById("room-code");
+  if(rc) rc.textContent = "ODA: " + roomCode;
 
   hideAll();
   showPanel("room");
@@ -497,27 +507,29 @@ function createRoom(){
   listenRoom();
 }
 
-function joinRoom(){
+async function joinRoom(){
+  await authReady;
+
   const code = (document.getElementById("joinCode").value || "").trim();
   if(!/^\d{5}$/.test(code)) return alert("5 haneli kod gir!");
 
   roomCode = code;
   slot = "p2";
 
-  rtdb.ref("rooms/" + roomCode).once("value").then((snap)=>{
-    if(!snap.exists()) return alert("Oda yok!");
-    const data = snap.val();
-    if(data.p2) return alert("Oda dolu!");
+  const snap = await rtdb.ref("rooms/" + roomCode).once("value");
+  if(!snap.exists()) return alert("Oda yok!");
+  const data = snap.val();
+  if(data.p2) return alert("Oda dolu!");
 
-    rtdb.ref("rooms/" + roomCode + "/p2").set({ character: currentIndices });
+  await rtdb.ref("rooms/" + roomCode + "/p2").set({ character: currentIndices });
 
-    document.getElementById("room-code").textContent = "ODA: " + roomCode;
+  const rc = document.getElementById("room-code");
+  if(rc) rc.textContent = "ODA: " + roomCode;
 
-    hideAll();
-    showPanel("room");
-    drawCharacterFromIndices(currentIndices, "my-character");
-    listenRoom();
-  });
+  hideAll();
+  showPanel("room");
+  drawCharacterFromIndices(currentIndices, "my-character");
+  listenRoom();
 }
 
 function leaveRoom(silent=false){
@@ -556,6 +568,7 @@ function hideAll(){
 }
 function showPanel(id){
   const el = document.getElementById(id);
+  if(!el) return;
   el.classList.remove("hidden");
   el.classList.remove("neon-show");
   void el.offsetWidth;
@@ -608,6 +621,7 @@ function openOnline(){
 /* -------------------- UNLOCK UI -------------------- */
 function updateUnlockBadge(){
   const b = document.getElementById("unlock-badge");
+  if(!b) return;
   if(neonUnlocked()){
     b.innerHTML = `Neon Pack: <b>AÇIK</b> ✅ (ekstra itemler aktif)`;
   }else{
@@ -618,6 +632,8 @@ function updateUnlockBadge(){
 
 function updateQuestUI(){
   const box = document.getElementById("quest-box");
+  if(!box) return;
+
   const p = getProgress();
   const unlocked = neonUnlocked();
 
@@ -670,6 +686,7 @@ function saveCurrentCharacter(){
 function loadLibrary(){
   const nick = LS.getStr("nickname","");
   const container = document.getElementById("dolap-list");
+  if(!container) return;
   container.innerHTML = "";
 
   const saved = LS.get("savedCharacters", []);
@@ -707,6 +724,7 @@ const canvas = document.getElementById("game-canvas");
 const ctx = canvas.getContext("2d");
 let currentGame = null;
 
+// common ui
 function openGame(which){
   hideAll();
   showPanel("game");
@@ -717,6 +735,7 @@ function openGame(which){
 function startGame(which){
   stopAnyGame();
   currentGame = which;
+
   if(which === "bounce") startBounce();
   else if(which === "reaction") startReaction();
   else if(which === "runner") startRunner();
@@ -727,12 +746,16 @@ function stopAnyGame(){
   stopReaction();
   stopRunner();
   currentGame = null;
+  if(canvas) canvas.onclick = null;
+  particles = [];
+  shake = 0;
 }
 
-/* active avatar küçük hud */
+// draw active character avatar at corner (if exists)
 function drawActiveAvatar(){
   const svg = LS.getStr("activeCharacterSVG","");
   if(!svg) return;
+
   ctx.save();
   ctx.globalAlpha = 0.9;
   ctx.fillStyle = "rgba(0,0,0,0.35)";
@@ -782,7 +805,7 @@ function drawParticles(){
 let shake = 0;
 function addShake(power=7){ shake = Math.max(shake, power); }
 
-/* GAME 1: BOUNCE */
+/* GAME 1: NEON BOUNCE */
 let bounceInterval = null;
 let bounce = null;
 
@@ -856,6 +879,7 @@ function startBounce(){
         stopBounce();
         document.getElementById("hud").innerHTML =
           `SKOR: <b>${bounce.score}</b> | CAN: <b style="color:var(--bad)">0</b><br><small>Yeniden’e bas</small>`;
+        ctx.restore();
         return;
       }else{
         b.x = canvas.width/2; b.y = canvas.height/2;
@@ -886,7 +910,7 @@ function stopBounce(){
   }
 }
 
-/* GAME 2: REACTION */
+/* GAME 2: REACTION RUSH */
 let reaction = null;
 let reactionTimer = null;
 let reactionStateTimer = null;
@@ -1015,7 +1039,7 @@ function stopReaction(){
   if(reactionTimer){ clearTimeout(reactionTimer); reactionTimer = null; }
 }
 
-/* GAME 3: RUNNER */
+/* GAME 3: NEON RUNNER */
 let runnerInterval = null;
 let runner = null;
 
@@ -1176,8 +1200,4 @@ window.leaveRoom = leaveRoom;
 
 </body>
 </html>
-
-
-
-
 
