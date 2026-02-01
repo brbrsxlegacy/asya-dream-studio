@@ -170,21 +170,6 @@ canvas{
   background:rgba(255,255,255,.12);
   margin:8px 0;
 }
-
-/* CHAT */
-.chat-box{
-  width:100%;
-  height:220px;
-  overflow:auto;
-  border:2px solid var(--neon-pink);
-  border-radius:14px;
-  background:rgba(0,0,0,.35);
-  padding:10px;
-  box-shadow:0 0 15px rgba(255,0,255,.18);
-  text-align:left;
-  font-size:10px;
-  line-height:1.5;
-}
 </style>
 </head>
 
@@ -302,19 +287,6 @@ canvas{
       <div class="avatar-preview" id="p2Preview"><small>Bağlanınca gelecek…</small></div>
       <p><small>Gerçek zamanlı güncellenir.</small></p>
     </div>
-  </div>
-
-  <div class="sep"></div>
-
-  <!-- CHAT -->
-  <div class="avatar-box" style="width:min(900px,95vw)">
-    <h3>ODA CHAT</h3>
-    <div id="chatBox" class="chat-box"><small>Mesajlar burada görünecek…</small></div>
-    <div class="controls" style="width:100%">
-      <input id="chatInput" placeholder="Mesaj yaz..." maxlength="120" style="flex:1; min-width:220px;" />
-      <button id="btnSendChat" style="border-color:var(--good);color:var(--good)">GÖNDER</button>
-    </div>
-    <p><small>Enter = gönder</small></p>
   </div>
 
   <div class="controls">
@@ -513,6 +485,7 @@ function change(cat){
 }
 
 function getMyDisplaySvg(){
+  // Eğer aktif karakter varsa onu gönder, yoksa editör halini gönder
   const active = LS.getStr("activeCharacterSVG","");
   return active || makeSvgFromIndices(currentIndices);
 }
@@ -657,15 +630,10 @@ function loadLibrary(){
     `;
 
     const btn = card.querySelector("button");
-    btn.onclick = async (ev) => {
+    btn.onclick = (ev) => {
       ev.stopPropagation();
       LS.setStr("activeCharacterSVG", c.svg);
       alert("Aktif karakter ayarlandı!");
-
-      // ✅ ODAYDAYSAN: anında Firebase'e gönder
-      if(roomState.inRoom) {
-        await pushMyState();
-      }
     };
 
     container.appendChild(card);
@@ -1112,8 +1080,7 @@ function stopRunner(){
 /* -------------------- FIREBASE (ONLINE) -------------------- */
 import { initializeApp } from "https://www.gstatic.com/firebasejs/10.12.5/firebase-app.js";
 import {
-  getDatabase, ref, set, update, onValue, get, remove, onDisconnect,
-  push, query, limitToLast
+  getDatabase, ref, set, update, onValue, get, remove, onDisconnect
 } from "https://www.gstatic.com/firebasejs/10.12.5/firebase-database.js";
 import {
   getAuth, signInAnonymously, onAuthStateChanged
@@ -1191,92 +1158,13 @@ function renderOnlinePreviews(){
   }
 }
 
-/* -------------------- CHAT -------------------- */
-let unsubChat = null;
-
-function escapeHtml(s){
-  return String(s)
-    .replaceAll("&","&amp;")
-    .replaceAll("<","&lt;")
-    .replaceAll(">","&gt;")
-    .replaceAll('"',"&quot;")
-    .replaceAll("'","&#39;");
-}
-
-function renderChatMessages(msgs){
-  const chatBox = document.getElementById("chatBox");
-  if(!chatBox) return;
-    const atBottom = (chatBox.scrollTop + chatBox.clientHeight) >= (chatBox.scrollHeight - 20);
-
-  if(!msgs || msgs.length === 0){
-    chatBox.innerHTML = `<small>Henüz mesaj yok…</small>`;
-    return;
-  }
-
-  chatBox.innerHTML = msgs.map(m=>{
-    const nick = escapeHtml(m.nick || "anon");
-    const text = escapeHtml(m.text || "");
-    const time = new Date(m.ts || Date.now());
-    const hh = String(time.getHours()).padStart(2,"0");
-    const mm = String(time.getMinutes()).padStart(2,"0");
-    return `<div style="margin:6px 0">
-      <span style="color:var(--neon-blue)">[${hh}:${mm}]</span>
-      <span style="color:var(--neon-pink)">${nick}:</span>
-      <span>${text}</span>
-    </div>`;
-  }).join("");
-
-  if(atBottom) chatBox.scrollTop = chatBox.scrollHeight;
-}
-
-function stopChatListener(){
-  if(unsubChat){
-    unsubChat();
-    unsubChat = null;
-  }
-}
-
-function listenChat(roomId){
-  stopChatListener();
-  const chatRef = query(ref(db, `rooms/${roomId}/chat`), limitToLast(40));
-  unsubChat = onValue(chatRef, (snap)=>{
-    const msgs = [];
-    snap.forEach(child=>{
-      msgs.push(child.val());
-    });
-    msgs.sort((a,b)=>(a.ts||0)-(b.ts||0));
-    renderChatMessages(msgs);
-  });
-}
-
-async function sendChat(){
-  if(!roomState.inRoom || !roomState.roomId) return alert("Odaya girmen lazım!");
-  const input = document.getElementById("chatInput");
-  const text = (input.value || "").trim();
-  if(!text) return;
-
-  const nick = LS.getStr("nickname","anon");
-  const msg = {
-    uid: roomState.uid || "noauth",
-    nick,
-    text: text.slice(0,120),
-    ts: Date.now()
-  };
-
-  // push ile yeni mesaj
-  const mref = push(ref(db, `rooms/${roomState.roomId}/chat`));
-  await set(mref, msg);
-
-  input.value = "";
-}
-
-/* -------------------- ROOMS -------------------- */
 async function createRoom(){
   await ensureAuth();
 
   const roomId = randomRoomCode();
   const roomRef = ref(db, `rooms/${roomId}`);
 
+  // oluştur
   const nick = LS.getStr("nickname","anon");
   await set(roomRef, {
     createdAt: Date.now(),
@@ -1292,13 +1180,8 @@ async function createRoom(){
   onDisconnect(roomRef).remove().catch(()=>{});
 
   listenRoom(roomId);
-  listenChat(roomId); // ✅ CHAT DİNLE
   alert(`Oda kuruldu: ${roomId}`);
   renderOnlinePreviews();
-
-  // chat kutusunu en alta indir
-  const chatBox = document.getElementById("chatBox");
-  if(chatBox) chatBox.scrollTop = chatBox.scrollHeight;
 }
 
 async function joinRoom(roomId){
@@ -1313,6 +1196,7 @@ async function joinRoom(roomId){
   const data = snap.val();
   if(!data.p1) return alert("Oda bozuk (p1 yok).");
 
+  // oda dolu mu
   if(data.p2 && data.p2.uid && data.p2.uid !== roomState.uid){
     return alert("Oda dolu!");
   }
@@ -1332,7 +1216,6 @@ async function joinRoom(roomId){
   onDisconnect(p2Ref).remove().catch(()=>{});
 
   listenRoom(roomId);
-  listenChat(roomId); // ✅ CHAT DİNLE
   alert(`Odaya girdin: ${roomId}`);
   renderOnlinePreviews();
 }
@@ -1341,22 +1224,22 @@ function listenRoom(roomId){
   if(roomState.unsubRoom) roomState.unsubRoom();
   const roomRef = ref(db, `rooms/${roomId}`);
 
+  // onValue unsubscribe fonksiyonunu döndürür
   const unsubscribe = onValue(roomRef, (snap)=>{
     if(!snap.exists()){
+      // oda kapandı
       if(roomState.inRoom){
         roomState.inRoom = false;
         roomState.roomId = null;
         roomState.role = null;
         updateRoomUI();
         document.getElementById("p2Preview").innerHTML = `<small>Oda kapandı.</small>`;
-        stopChatListener(); // ✅ oda kapanınca chat kapanır
-        const chatBox = document.getElementById("chatBox");
-        if(chatBox) chatBox.innerHTML = `<small>Oda kapandı.</small>`;
       }
       return;
     }
 
     const data = snap.val();
+    // kendi rolüne göre diğerini çiz
     const p2Preview = document.getElementById("p2Preview");
 
     if(roomState.role === "p1"){
@@ -1365,8 +1248,10 @@ function listenRoom(roomId){
       }else{
         p2Preview.innerHTML = `<small>Arkadaş bekleniyor…</small>`;
       }
+      // p1 preview her zaman bizim
       document.getElementById("p1Preview").innerHTML = getMyDisplaySvg();
     }else if(roomState.role === "p2"){
+      // p2 için "diğer" p1
       if(data.p1 && data.p1.svg){
         p2Preview.innerHTML = data.p1.svg;
       }else{
@@ -1375,6 +1260,7 @@ function listenRoom(roomId){
       document.getElementById("p1Preview").innerHTML = getMyDisplaySvg();
     }
 
+    // room hud
     updateRoomUI();
   });
 
@@ -1391,6 +1277,7 @@ async function pushMyState(){
   const meRef = ref(db, `rooms/${roomId}/${role}`);
   await update(meRef, { uid: roomState.uid, nick, svg, ts: Date.now() });
 
+  // preview güncelle
   document.getElementById("p1Preview").innerHTML = svg;
 }
 
@@ -1406,17 +1293,12 @@ async function leaveRoom(){
     }else{
       await remove(ref(db, `rooms/${roomId}/p2`));
     }
-  }catch(e){}
+  }catch(e){
+    // yut
+  }
 
   if(roomState.unsubRoom) roomState.unsubRoom();
   roomState.unsubRoom = null;
-
-  stopChatListener(); // ✅ chat kapat
-  const chatBox = document.getElementById("chatBox");
-  if(chatBox) chatBox.innerHTML = `<small>Mesajlar burada görünecek…</small>`;
-  const chatInput = document.getElementById("chatInput");
-  if(chatInput) chatInput.value = "";
-
   roomState.inRoom = false;
   roomState.roomId = null;
   roomState.role = null;
@@ -1430,22 +1312,20 @@ function initApp(){
   hideAll();
   showPanel("login");
 
+  // Menu buttons
   document.getElementById("btn-enter").onclick = enterSite;
   document.getElementById("btn-creator").onclick = openCreator;
   document.getElementById("btn-library").onclick = openLibrary;
   document.getElementById("btn-games").onclick = openGamesHub;
   document.getElementById("btn-online").onclick = openOnline;
 
+  // Online buttons
   document.getElementById("btn-create-room").onclick = createRoom;
   document.getElementById("btn-join-room").onclick = () => joinRoom(document.getElementById("roomCodeInput").value);
   document.getElementById("btn-leave-room").onclick = leaveRoom;
   document.getElementById("btn-sync").onclick = pushMyState;
 
-  // ✅ CHAT BUTON + ENTER
-  document.getElementById("btnSendChat").onclick = sendChat;
-  const chatInput = document.getElementById("chatInput");
-  chatInput.addEventListener("keydown", (e)=>{ if(e.key === "Enter") sendChat(); });
-
+  // Nick enter
   const nickInput = document.getElementById("nickname");
   nickInput.addEventListener("keydown", (e)=>{ if(e.key === "Enter") enterSite(); });
 
@@ -1458,6 +1338,7 @@ function initApp(){
   renderCharacter();
   renderOnlinePreviews();
 
+  // Auth state (net)
   onAuthStateChanged(auth, (u)=>{
     roomState.uid = u ? u.uid : null;
     setNet(!!u);
@@ -1477,5 +1358,7 @@ window.backToMenu = backToMenu;
 window.openGame = openGame;
 window.change = change;
 window.saveCurrentCharacter = saveCurrentCharacter;
+</script>
 
-
+</body>
+</html>
