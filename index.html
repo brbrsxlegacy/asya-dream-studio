@@ -5,6 +5,12 @@
 <meta name="viewport" content="width=device-width, initial-scale=1.0" />
 <title>Pixel Master + Mini Oyun</title>
 <link href="https://fonts.googleapis.com/css2?family=Press+Start+2P&display=swap" rel="stylesheet">
+
+<!-- ADDED: Firebase compat (modulesuz, inline onclick bozulmaz) -->
+<script src="https://www.gstatic.com/firebasejs/10.7.1/firebase-app-compat.js"></script>
+<script src="https://www.gstatic.com/firebasejs/10.7.1/firebase-auth-compat.js"></script>
+<script src="https://www.gstatic.com/firebasejs/10.7.1/firebase-database-compat.js"></script>
+
 <style>
 :root{ --neon-pink:#ff00ff; --neon-blue:#00ffff; --good:#00ff66; --bad:#ff3355; }
 
@@ -175,8 +181,6 @@ canvas{
 
 <!-- GAMES HUB -->
 
-
-  
 <!-- ONLINE MOD -->
 <div id="online" class="panel hidden">
   <h2>Online Mod</h2>
@@ -189,6 +193,33 @@ canvas{
   <button onclick="joinRoom()">Odaya Gir</button>
 
   <button onclick="backToMenu()">Geri</button>
+</div>
+
+<!-- ADDED: ROOM SCREEN (yan yana panel) -->
+<div id="room" class="panel hidden">
+  <div id="room-code" style="position:fixed;top:10px;left:10px;color:#00ffff">ODA: -----</div>
+
+  <div style="display:flex;gap:40px;flex-wrap:wrap;justify-content:center;width:min(900px,95vw)">
+    <div>
+      <h2>Sen</h2>
+      <div id="my-character"></div>
+      <div class="controls">
+        <button onclick="change('hair')">Saç</button>
+        <button onclick="change('top')">Üst</button>
+        <button onclick="change('bottom')">Alt</button>
+        <button onclick="change('shoes')">Ayakkabı</button>
+      </div>
+    </div>
+
+    <div>
+      <h2>Arkadaş</h2>
+      <div id="friend-character"></div>
+    </div>
+  </div>
+
+  <div class="controls">
+    <button onclick="leaveRoom()">Geri</button>
+  </div>
 </div>
 
 <div id="games" class="panel hidden">
@@ -401,11 +432,148 @@ function change(cat){
   const list = getAssetList(cat);
   currentIndices[cat] = (currentIndices[cat] + 1) % list.length;
   renderCharacter();
+
+  // ADDED: online odadaysa anında firebase'e gönder
+  if(roomCode && slot && db){
+    db.ref(`rooms/${roomCode}/${slot}`).update({ character: currentIndices });
+  }
 }
+
+/* ===================== ADDED: FIREBASE + ONLINE ODA ===================== */
+const firebaseConfig = {
+  apiKey: "AIzaSyABqkhpL1SMRzRJ9GQLjjZE2IryqpAvMPw",
+  authDomain: "pixelroom-ae218.firebaseapp.com",
+  projectId: "pixelroom-ae218",
+  storageBucket: "pixelroom-ae218.firebasestorage.app",
+  messagingSenderId: "720297722320",
+  appId: "1:720297722320:web:c815edae99d1efa7ff39d5",
+  measurementId: "G-HD8901B19M",
+
+  // ADDED: RTDB için şart
+  databaseURL: "https://pixelroom-ae218-default-rtdb.firebaseio.com"
+};
+
+firebase.initializeApp(firebaseConfig);
+firebase.auth().signInAnonymously();
+const db = firebase.database();
+
+let roomCode = null;
+let slot = null; // "p1" / "p2"
+
+function generateRoomCode(){
+  return Math.floor(10000 + Math.random()*90000).toString();
+}
+
+function openOnline(){
+  stopAnyGame();
+  hideAll();
+  showPanel("online");
+}
+
+// roomdaki iki paneli çiz
+function drawCharacterFromIndices(indices, targetId){
+  const target = document.getElementById(targetId);
+  if(!target) return;
+
+  if(!indices){
+    target.innerHTML = `<p><small>Bekleniyor…</small></p>`;
+    return;
+  }
+
+  const hairList = getAssetList("hair");
+  const topList = getAssetList("top");
+  const bottomList = getAssetList("bottom");
+  const shoesList = getAssetList("shoes");
+
+  target.innerHTML = `
+    <svg viewBox="0 0 100 160" xmlns="http://www.w3.org/2000/svg" width="220" height="320">
+      ${bodyBase}
+      ${hairList[indices.hair % hairList.length]}
+      ${topList[indices.top % topList.length]}
+      ${bottomList[indices.bottom % bottomList.length]}
+      ${shoesList[indices.shoes % shoesList.length]}
+    </svg>
+  `;
+}
+
+function listenRoom(){
+  db.ref("rooms/" + roomCode).on("value", snap=>{
+    const data = snap.val();
+    if(!data){
+      leaveRoom(true);
+      return;
+    }
+
+    // ben
+    drawCharacterFromIndices(data[slot]?.character, "my-character");
+
+    // arkadaş
+    const other = (slot === "p1") ? "p2" : "p1";
+    drawCharacterFromIndices(data[other]?.character, "friend-character");
+  });
+}
+
+function createRoom(){
+  roomCode = generateRoomCode();
+  slot = "p1";
+
+  db.ref("rooms/" + roomCode).set({
+    p1: { character: currentIndices },
+    p2: null,
+    createdAt: Date.now()
+  });
+
+  const codeEl = document.getElementById("room-code");
+  if(codeEl) codeEl.textContent = "ODA: " + roomCode;
+
+  hideAll();
+  showPanel("room");
+  listenRoom();
+}
+
+function joinRoom(){
+  const code = document.getElementById("joinCode").value.trim();
+  if(code.length !== 5) return alert("5 haneli kod gir");
+
+  roomCode = code;
+  slot = "p2";
+
+  db.ref("rooms/" + roomCode).once("value").then(snap=>{
+    if(!snap.exists()) return alert("Oda yok");
+    const data = snap.val();
+    if(data.p2) return alert("Oda dolu");
+
+    db.ref(`rooms/${roomCode}/p2`).set({ character: currentIndices });
+
+    const codeEl = document.getElementById("room-code");
+    if(codeEl) codeEl.textContent = "ODA: " + roomCode;
+
+    hideAll();
+    showPanel("room");
+    listenRoom();
+  });
+}
+
+function leaveRoom(silent=false){
+  if(roomCode && slot){
+    if(slot === "p2"){
+      db.ref(`rooms/${roomCode}/p2`).remove();
+    }else{
+      db.ref(`rooms/${roomCode}`).remove();
+    }
+    db.ref("rooms/" + roomCode).off();
+  }
+  roomCode = null;
+  slot = null;
+
+  if(!silent) backToMenu();
+}
+/* ===================== ADDED END ===================== */
 
 /* -------------------- PAGES -------------------- */
 function hideAll(){
-  ["login","menu","creator","library","games","game"].forEach(id=>{
+  // CHANGED (zorunlu): online + room da gizlensin
+  ["login","menu","creator","library","online","room","games","game"].forEach(id=>{
     document.getElementById(id).classList.add("hidden");
   });
 }
@@ -1059,10 +1227,14 @@ window.saveCurrentCharacter = saveCurrentCharacter;
 window.backToMenu = backToMenu;
 window.openGame = openGame;
 window.openGamesHub = openGamesHub;
+
+// ADDED globals
+window.openOnline = openOnline;
+window.createRoom = createRoom;
+window.joinRoom = joinRoom;
+window.leaveRoom = leaveRoom;
 </script>
 
 </body>
 </html>
-
-
 
