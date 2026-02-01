@@ -3,135 +3,88 @@
 <head>
 <meta charset="UTF-8" />
 <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-<title>Pixel Master + Online Room + Chat + Games + Dolap</title>
+<title>Asya Dream Studio - Dolap + Kıyafet + Oyun + Online</title>
 <link href="https://fonts.googleapis.com/css2?family=Press+Start+2P&display=swap" rel="stylesheet">
 
 <style>
-:root{ --neon-pink:#ff00ff; --neon-blue:#00ffff; --good:#00ff66; --bad:#ff3355; }
-*{box-sizing:border-box;margin:0;padding:0;}
-body,html{
+:root{
+  --neon-pink:#ff00ff;
+  --neon-blue:#00ffff;
+  --good:#00ff66;
+  --bad:#ff3355;
+  --bg1:#1a1a2e;
+  --bg2:#000;
+}
+*{box-sizing:border-box;margin:0;padding:0}
+html,body{
   width:100%;height:100%;
   font-family:'Press Start 2P', cursive;
-  background:radial-gradient(circle at 50% 50%,#1a1a2e 0%,#000 100%);
+  background:radial-gradient(circle at 50% 50%, var(--bg1) 0%, var(--bg2) 100%);
   color:#fff;
-  display:flex;flex-direction:column;align-items:center;justify-content:flex-start;
+  display:flex;
+  flex-direction:column;
+  align-items:center;
+  justify-content:flex-start;
   padding:18px 10px;
 }
 .hidden{display:none !important;}
-
-@keyframes neonFadeIn{
-  0%{opacity:0; filter:drop-shadow(0 0 0px #ff00ff);}
-  50%{opacity:.5; filter:drop-shadow(0 0 8px #ff00ff);}
-  100%{opacity:1; filter:drop-shadow(0 0 20px #ff00ff);}
-}
-.neon-show{ animation:neonFadeIn .7s ease forwards; }
-
-h2,p{ text-align:center; line-height:1.45; }
+h2,p{ text-align:center; line-height:1.5; }
 small{ opacity:.85; }
 
-/* ONLINE üst kontrol barı (oda + menü) */
-.online-top-controls{
-  position: sticky;
-  top: 62px; /* NET/ROOM barının altı */
-  z-index: 60;
-  width: min(900px, 95vw);
-  display: flex;
-  gap: 12px;
-  flex-wrap: wrap;
-  justify-content: space-between;
-  align-items: center;
-  padding: 12px;
-  border-radius: 16px;
-  border: 1px solid rgba(255,255,255,.18);
-  background: rgba(0,0,0,.6);
-  backdrop-filter: blur(6px);
-}
-
-.online-top-controls .group{
-  display:flex;
-  gap:10px;
-  flex-wrap:wrap;
-  align-items:center;
-}
-
-.online-top-controls input{
-  width:160px;
-}
-
-
 button{
-  padding:10px 14px; cursor:pointer;
+  padding:10px 14px;
+  cursor:pointer;
   font-family:'Press Start 2P';
   border:2px solid var(--neon-pink);
   color:var(--neon-pink);
   background:transparent;
-  border-radius:10px;
+  border-radius:12px;
   transition:.25s;
 }
 button:hover{ background:var(--neon-pink); color:#000; box-shadow:0 0 15px var(--neon-pink); }
 button:disabled{ opacity:.45; cursor:not-allowed; }
 
-input{
+input, select{
   padding:10px 12px;
-  border-radius:10px;
+  border-radius:12px;
   border:2px solid var(--neon-blue);
   background:#0b0b0f;
   color:#fff;
   font-family:'Press Start 2P';
   outline:none;
-  width:min(420px, 90vw);
 }
+input{ width:min(420px, 90vw); }
 
 .controls{
-  display:flex;justify-content:center;align-items:center;
-  gap:10px;flex-wrap:wrap;margin-top:12px;
+  display:flex;
+  justify-content:center;
+  align-items:center;
+  gap:10px;
+  flex-wrap:wrap;
+  margin-top:12px;
 }
-
 .panel{
-  width:min(980px, 95vw);
-  display:flex;flex-direction:column;align-items:center;
+  width:min(1100px, 96vw);
+  display:flex;
+  flex-direction:column;
+  align-items:center;
   gap:10px;
 }
-
 .badge{
   border:1px solid rgba(255,255,255,.25);
-  padding:8px 10px;
-  border-radius:12px;
-  background:rgba(0,0,0,.35);
-  width:min(900px, 95vw);
+  padding:10px 12px;
+  border-radius:14px;
+  background:rgba(0,0,0,.40);
+  width:min(980px, 96vw);
 }
 .badge b{ color:var(--neon-blue); }
-
-#character-canvas{
-  width:350px;height:480px;
-  background:linear-gradient(145deg,#0c0c12,#1a1a2a);
-  border:2px solid var(--neon-blue);
-  border-radius:16px;
-  display:flex;justify-content:center;align-items:center;
-  box-shadow:0 0 15px rgba(255,0,255,.35);
-  margin:10px 0;
-}
-#character-canvas svg{ width:100%; height:100%; }
-
-#dolap-list{
-  display:flex;flex-wrap:wrap;gap:14px;justify-content:center;
-  padding:10px;max-width:95vw;
-  overflow-y:auto;max-height:55vh;
-}
-.character-card{
-  background:rgba(0,0,0,0.65);
-  padding:10px;border:2px solid var(--neon-blue);
-  border-radius:12px;text-align:center;width:200px;
-  display:flex;flex-direction:column;align-items:center;gap:10px;
-}
-.character-card svg{width:92px;height:120px;}
-.character-card .row{display:flex;gap:8px;flex-wrap:wrap;justify-content:center}
-.character-card .row button{ padding:8px 10px; font-size:10px; }
 
 .topbar{
   position:fixed;
   top:10px; left:10px; right:10px;
-  display:flex; align-items:center; justify-content:space-between;
+  display:flex;
+  align-items:center;
+  justify-content:space-between;
   pointer-events:none;
   z-index:999;
 }
@@ -140,81 +93,219 @@ input{
   padding:8px 10px;
   border-radius:12px;
   border:1px solid rgba(255,255,255,.25);
-  background:rgba(0,0,0,.45);
+  background:rgba(0,0,0,.50);
   font-size:10px;
 }
 .net-badge b{ color:var(--good); }
 .net-badge.off b{ color:var(--bad); }
 .room-badge b{ color:var(--neon-blue); }
 
-.online-stage{
-  width:min(900px, 95vw);
-  display:flex; gap:18px; justify-content:center; flex-wrap:wrap;
-  margin-top:8px;
-}
-.avatar-box{
-  width:380px; max-width:95vw;
+/* creator preview */
+#character-canvas{
+  width:360px;height:520px;
   border:2px solid var(--neon-blue);
-  border-radius:16px;
-  background:rgba(0,0,0,.35);
-  padding:12px;
-  display:flex; flex-direction:column; align-items:center; gap:10px;
-  box-shadow:0 0 15px rgba(0,255,255,.18);
-}
-.avatar-box h3{ font-size:12px; }
-.avatar-preview{
-  width:220px; height:300px;
-  border:2px solid var(--neon-pink);
-  border-radius:14px;
-  display:flex; justify-content:center; align-items:center;
+  border-radius:18px;
   background:linear-gradient(145deg,#0c0c12,#1a1a2a);
-  box-shadow:0 0 15px rgba(255,0,255,.22);
-}
-.avatar-preview svg{ width:100%; height:100%; }
-.sep{
-  width:min(900px, 95vw);
-  height:1px;
-  background:rgba(255,255,255,.12);
+  box-shadow:0 0 18px rgba(0,255,255,.18), 0 0 18px rgba(255,0,255,.18);
+  display:flex;
+  align-items:center;
+  justify-content:center;
   margin:8px 0;
 }
+#character-canvas svg{ width:100%; height:100%; }
 
-/* GAMES */
+/* picker modal */
+.modal-back{
+  position:fixed;
+  inset:0;
+  background:rgba(0,0,0,.70);
+  display:flex;
+  align-items:center;
+  justify-content:center;
+  z-index:2000;
+  padding:14px;
+}
+.modal{
+  width:min(980px, 96vw);
+  max-height:min(84vh, 760px);
+  overflow:hidden;
+  border:2px solid var(--neon-blue);
+  border-radius:18px;
+  background:rgba(0,0,0,.75);
+  box-shadow:0 0 18px rgba(0,255,255,.2);
+  display:flex;
+  flex-direction:column;
+}
+.modal-top{
+  display:flex;
+  align-items:center;
+  justify-content:space-between;
+  gap:10px;
+  padding:12px;
+  border-bottom:1px solid rgba(255,255,255,.12);
+}
+.modal-top h3{ font-size:12px; }
+.modal-top .row{
+  display:flex;
+  gap:10px;
+  flex-wrap:wrap;
+  justify-content:flex-end;
+  align-items:center;
+}
+.modal-body{
+  padding:12px;
+  overflow:auto;
+}
+.grid{
+  display:grid;
+  grid-template-columns: repeat(6, minmax(0, 1fr));
+  gap:10px;
+}
+@media (max-width:980px){ .grid{ grid-template-columns: repeat(3, minmax(0, 1fr)); } }
+@media (max-width:520px){ .grid{ grid-template-columns: repeat(2, minmax(0, 1fr)); } }
+
+.item{
+  border:2px solid rgba(255,255,255,.16);
+  border-radius:14px;
+  background:rgba(0,0,0,.35);
+  padding:10px;
+  display:flex;
+  flex-direction:column;
+  align-items:center;
+  gap:8px;
+  cursor:pointer;
+  transition:.18s;
+}
+.item:hover{
+  transform:translateY(-2px);
+  border-color: var(--neon-pink);
+  box-shadow:0 0 12px rgba(255,0,255,.25);
+}
+.item svg{ width:110px; height:160px; }
+.item .name{ font-size:9px; opacity:.95; text-align:center; line-height:1.35; }
+
+/* library */
+#dolap-list{
+  display:flex;
+  flex-wrap:wrap;
+  gap:14px;
+  justify-content:center;
+  padding:10px;
+  max-width:96vw;
+  overflow:auto;
+  max-height:60vh;
+}
+.character-card{
+  width:210px;
+  border:2px solid var(--neon-blue);
+  border-radius:14px;
+  background:rgba(0,0,0,.55);
+  padding:10px;
+  display:flex;
+  flex-direction:column;
+  align-items:center;
+  gap:10px;
+}
+.character-card svg{ width:110px; height:160px; }
+.character-card .row{ display:flex; gap:8px; flex-wrap:wrap; justify-content:center; }
+.character-card .row button{ padding:8px 10px; font-size:10px; }
+
+/* games */
 .grid3{
   display:grid;
   grid-template-columns: repeat(3, minmax(0, 1fr));
   gap:10px;
-  width:min(820px, 95vw);
+  width:min(900px, 96vw);
 }
-@media (max-width:900px){
-  .grid3{ grid-template-columns: 1fr; }
-}
+@media (max-width:900px){ .grid3{ grid-template-columns: 1fr; } }
 .game-btn{
   padding:14px 12px;
   border:2px solid var(--neon-blue);
   color:var(--neon-blue);
 }
 .game-btn:hover{ background:var(--neon-blue); color:#000; box-shadow:0 0 15px var(--neon-blue); }
-
 #game-canvas{
-  width:min(360px, 92vw);
+  width:min(520px, 96vw);
   height:auto;
   border:2px solid var(--neon-pink);
-  border-radius:12px;
+  border-radius:14px;
   background:#0a0a0f;
-  box-shadow:0 0 15px rgba(255,0,255,.28);
+  box-shadow:0 0 18px rgba(255,0,255,.22);
   touch-action: manipulation;
 }
 
-/* CHAT */
+/* online */
+.online-top-controls{
+  position: sticky;
+  top: 62px;
+  z-index: 60;
+  width: min(980px, 96vw);
+  display:flex;
+  justify-content:space-between;
+  align-items:center;
+  gap:10px;
+  flex-wrap:wrap;
+  padding:12px;
+  border-radius:16px;
+  border:1px solid rgba(255,255,255,.18);
+  background: rgba(0,0,0,.60);
+  backdrop-filter: blur(6px);
+}
+.online-top-controls .group{ display:flex; gap:10px; flex-wrap:wrap; align-items:center; }
+.online-top-controls input{ width:170px; }
+
+.online-stage{
+  width:min(980px, 96vw);
+  display:flex;
+  gap:18px;
+  justify-content:center;
+  flex-wrap:wrap;
+  margin-top:8px;
+}
+.avatar-box{
+  width:420px;
+  max-width:96vw;
+  border:2px solid var(--neon-blue);
+  border-radius:16px;
+  background:rgba(0,0,0,.35);
+  padding:12px;
+  display:flex;
+  flex-direction:column;
+  align-items:center;
+  gap:10px;
+  box-shadow:0 0 15px rgba(0,255,255,.18);
+}
+.avatar-box h3{ font-size:12px; }
+.avatar-preview{
+  width:240px;
+  height:340px;
+  border:2px solid var(--neon-pink);
+  border-radius:14px;
+  display:flex;
+  justify-content:center;
+  align-items:center;
+  background:linear-gradient(145deg,#0c0c12,#1a1a2a);
+  box-shadow:0 0 15px rgba(255,0,255,.22);
+}
+.avatar-preview svg{ width:100%; height:100%; }
+
+.sep{
+  width:min(980px, 96vw);
+  height:1px;
+  background:rgba(255,255,255,.12);
+  margin:8px 0;
+}
+
+/* chat */
 .chat-wrap{
-  width:min(900px,95vw);
+  width:min(980px, 96vw);
   border:1px solid rgba(255,255,255,.2);
   border-radius:14px;
   background:rgba(0,0,0,.35);
   padding:10px;
 }
 .chat-list{
-  height:220px;
+  height:240px;
   overflow:auto;
   padding:8px;
   border-radius:12px;
@@ -237,7 +328,7 @@ input{
   justify-content:center;
   flex-wrap:wrap;
 }
-.chat-row input{ width:min(620px, 95vw); }
+.chat-row input{ width:min(680px, 96vw); }
 </style>
 </head>
 
@@ -249,19 +340,25 @@ input{
 </div>
 
 <!-- LOGIN -->
-<div id="login" class="panel neon-show">
+<div id="login" class="panel">
+  <h2>ASYA DREAM STUDIO</h2>
   <p>Takma adını gir</p>
-  <input id="nickname" placeholder="Takma ad" autocomplete="off" autocapitalize="off" spellcheck="false" />
-  <button id="btn-enter">GİR</button>
-  <p><small>Not: Live Server ile aç.</small></p>
+  <input id="nickname" placeholder="Takma ad" autocomplete="off" />
+  <div class="controls">
+    <button id="btn-enter">GİR</button>
+  </div>
+  <p><small>Live Server ile aç (yoksa bazı şeyler çalışmayabilir).</small></p>
 </div>
 
 <!-- MENU -->
 <div id="menu" class="panel hidden">
   <h2>Merhaba <span id="display-nick"></span>!</h2>
+  <div class="badge">
+    <p><small>Dolap: Kaydedip aktif et • Oyunlar: 3 mini oyun • Online: 2 sekmeyle oda/chat</small></p>
+  </div>
   <div class="controls">
-    <button id="btn-library">Dolap</button>
     <button id="btn-creator">Karakter Oluştur</button>
+    <button id="btn-library">Dolap</button>
     <button id="btn-games">Oyunlar</button>
     <button id="btn-online">Online Mod</button>
   </div>
@@ -270,40 +367,53 @@ input{
 <!-- CREATOR -->
 <div id="creator" class="panel hidden">
   <h2>Karakter Oluştur</h2>
-  <div class="badge" id="unlock-badge"></div>
+  <div class="badge" id="creatorInfo"></div>
+
   <div id="character-canvas"></div>
+
   <div class="controls">
-    <button id="btn-hair">Saç</button>
-    <button id="btn-top">Üst</button>
-    <button id="btn-bottom">Alt</button>
-    <button id="btn-shoes">Ayakkabı</button>
-    <button id="btn-save">Kaydet</button>
-    <button id="btn-back1">Menü</button>
+    <button id="btn-pick-hair">Saç Seç</button>
+    <button id="btn-pick-top">Üst Seç</button>
+    <button id="btn-pick-bottom">Alt Seç</button>
+    <button id="btn-pick-shoes">Ayakkabı Seç</button>
+    <button id="btn-pick-acc">Aksesuar Seç</button>
+  </div>
+
+  <div class="controls">
+    <button id="btn-random" style="border-color:var(--neon-blue);color:var(--neon-blue)">RANDOM</button>
+    <button id="btn-save" style="border-color:var(--good);color:var(--good)">KAYDET</button>
+    <button id="btn-back1">MENÜ</button>
   </div>
 </div>
 
 <!-- LIBRARY -->
 <div id="library" class="panel hidden">
   <h2>Dolap</h2>
-  <p><small>AKTİF yapınca oyunlarda + online odada o karakter gider.</small></p>
+  <div class="badge">
+    <p><small>AKTİF yapınca Online’da senin karakterin o gider.</small></p>
+  </div>
   <div id="dolap-list"></div>
   <div class="controls">
-    <button id="btn-back2">Menü</button>
+    <button id="btn-clear-all" style="border-color:var(--bad);color:var(--bad)">HEPSİNİ SİL</button>
+    <button id="btn-back2">MENÜ</button>
   </div>
 </div>
 
 <!-- GAMES HUB -->
 <div id="games" class="panel hidden">
   <h2>OYUNLAR</h2>
-  <div class="badge" id="quest-box"></div>
+  <div class="badge"><small>Bir oyun seç.</small></div>
 
   <div class="grid3">
-    <button class="game-btn" id="btn-g1">Neon Bounce</button>
-    <button class="game-btn" id="btn-g2">Reaction Rush</button>
-    <button class="game-btn" id="btn-g3">Neon Runner</button>
+    <button class="game-btn" id="btn-game-bounce">Neon Bounce</button>
+    <button class="game-btn" id="btn-game-reaction">Reaction Rush</button>
+    <button class="game-btn" id="btn-game-runner">Neon Runner</button>
   </div>
 
-
+  <div class="controls">
+    <button id="btn-back-games">MENÜ</button>
+  </div>
+</div>
 
 <!-- GAME SCREEN -->
 <div id="game" class="panel hidden">
@@ -311,63 +421,31 @@ input{
   <div class="badge" id="hud"></div>
   <canvas id="game-canvas" width="360" height="520"></canvas>
   <div class="controls">
-    <button id="btn-restart">Yeniden</button>
-    <button id="btn-back-games2">Oyunlar</button>
-    <button id="btn-back-menu2">Menü</button>
+    <button id="btn-restart">YENİDEN</button>
+    <button id="btn-back-to-games">OYUNLAR</button>
+    <button id="btn-back-to-menu2">MENÜ</button>
   </div>
 </div>
 
 <!-- ONLINE -->
 <div id="online" class="panel hidden">
   <h2>ONLINE MOD + CHAT</h2>
-  <div class="badge">
-    <p>Oda oluştur veya koda gir.</p>
-    <p><small>NET ON = Auth + DB bağlantısı tamam.</small></p>
-  </div>
- <div class="online-top-controls">
 
-  <!-- SOL: Menü -->
-  <div class="group">
-    <button id="btn-back3">Menü</button>
-  </div>
-
-  <!-- ORTA: Oda işlemleri -->
-  <div class="group">
-    <button id="btn-create-room"
-      style="border-color:var(--neon-blue);color:var(--neon-blue)">
-      ODA OLUŞTUR
-    </button>
-
-    <input id="roomCodeInput"
-      placeholder="ODA KODU"
-      maxlength="5" />
-
-    <button id="btn-join-room"
-      style="border-color:var(--neon-blue);color:var(--neon-blue)">
-      GİR
-    </button>
+  <div class="online-top-controls">
+    <div class="group">
+      <button id="btn-back3">MENÜ</button>
+    </div>
+    <div class="group">
+      <button id="btn-create-room" style="border-color:var(--neon-blue);color:var(--neon-blue)">ODA OLUŞTUR</button>
+      <input id="roomCodeInput" placeholder="ODA KODU" maxlength="5" />
+      <button id="btn-join-room" style="border-color:var(--neon-blue);color:var(--neon-blue)">GİR</button>
+    </div>
+    <div class="group">
+      <button id="btn-leave-room" style="border-color:var(--bad);color:var(--bad)">ODADAN ÇIK</button>
+    </div>
   </div>
 
-  <!-- SAĞ: Odadan çık -->
-  <div class="group">
-    <button id="btn-leave-room"
-      style="border-color:var(--bad);color:var(--bad)">
-      ODADAN ÇIK
-    </button>
-  </div>
-
-</div>
-
-
-
-<div class="online-top-controls">
-  <div class="left">
-    <button id="btn-back3">Menü</button>
-  </div>
-  <div class="right">
-    <button id="btn-leave-room" style="border-color:var(--bad);color:var(--bad)">ODADAN ÇIK</button>
-  </div>
-</div>
+  <div class="badge" id="onlineInfo"></div>
 
   <div class="sep"></div>
 
@@ -376,13 +454,9 @@ input{
       <h3>Sen</h3>
       <div class="avatar-preview" id="p1Preview"></div>
       <div class="controls">
-        <button id="btn-hair2">Saç</button>
-        <button id="btn-top2">Üst</button>
-        <button id="btn-bottom2">Alt</button>
-        <button id="btn-shoes2">Ayakkabı</button>
         <button id="btn-sync" style="border-color:var(--good);color:var(--good)">SENKRONLA</button>
       </div>
-      <p><small>Aktif karakter varsa o gider, yoksa editör görünümü gider.</small></p>
+      <p><small>Not: Aynı PC’de 2 sekme açıp aynı oda koduna girersen “Diğer Kişi” görünür.</small></p>
     </div>
 
     <div class="avatar-box">
@@ -395,17 +469,44 @@ input{
   <div class="sep"></div>
 
   <div class="chat-wrap">
-    <p style="text-align:center"><small>CHAT (oda içindeyken aktif)</small></p>
+    <p style="text-align:center"><small>CHAT</small></p>
     <div class="chat-list" id="chatList"></div>
     <div class="chat-row">
       <input id="chatInput" placeholder="Mesaj yaz (Enter)" maxlength="120" />
       <button id="btn-send" style="border-color:var(--neon-blue);color:var(--neon-blue)">GÖNDER</button>
     </div>
   </div>
+</div>
 
+<!-- MODAL -->
+<div id="pickerBackdrop" class="modal-back hidden">
+  <div class="modal">
+    <div class="modal-top">
+      <h3 id="pickerTitle">Seç</h3>
+      <div class="row">
+        <select id="pickerFilter">
+          <option value="all">Tümü</option>
+          <option value="basic">Basic</option>
+          <option value="neon">Neon</option>
+          <option value="sport">Sport</option>
+          <option value="formal">Formal</option>
+          <option value="street">Street</option>
+          <option value="cute">Cute</option>
+        </select>
+        <input id="pickerSearch" placeholder="Ara..." style="width:220px" />
+        <button id="btn-close-picker" style="border-color:var(--bad);color:var(--bad)">KAPAT</button>
+      </div>
+    </div>
+    <div class="modal-body">
+      <div class="grid" id="pickerGrid"></div>
+    </div>
+  </div>
+</div>
 
-<script type="module">
-/* -------------------- HELPERS -------------------- */
+<script>
+/* =========================
+   STORAGE + DOM
+========================= */
 const LS = {
   get(k, def){ try{ return JSON.parse(localStorage.getItem(k)) ?? def; }catch{ return def; } },
   set(k, v){ localStorage.setItem(k, JSON.stringify(v)); },
@@ -414,7 +515,6 @@ const LS = {
 };
 const $ = (id)=>document.getElementById(id);
 
-/* -------------------- NAV -------------------- */
 function hideAll(){
   ["login","menu","creator","library","games","game","online"].forEach(id=>{
     const el = $(id);
@@ -423,42 +523,257 @@ function hideAll(){
 }
 function showPanel(id){
   const el = $(id);
-  if(!el) return;
+  if(!el){ console.error("Panel yok:", id); return; }
   el.classList.remove("hidden");
-  el.classList.remove("neon-show");
-  void el.offsetWidth;
-  el.classList.add("neon-show");
 }
-function backToMenu(){
-  stopAnyGame();
-  hideAll();
-  $("display-nick").textContent = LS.getStr("nickname","");
-  showPanel("menu");
-}
-function openCreator(){
-  stopAnyGame();
-  hideAll(); showPanel("creator");
-  updateUnlockBadge();
-  renderCharacter();
-}
-function openLibrary(){
-  stopAnyGame();
-  hideAll(); showPanel("library");
-  loadLibrary();
-}
-function openGamesHub(){
-  stopAnyGame();
-  hideAll(); showPanel("games");
-  updateQuestUI();
-}
-function openOnline(){
-  stopAnyGame();
-  hideAll(); showPanel("online");
-  renderOnlinePreviews();
-  refreshChatUI();
+function escapeHtml(s){
+  return String(s).replace(/[&<>"']/g, c=>({
+    "&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;","'":"&#39;"
+  }[c]));
 }
 
-/* -------------------- LOGIN -------------------- */
+/* =========================
+   AVATAR SVG ENGINE
+   (Kıyafetleri otomatik üretir)
+========================= */
+
+/* body base */
+const BODY = {
+  head:`<rect x="36" y="18" width="28" height="28" rx="6" fill="#ffdbac"/>`,
+  neck:`<rect x="44" y="46" width="12" height="10" rx="3" fill="#ffdbac"/>`,
+  torso:`<rect x="38" y="56" width="24" height="36" rx="6" fill="#ffdbac"/>`,
+  legL:`<rect x="40" y="92" width="10" height="44" rx="4" fill="#ffdbac"/>`,
+  legR:`<rect x="50" y="92" width="10" height="44" rx="4" fill="#ffdbac"/>`
+};
+
+/* yüz: basit ama tatlı */
+function faceLayer(){
+  return `
+    <rect x="42" y="28" width="6" height="6" rx="2" fill="#111"/>
+    <rect x="52" y="28" width="6" height="6" rx="2" fill="#111"/>
+    <rect x="43" y="24" width="6" height="2" fill="#6b3b1a"/>
+    <rect x="52" y="24" width="6" height="2" fill="#6b3b1a"/>
+    <rect x="47" y="36" width="6" height="2" rx="1" fill="#c75d6d"/>
+    <rect x="41" y="34" width="4" height="2" fill="#ff9bb3" opacity=".55"/>
+    <rect x="55" y="34" width="4" height="2" fill="#ff9bb3" opacity=".55"/>
+  `;
+}
+
+/* paletler */
+const PAL = {
+  basic:["#222","#444","#666","#9b5cff","#1e90ff","#ff0055","#00ffff","#00ff66","#ffd700","#ffffff","#ff7aa8","#ff8c00"],
+  neon:["#ff00ff","#00ffff","#00ff66","#ff3355","#9b5cff","#ffffff","#111","#ffd700"],
+  cute:["#ff7aa8","#ffb3d1","#ffd1e6","#ffffff","#9b5cff","#00ffff"],
+  sport:["#111","#222","#00ffff","#00ff66","#ff3355","#ffffff"],
+  street:["#111","#222","#333","#ff00ff","#00ffff","#ff8c00"],
+  formal:["#111","#222","#ffffff","#9b5cff","#ffd700","#444"]
+};
+
+function pick(arr, i){ return arr[i % arr.length]; }
+
+/* item üreticileri: her kategori için name + tag + svg layer */
+function makeHair(i, tag="basic"){
+  const c1 = pick(PAL[tag] || PAL.basic, i);
+  const c2 = pick(PAL[tag] || PAL.basic, i+3);
+  const style = i % 8;
+  if(style===0) return {name:`Kısa Saç #${i}`, tag, svg:`<rect x="32" y="14" width="36" height="14" rx="6" fill="${c1}"/>`};
+  if(style===1) return {name:`Perçem #${i}`, tag, svg:`<rect x="30" y="14" width="40" height="16" rx="7" fill="${c1}"/><rect x="34" y="20" width="32" height="4" fill="${c2}" opacity=".5"/>`};
+  if(style===2) return {name:`Uzun Saç #${i}`, tag, svg:`<rect x="30" y="14" width="40" height="18" rx="8" fill="${c1}"/><rect x="28" y="30" width="12" height="30" rx="6" fill="${c1}"/><rect x="60" y="30" width="12" height="30" rx="6" fill="${c1}"/>`};
+  if(style===3) return {name:`Topuz #${i}`, tag, svg:`<rect x="33" y="16" width="34" height="14" rx="7" fill="${c1}"/><rect x="44" y="8" width="12" height="10" rx="5" fill="${c1}"/><rect x="46" y="10" width="8" height="3" fill="${c2}" opacity=".6"/>`};
+  if(style===4) return {name:`Örgü #${i}`, tag, svg:`<rect x="31" y="14" width="38" height="16" rx="8" fill="${c1}"/><rect x="28" y="32" width="10" height="22" rx="5" fill="${c1}"/><rect x="62" y="32" width="10" height="22" rx="5" fill="${c1}"/><rect x="30" y="36" width="6" height="2" fill="${c2}" opacity=".7"/><rect x="64" y="36" width="6" height="2" fill="${c2}" opacity=".7"/>`};
+  if(style===5) return {name:`Dalgalı #${i}`, tag, svg:`<rect x="30" y="14" width="40" height="18" rx="8" fill="${c1}"/><rect x="29" y="30" width="42" height="8" rx="4" fill="${c2}" opacity=".35"/>`};
+  if(style===6) return {name:`Kakül #${i}`, tag, svg:`<rect x="31" y="14" width="38" height="16" rx="8" fill="${c1}"/><rect x="34" y="22" width="32" height="5" rx="2" fill="${c2}" opacity=".55"/>`};
+  return {name:`Havalı #${i}`, tag, svg:`<rect x="31" y="14" width="38" height="16" rx="8" fill="${c1}"/><rect x="38" y="12" width="24" height="4" rx="2" fill="${c2}" opacity=".7"/>`};
+}
+
+function makeTop(i, tag="basic"){
+  const c1 = pick(PAL[tag] || PAL.basic, i+1);
+  const c2 = pick(PAL[tag] || PAL.basic, i+5);
+  const style = i % 10;
+  if(style===0) return {name:`Tişört #${i}`, tag, svg:`<rect x="36" y="56" width="28" height="30" rx="6" fill="${c1}"/>`};
+  if(style===1) return {name:`Hoodie #${i}`, tag, svg:`<rect x="34" y="54" width="32" height="34" rx="8" fill="${c1}"/><rect x="41" y="58" width="18" height="6" rx="3" fill="${c2}" opacity=".5"/>`};
+  if(style===2) return {name:`Ceket #${i}`, tag, svg:`<rect x="34" y="54" width="32" height="36" rx="8" fill="${c1}"/><rect x="49" y="54" width="2" height="36" fill="${c2}" opacity=".7"/>`};
+  if(style===3) return {name:`Kazak #${i}`, tag, svg:`<rect x="35" y="55" width="30" height="34" rx="8" fill="${c1}"/><rect x="35" y="64" width="30" height="2" fill="${c2}" opacity=".5"/><rect x="35" y="70" width="30" height="2" fill="${c2}" opacity=".5"/>`};
+  if(style===4) return {name:`Neon Üst #${i}`, tag, svg:`<rect x="35" y="55" width="30" height="34" rx="8" fill="${c1}"/><rect x="35" y="55" width="30" height="3" fill="${c2}" opacity=".9"/><rect x="35" y="86" width="30" height="3" fill="${c2}" opacity=".9"/>`};
+  if(style===5) return {name:`Formal Gömlek #${i}`, tag, svg:`<rect x="35" y="55" width="30" height="34" rx="8" fill="${c1}"/><rect x="48" y="55" width="4" height="6" fill="${c2}" opacity=".7"/><rect x="48" y="61" width="4" height="6" fill="${c2}" opacity=".7"/>`};
+  if(style===6) return {name:`Kolsuz #${i}`, tag, svg:`<rect x="38" y="56" width="24" height="32" rx="8" fill="${c1}"/>`};
+  if(style===7) return {name:`Kısa Ceket #${i}`, tag, svg:`<rect x="34" y="56" width="32" height="28" rx="8" fill="${c1}"/><rect x="34" y="56" width="32" height="4" fill="${c2}" opacity=".6"/>`};
+  if(style===8) return {name:`Cute Üst #${i}`, tag, svg:`<rect x="36" y="56" width="28" height="32" rx="10" fill="${c1}"/><rect x="40" y="70" width="20" height="6" rx="3" fill="${c2}" opacity=".5"/>`};
+  return {name:`Street Üst #${i}`, tag, svg:`<rect x="34" y="54" width="32" height="36" rx="8" fill="${c1}"/><rect x="36" y="74" width="28" height="4" fill="${c2}" opacity=".55"/>`};
+}
+
+function makeBottom(i, tag="basic"){
+  const c1 = pick(PAL[tag] || PAL.basic, i+2);
+  const c2 = pick(PAL[tag] || PAL.basic, i+7);
+  const style = i % 10;
+  if(style===0) return {name:`Pantolon #${i}`, tag, svg:`<rect x="40" y="92" width="10" height="44" rx="4" fill="${c1}"/><rect x="50" y="92" width="10" height="44" rx="4" fill="${c1}"/>`};
+  if(style===1) return {name:`Şort #${i}`, tag, svg:`<rect x="38" y="90" width="28" height="16" rx="6" fill="${c1}"/>`};
+  if(style===2) return {name:`Etek #${i}`, tag, svg:`<rect x="38" y="90" width="28" height="22" rx="6" fill="${c1}"/><rect x="38" y="100" width="28" height="2" fill="${c2}" opacity=".6"/>`};
+  if(style===3) return {name:`Jogger #${i}`, tag, svg:`<rect x="40" y="92" width="10" height="44" rx="4" fill="${c1}"/><rect x="50" y="92" width="10" height="44" rx="4" fill="${c1}"/><rect x="40" y="128" width="20" height="3" fill="${c2}" opacity=".7"/>`};
+  if(style===4) return {name:`Neon Alt #${i}`, tag, svg:`<rect x="40" y="92" width="10" height="44" rx="4" fill="${c1}"/><rect x="50" y="92" width="10" height="44" rx="4" fill="${c1}"/><rect x="40" y="92" width="20" height="3" fill="${c2}" opacity=".9"/>`};
+  if(style===5) return {name:`Kargo #${i}`, tag, svg:`<rect x="40" y="92" width="10" height="44" rx="4" fill="${c1}"/><rect x="50" y="92" width="10" height="44" rx="4" fill="${c1}"/><rect x="41" y="110" width="8" height="6" fill="${c2}" opacity=".55"/><rect x="51" y="110" width="8" height="6" fill="${c2}" opacity=".55"/>`};
+  if(style===6) return {name:`Formal Alt #${i}`, tag, svg:`<rect x="40" y="92" width="10" height="44" rx="2" fill="${c1}"/><rect x="50" y="92" width="10" height="44" rx="2" fill="${c1}"/>`};
+  if(style===7) return {name:`Cute Etek #${i}`, tag, svg:`<rect x="38" y="90" width="28" height="24" rx="10" fill="${c1}"/><rect x="44" y="94" width="16" height="4" rx="2" fill="${c2}" opacity=".5"/>`};
+  if(style===8) return {name:`Street Alt #${i}`, tag, svg:`<rect x="40" y="92" width="10" height="44" rx="4" fill="${c1}"/><rect x="50" y="92" width="10" height="44" rx="4" fill="${c1}"/><rect x="40" y="104" width="20" height="2" fill="${c2}" opacity=".55"/>`};
+  return {name:`Sport Şort #${i}`, tag, svg:`<rect x="38" y="90" width="28" height="16" rx="6" fill="${c1}"/><rect x="40" y="94" width="24" height="3" rx="1" fill="${c2}" opacity=".6"/>`};
+}
+
+function makeShoes(i, tag="basic"){
+  const c1 = pick(PAL[tag] || PAL.basic, i+4);
+  const c2 = pick(PAL[tag] || PAL.basic, i+9);
+  const style = i % 8;
+  if(style===0) return {name:`Sneaker #${i}`, tag, svg:`<rect x="38" y="136" width="14" height="8" rx="3" fill="${c1}"/><rect x="52" y="136" width="14" height="8" rx="3" fill="${c1}"/>`};
+  if(style===1) return {name:`Neon Sneaker #${i}`, tag, svg:`<rect x="38" y="136" width="14" height="8" rx="3" fill="${c1}"/><rect x="52" y="136" width="14" height="8" rx="3" fill="${c1}"/><rect x="38" y="136" width="28" height="2" fill="${c2}" opacity=".9"/>`};
+  if(style===2) return {name:`Bot #${i}`, tag, svg:`<rect x="38" y="130" width="14" height="14" rx="3" fill="${c1}"/><rect x="52" y="130" width="14" height="14" rx="3" fill="${c1}"/>`};
+  if(style===3) return {name:`Topuklu #${i}`, tag, svg:`<rect x="38" y="136" width="14" height="6" rx="2" fill="${c1}"/><rect x="52" y="136" width="14" height="6" rx="2" fill="${c1}"/><rect x="44" y="142" width="3" height="4" fill="${c2}" /><rect x="58" y="142" width="3" height="4" fill="${c2}" />`};
+  if(style===4) return {name:`Sandalet #${i}`, tag, svg:`<rect x="38" y="138" width="14" height="4" rx="2" fill="${c1}"/><rect x="52" y="138" width="14" height="4" rx="2" fill="${c1}"/><rect x="40" y="137" width="10" height="2" fill="${c2}" opacity=".65"/><rect x="54" y="137" width="10" height="2" fill="${c2}" opacity=".65"/>`};
+  if(style===5) return {name:`Sport #${i}`, tag, svg:`<rect x="38" y="136" width="14" height="8" rx="3" fill="${c1}"/><rect x="52" y="136" width="14" height="8" rx="3" fill="${c1}"/><rect x="42" y="138" width="6" height="2" fill="${c2}" opacity=".7"/><rect x="56" y="138" width="6" height="2" fill="${c2}" opacity=".7"/>`};
+  if(style===6) return {name:`Formal #${i}`, tag, svg:`<rect x="38" y="136" width="14" height="7" rx="2" fill="${c1}"/><rect x="52" y="136" width="14" height="7" rx="2" fill="${c1}"/><rect x="38" y="142" width="28" height="2" fill="${c2}" opacity=".4"/>`};
+  return {name:`Cute #${i}`, tag, svg:`<rect x="38" y="136" width="14" height="8" rx="4" fill="${c1}"/><rect x="52" y="136" width="14" height="8" rx="4" fill="${c1}"/><rect x="42" y="136" width="4" height="4" rx="2" fill="${c2}" opacity=".55"/><rect x="56" y="136" width="4" height="4" rx="2" fill="${c2}" opacity=".55"/>`};
+}
+
+function makeAcc(i, tag="basic"){
+  const c1 = pick(PAL[tag] || PAL.basic, i+6);
+  const style = i % 7;
+  if(style===0) return {name:`Gözlük #${i}`, tag, svg:`<rect x="41" y="28" width="8" height="6" rx="2" fill="none" stroke="${c1}" stroke-width="2"/><rect x="51" y="28" width="8" height="6" rx="2" fill="none" stroke="${c1}" stroke-width="2"/><rect x="49" y="30" width="2" height="2" fill="${c1}"/>`};
+  if(style===1) return {name:`Taç #${i}`, tag, svg:`<rect x="40" y="12" width="20" height="6" rx="3" fill="${c1}"/><rect x="44" y="10" width="3" height="6" fill="${c1}"/><rect x="53" y="10" width="3" height="6" fill="${c1}"/>`};
+  if(style===2) return {name:`Şapka #${i}`, tag, svg:`<rect x="34" y="14" width="32" height="8" rx="4" fill="${c1}"/><rect x="30" y="20" width="40" height="4" rx="2" fill="${c1}"/>`};
+  if(style===3) return {name:`Kolye #${i}`, tag, svg:`<rect x="44" y="52" width="12" height="2" fill="${c1}" opacity=".9"/><rect x="49" y="54" width="2" height="4" fill="${c1}" opacity=".9"/>`};
+  if(style===4) return {name:`Maske #${i}`, tag, svg:`<rect x="41" y="32" width="18" height="6" rx="3" fill="${c1}" opacity=".8"/>`};
+  if(style===5) return {name:`Küpe #${i}`, tag, svg:`<rect x="35" y="34" width="3" height="6" rx="1" fill="${c1}"/><rect x="62" y="34" width="3" height="6" rx="1" fill="${c1}"/>`};
+  return {name:`Bandana #${i}`, tag, svg:`<rect x="34" y="24" width="32" height="4" rx="2" fill="${c1}" opacity=".9"/>`};
+}
+
+/* Kıyafet envanteri (çok sayıda) */
+function buildWardrobe(){
+  const wardrobe = { hair:[], top:[], bottom:[], shoes:[], acc:[] };
+
+  // Buradaki sayıları arttırırsan katalog büyür.
+  // Şu haliyle toplam ~320+ parça var.
+  for(let i=0;i<80;i++){
+    wardrobe.hair.push(makeHair(i, i%3===0?"neon": i%3===1?"street":"basic"));
+  }
+  for(let i=0;i<90;i++){
+    wardrobe.top.push(makeTop(i, i%4===0?"sport": i%4===1?"street": i%4===2?"cute":"formal"));
+  }
+  for(let i=0;i<90;i++){
+    wardrobe.bottom.push(makeBottom(i, i%4===0?"sport": i%4===1?"street": i%4===2?"cute":"formal"));
+  }
+  for(let i=0;i<80;i++){
+    wardrobe.shoes.push(makeShoes(i, i%4===0?"sport": i%4===1?"street": i%4===2?"cute":"formal"));
+  }
+  for(let i=0;i<55;i++){
+    wardrobe.acc.push(makeAcc(i, i%3===0?"neon": i%3===1?"cute":"basic"));
+  }
+  return wardrobe;
+}
+
+const WARDROBE = buildWardrobe();
+
+/* Seçili parçalar */
+let current = {
+  hair: 0,
+  top: 0,
+  bottom: 0,
+  shoes: 0,
+  acc: -1
+};
+
+function avatarSvgFromSelection(sel){
+  const hair = WARDROBE.hair[sel.hair]?.svg ?? "";
+  const top  = WARDROBE.top[sel.top]?.svg ?? "";
+  const bot  = WARDROBE.bottom[sel.bottom]?.svg ?? "";
+  const sh   = WARDROBE.shoes[sel.shoes]?.svg ?? "";
+  const acc  = (sel.acc>=0 ? (WARDROBE.acc[sel.acc]?.svg ?? "") : "");
+
+  return `
+  <svg viewBox="0 0 100 160" xmlns="http://www.w3.org/2000/svg">
+    ${BODY.head}
+    ${faceLayer()}
+    ${hair}
+    ${BODY.neck}
+    ${BODY.torso}
+    ${top}
+    ${BODY.legL}
+    ${BODY.legR}
+    ${bot}
+    ${sh}
+    ${acc}
+  </svg>`;
+}
+
+function renderCreator(){
+  $("character-canvas").innerHTML = avatarSvgFromSelection(current);
+  const count = WARDROBE.hair.length + WARDROBE.top.length + WARDROBE.bottom.length + WARDROBE.shoes.length + WARDROBE.acc.length;
+  $("creatorInfo").innerHTML = `Kıyafet Havuzu: <b>${count}</b> parça • Saç:<b>${WARDROBE.hair.length}</b> Üst:<b>${WARDROBE.top.length}</b> Alt:<b>${WARDROBE.bottom.length}</b> Ayakkabı:<b>${WARDROBE.shoes.length}</b> Aksesuar:<b>${WARDROBE.acc.length}</b>`;
+}
+
+/* =========================
+   PICKER MODAL (Grid seçici)
+========================= */
+let pickerCategory = "hair";
+
+function openPicker(cat){
+  pickerCategory = cat;
+  $("pickerTitle").textContent = ({
+    hair:"Saç Seç", top:"Üst Seç", bottom:"Alt Seç", shoes:"Ayakkabı Seç", acc:"Aksesuar Seç"
+  }[cat] || "Seç");
+  $("pickerSearch").value = "";
+  $("pickerFilter").value = "all";
+  buildPickerGrid();
+  $("pickerBackdrop").classList.remove("hidden");
+}
+
+function closePicker(){
+  $("pickerBackdrop").classList.add("hidden");
+}
+
+function buildPickerGrid(){
+  const grid = $("pickerGrid");
+  grid.innerHTML = "";
+  const q = $("pickerSearch").value.trim().toLowerCase();
+  const f = $("pickerFilter").value;
+
+  const list = WARDROBE[pickerCategory] || [];
+  const previewBase = (selOverride)=>{
+    const sel = {...current, ...selOverride};
+    return avatarSvgFromSelection(sel);
+  };
+
+  // Aksesuar için "None" seçeneği
+  if(pickerCategory === "acc"){
+    const it = document.createElement("div");
+    it.className = "item";
+    it.innerHTML = `<div class="name">YOK</div>${previewBase({acc:-1})}`;
+    it.onclick = ()=>{ current.acc = -1; renderCreator(); closePicker(); syncOnlineAuto(); };
+    grid.appendChild(it);
+  }
+
+  for(let i=0;i<list.length;i++){
+    const item = list[i];
+    if(f !== "all" && item.tag !== f) continue;
+    if(q && !item.name.toLowerCase().includes(q) && !(item.tag||"").toLowerCase().includes(q)) continue;
+
+    const it = document.createElement("div");
+    it.className = "item";
+
+    const preview = previewBase({[pickerCategory]: i});
+    it.innerHTML = `<div class="name">${escapeHtml(item.name)}<br><small>${escapeHtml(item.tag)}</small></div>${preview}`;
+
+    it.onclick = ()=>{
+      current[pickerCategory] = i;
+      renderCreator();
+      closePicker();
+      syncOnlineAuto();
+    };
+
+    grid.appendChild(it);
+  }
+}
+
+/* =========================
+   LOGIN + MENU NAV
+========================= */
 function enterSite(){
   const nick = $("nickname").value.trim();
   if(!nick) return alert("Takma ad boş olamaz!");
@@ -467,226 +782,57 @@ function enterSite(){
   hideAll(); showPanel("menu");
 }
 
-/* -------------------- DAILY QUEST / UNLOCK -------------------- */
-function todayKey(){
-  const d = new Date();
-  const y = d.getFullYear();
-  const m = String(d.getMonth()+1).padStart(2,'0');
-  const day = String(d.getDate()).padStart(2,'0');
-  return `${y}-${m}-${day}`;
-}
-function getProgress(){
-  const p = LS.get("dailyProgress", null);
-  const t = todayKey();
-  if(!p || p.day !== t){
-    const fresh = { day:t, score:0, completed:false, claimed:false };
-    LS.set("dailyProgress", fresh);
-    return fresh;
-  }
-  return p;
-}
-function saveProgress(p){ LS.set("dailyProgress", p); }
-
-function addScoreToDaily(amount){
-  const p = getProgress();
-  if(p.completed) return;
-  p.score = Math.max(0, (p.score||0) + amount);
-  if(p.score >= 20){
-    p.score = 20;
-    p.completed = true;
-  }
-  saveProgress(p);
-  updateQuestUI();
-  updateUnlockBadge();
+function backToMenu(){
+  hideAll();
+  $("display-nick").textContent = LS.getStr("nickname","");
+  showPanel("menu");
 }
 
-function claimReward(){
-  const p = getProgress();
-  if(!p.completed || p.claimed) return;
-  p.claimed = true;
-  saveProgress(p);
-  LS.set("neonPackUnlocked", true);
-  updateQuestUI();
-  updateUnlockBadge();
-  alert("NEON PACK açıldı! (ekstra saç/üst/alt/ayakkabı)");
+function openCreator(){
+  stopAnyGame();
+  hideAll(); showPanel("creator");
+  renderCreator();
 }
 
-function neonUnlocked(){ return !!LS.get("neonPackUnlocked", false); }
-
-function updateUnlockBadge(){
-  const b = $("unlock-badge");
-  if(neonUnlocked()){
-    b.innerHTML = `Neon Pack: <b>AÇIK</b> ✅`;
-  }else{
-    const p = getProgress();
-    b.innerHTML = `Neon Pack: <b>KİLİTLİ</b> 🔒 | Günlük: <b>${p.score}/20</b>`;
-  }
+function openLibrary(){
+  stopAnyGame();
+  hideAll(); showPanel("library");
+  loadLibrary();
 }
 
-function updateQuestUI(){
-  const box = $("quest-box");
-  const p = getProgress();
-  let status = `Günlük görev: <b>20 puan</b> yap (${p.score}/20)`;
-  if(p.completed) status = `Günlük görev: <b>TAMAM</b> ✅ (20/20)`;
-
-  let claim = "";
-  if(p.completed && !p.claimed){
-    claim = `<div class="controls" style="margin-top:10px">
-      <button id="btn-claim" style="border-color:var(--good);color:var(--good)">ÖDÜLÜ AL</button>
-    </div>`;
-  }else if(p.claimed || neonUnlocked()){
-    claim = `<p style="margin-top:10px;color:var(--good)">Ödül alındı: Neon Pack ✅</p>`;
-  }
-
-  box.innerHTML = `
-    <p>${status}</p>
-    <p><small>Not: Herhangi bir oyunda puan kazanman yeter.</small></p>
-    ${claim}
-  `;
-  const btn = $("btn-claim");
-  if(btn) btn.onclick = claimReward;
+function openGamesHub(){
+  stopAnyGame();
+  hideAll(); showPanel("games");
 }
 
-/* -------------------- CHARACTER ASSETS -------------------- */
-const bodyBase = `
-<rect x="35" y="30" width="30" height="30" fill="#ffdbac"/>
-<rect x="40" y="60" width="20" height="40" fill="#ffdbac"/>
-<rect x="40" y="100" width="9" height="40" fill="#ffdbac"/>
-<rect x="51" y="100" width="9" height="40" fill="#ffdbac"/>
-`;
-
-const baseAssets = {
-  hair:[
-    `<rect x="35" y="25" width="30" height="10" fill="#4d2600"/>`,
-    `<rect x="32" y="20" width="36" height="20" fill="#ffd700"/>`,
-    `<rect x="30" y="18" width="40" height="22" fill="#00ffff"/>`,
-    `<rect x="35" y="25" width="30" height="10" fill="#ff00ff"/>`,
-    `<rect x="32" y="20" width="36" height="20" fill="#ff4500"/>`,
-    `<rect x="30" y="18" width="40" height="22" fill="#00ff00"/>`,
-    `<rect x="34" y="23" width="32" height="12" fill="#1e90ff"/>`,
-    `<rect x="33" y="21" width="34" height="14" fill="#ff1493"/>`,
-    `<rect x="35" y="22" width="30" height="15" fill="#ffa500"/>`,
-    `<rect x="31" y="19" width="38" height="18" fill="#adff2f"/>`
-  ],
-  top:[
-    `<rect x="40" y="60" width="20" height="35" fill="#ff0055"/>`,
-    `<rect x="40" y="60" width="20" height="35" fill="#222"/>`,
-    `<rect x="40" y="60" width="20" height="35" fill="#00ff00"/>`,
-    `<rect x="40" y="60" width="20" height="35" fill="#ff00ff"/>`,
-    `<rect x="40" y="60" width="20" height="35" fill="#1e90ff"/>`,
-    `<rect x="40" y="60" width="20" height="35" fill="#ffa500"/>`,
-    `<rect x="40" y="60" width="20" height="35" fill="#00ffff"/>`,
-    `<rect x="40" y="60" width="20" height="35" fill="#adff2f"/>`,
-    `<rect x="40" y="60" width="20" height="35" fill="#ff4500"/>`,
-    `<rect x="40" y="60" width="20" height="35" fill="#ff1493"/>`
-  ],
-  bottom:[
-    `<rect x="40" y="95" width="9" height="45" fill="#2b2b80"/><rect x="51" y="95" width="9" height="45" fill="#2b2b80"/>`,
-    `<rect x="40" y="95" width="20" height="15" fill="#555"/>`,
-    `<rect x="40" y="95" width="9" height="45" fill="#ff00ff"/><rect x="51" y="95" width="9" height="45" fill="#ff00ff"/>`,
-    `<rect x="40" y="95" width="9" height="45" fill="#00ffff"/><rect x="51" y="95" width="9" height="45" fill="#00ffff"/>`,
-    `<rect x="40" y="95" width="9" height="45" fill="#ffa500"/><rect x="51" y="95" width="9" height="45" fill="#ffa500"/>`,
-    `<rect x="40" y="95" width="9" height="45" fill="#ff1493"/><rect x="51" y="95" width="9" height="45" fill="#ff1493"/>`,
-    `<rect x="40" y="95" width="9" height="45" fill="#1e90ff"/><rect x="51" y="95" width="9" height="45" fill="#1e90ff"/>`,
-    `<rect x="40" y="95" width="9" height="45" fill="#00ff00"/><rect x="51" y="95" width="9" height="45" fill="#00ff00"/>`,
-    `<rect x="40" y="95" width="9" height="45" fill="#ff4500"/><rect x="51" y="95" width="9" height="45" fill="#ff4500"/>`,
-    `<rect x="40" y="95" width="9" height="45" fill="#adff2f"/><rect x="51" y="95" width="9" height="45" fill="#adff2f"/>`
-  ],
-  shoes:[
-    `<rect x="38" y="140" width="14" height="6" fill="#000"/><rect x="52" y="140" width="14" height="6" fill="#000"/>`,
-    `<rect x="38" y="140" width="14" height="6" fill="#ff3355"/><rect x="52" y="140" width="14" height="6" fill="#ff3355"/>`,
-    `<rect x="38" y="140" width="14" height="6" fill="#1e90ff"/><rect x="52" y="140" width="14" height="6" fill="#1e90ff"/>`,
-    `<rect x="38" y="140" width="14" height="6" fill="#00ff66"/><rect x="52" y="140" width="14" height="6" fill="#00ff66"/>`,
-    `<rect x="38" y="140" width="14" height="6" fill="#ff00ff"/><rect x="52" y="140" width="14" height="6" fill="#ff00ff"/>`,
-    `<rect x="38" y="140" width="14" height="6" fill="#00ffff"/><rect x="52" y="140" width="14" height="6" fill="#00ffff"/>`,
-    `<rect x="38" y="140" width="14" height="6" fill="#ffd700"/><rect x="52" y="140" width="14" height="6" fill="#ffd700"/>`,
-    `<rect x="38" y="140" width="14" height="6" fill="#555"/><rect x="52" y="140" width="14" height="6" fill="#555"/>`,
-    `<rect x="38" y="140" width="14" height="6" fill="#fff"/><rect x="52" y="140" width="14" height="6" fill="#fff"/>`,
-    `<rect x="38" y="140" width="14" height="6" fill="#8b4513"/><rect x="52" y="140" width="14" height="6" fill="#8b4513"/>`
-  ]
-};
-
-const neonPack = {
-  hair:[
-    `<rect x="29" y="18" width="42" height="20" fill="#9b5cff"/><rect x="31" y="22" width="38" height="6" fill="#00ffff"/>`,
-    `<rect x="31" y="18" width="38" height="22" fill="#00ff66"/>`,
-    `<rect x="30" y="20" width="40" height="18" fill="#ff3355"/>`,
-    `<rect x="32" y="18" width="36" height="22" fill="#ffffff"/><rect x="33" y="22" width="34" height="4" fill="#ff00ff"/>`,
-    `<rect x="30" y="18" width="40" height="22" fill="#222"/><rect x="30" y="18" width="40" height="4" fill="#00ffff"/>`
-  ],
-  top:[
-    `<rect x="40" y="60" width="20" height="35" fill="#9b5cff"/><rect x="40" y="74" width="20" height="4" fill="#00ffff"/>`,
-    `<rect x="40" y="60" width="20" height="35" fill="#00ff66"/>`,
-    `<rect x="40" y="60" width="20" height="35" fill="#ff3355"/>`,
-    `<rect x="40" y="60" width="20" height="35" fill="#fff"/><rect x="40" y="66" width="20" height="4" fill="#ff00ff"/>`,
-    `<rect x="40" y="60" width="20" height="35" fill="#111"/><rect x="40" y="60" width="20" height="3" fill="#00ffff"/>`
-  ],
-  bottom:[
-    `<rect x="40" y="95" width="9" height="45" fill="#9b5cff"/><rect x="51" y="95" width="9" height="45" fill="#9b5cff"/>`,
-    `<rect x="40" y="95" width="9" height="45" fill="#00ff66"/><rect x="51" y="95" width="9" height="45" fill="#00ff66"/>`,
-    `<rect x="40" y="95" width="9" height="45" fill="#ff3355"/><rect x="51" y="95" width="9" height="45" fill="#ff3355"/>`,
-    `<rect x="40" y="95" width="20" height="15" fill="#fff"/><rect x="40" y="110" width="20" height="3" fill="#ff00ff"/>`,
-    `<rect x="40" y="95" width="9" height="45" fill="#111"/><rect x="51" y="95" width="9" height="45" fill="#111"/><rect x="40" y="95" width="20" height="3" fill="#00ffff"/>`
-  ],
-  shoes:[
-    `<rect x="38" y="140" width="14" height="6" fill="#9b5cff"/><rect x="52" y="140" width="14" height="6" fill="#9b5cff"/>`,
-    `<rect x="38" y="140" width="14" height="6" fill="#00ff66"/><rect x="52" y="140" width="14" height="6" fill="#00ff66"/>`,
-    `<rect x="38" y="140" width="14" height="6" fill="#ff3355"/><rect x="52" y="140" width="14" height="6" fill="#ff3355"/>`,
-    `<rect x="38" y="140" width="14" height="6" fill="#fff"/><rect x="52" y="140" width="14" height="6" fill="#fff"/>`,
-    `<rect x="38" y="140" width="14" height="6" fill="#111"/><rect x="52" y="140" width="14" height="6" fill="#111"/><rect x="38" y="140" width="28" height="2" fill="#00ffff"/>`
-  ]
-};
-
-function getAssetList(cat){
-  const base = baseAssets[cat];
-  return neonUnlocked() ? base.concat(neonPack[cat]) : base;
+function openOnline(){
+  stopAnyGame();
+  hideAll(); showPanel("online");
+  renderOnlinePreviews();
+  refreshChatUI();
+  updateOnlineInfo();
 }
 
-let currentIndices = { hair:0, top:0, bottom:0, shoes:0 };
-
-function makeSvgFromIndices(indices){
-  const hairList = getAssetList("hair");
-  const topList = getAssetList("top");
-  const bottomList = getAssetList("bottom");
-  const shoesList = getAssetList("shoes");
-
-  const h = ((indices.hair % hairList.length)+hairList.length)%hairList.length;
-  const t = ((indices.top % topList.length)+topList.length)%topList.length;
-  const b = ((indices.bottom % bottomList.length)+bottomList.length)%bottomList.length;
-  const s = ((indices.shoes % shoesList.length)+shoesList.length)%shoesList.length;
-
-  return `
-  <svg viewBox="0 0 100 160" xmlns="http://www.w3.org/2000/svg">
-    ${bodyBase}
-    ${hairList[h]}
-    ${topList[t]}
-    ${bottomList[b]}
-    ${shoesList[s]}
-  </svg>`;
-}
-
-function renderCharacter(){
-  $("character-canvas").innerHTML = makeSvgFromIndices(currentIndices);
-}
-
-function change(cat){
-  const list = getAssetList(cat);
-  currentIndices[cat] = (currentIndices[cat] + 1) % list.length;
-  renderCharacter();
-  if(roomState.inRoom) pushMyState().catch(()=>{});
-}
-
-function getMyDisplaySvg(){
-  const active = LS.getStr("activeCharacterSVG","");
-  return active || makeSvgFromIndices(currentIndices);
-}
-
-/* -------------------- DOLAP -------------------- */
-function saveCurrentCharacter(){
+/* =========================
+   DOLAP (kayıt / aktif / sil)
+========================= */
+function saveCharacter(){
   const nick = LS.getStr("nickname","anon");
-  const svg = makeSvgFromIndices(currentIndices);
+  const svg = avatarSvgFromSelection(current);
   const saved = LS.get("savedCharacters", []);
-  saved.push({ nick, svg, ts: Date.now() });
+  const item = {
+    nick,
+    svg,
+    ts: Date.now(),
+    meta: {
+      hair: WARDROBE.hair[current.hair]?.name,
+      top: WARDROBE.top[current.top]?.name,
+      bottom: WARDROBE.bottom[current.bottom]?.name,
+      shoes: WARDROBE.shoes[current.shoes]?.name,
+      acc: current.acc>=0 ? WARDROBE.acc[current.acc]?.name : "YOK"
+    }
+  };
+  saved.push(item);
   LS.set("savedCharacters", saved);
   alert("Karakter kaydedildi!");
 }
@@ -697,38 +843,37 @@ function loadLibrary(){
   container.innerHTML = "";
 
   const saved = LS.get("savedCharacters", []);
-  const my = saved.filter(x => x.nick === nick).slice().reverse();
+  const mine = saved.filter(x=>x.nick===nick).slice().reverse();
 
-  if(my.length === 0){
-    container.innerHTML = "<p>Henüz karakter yok.</p>";
+  if(mine.length===0){
+    container.innerHTML = "<p>Henüz karakter yok. Oluşturup KAYDET bas.</p>";
     return;
   }
 
-  for(const c of my){
+  for(const c of mine){
     const card = document.createElement("div");
     card.className = "character-card";
+    const meta = c.meta || {};
     card.innerHTML = `
-      <div class="preview">${c.svg}</div>
+      <div>${c.svg}</div>
+      <small>${new Date(c.ts).toLocaleString()}</small>
+      <small>Üst: ${escapeHtml(meta.top||"-")}</small>
+      <small>Alt: ${escapeHtml(meta.bottom||"-")}</small>
       <div class="row">
         <button class="btnActive" style="border-color:var(--neon-blue);color:var(--neon-blue)">AKTİF</button>
         <button class="btnDel" style="border-color:var(--bad);color:var(--bad)">SİL</button>
       </div>
-      <small>${new Date(c.ts).toLocaleString()}</small>
     `;
 
-    card.querySelector(".btnActive").onclick = (ev) => {
-      ev.stopPropagation();
+    card.querySelector(".btnActive").onclick = ()=>{
       LS.setStr("activeCharacterSVG", c.svg);
       alert("Aktif karakter ayarlandı!");
-      // online açıksa anında gönder
-      if(roomState.inRoom) pushMyState().catch(()=>{});
+      syncOnlineAuto();
     };
 
-    card.querySelector(".btnDel").onclick = (ev) => {
-      ev.stopPropagation();
+    card.querySelector(".btnDel").onclick = ()=>{
       const all = LS.get("savedCharacters", []);
-      const kept = all.filter(x => !(x.nick===c.nick && x.ts===c.ts));
-      LS.set("savedCharacters", kept);
+      LS.set("savedCharacters", all.filter(x => !(x.nick===c.nick && x.ts===c.ts)));
       loadLibrary();
     };
 
@@ -736,40 +881,258 @@ function loadLibrary(){
   }
 }
 
-/* -------------------- FIREBASE (ONLINE + CHAT) -------------------- */
-import { initializeApp } from "https://www.gstatic.com/firebasejs/10.12.5/firebase-app.js";
-import {
-  getDatabase, ref, set, update, onValue, get, remove, onDisconnect,
-  push, onChildAdded, query, limitToLast
-} from "https://www.gstatic.com/firebasejs/10.12.5/firebase-database.js";
-import { getAuth, signInAnonymously, onAuthStateChanged } from "https://www.gstatic.com/firebasejs/10.12.5/firebase-auth.js";
+function clearAllMy(){
+  const nick = LS.getStr("nickname","");
+  const all = LS.get("savedCharacters", []);
+  const kept = all.filter(x=>x.nick!==nick);
+  LS.set("savedCharacters", kept);
+  if(LS.getStr("activeCharacterSVG","")) LS.setStr("activeCharacterSVG","");
+  loadLibrary();
+  alert("Hepsi silindi.");
+}
 
-const firebaseConfig = {
-  apiKey: "AIzaSyABqkhpL1SMRzRJ9GQLjjZE2IryqpAvMPw",
-  authDomain: "pixelroom-ae218.firebaseapp.com",
-  databaseURL: "https://pixelroom-ae218-default-rtdb.europe-west1.firebasedatabase.app",
-  projectId: "pixelroom-ae218",
-  storageBucket: "pixelroom-ae218.firebasestorage.app",
-  messagingSenderId: "720297722320",
-  appId: "1:720297722320:web:c815edae99d1efa7ff39d5",
-  measurementId: "G-HD8901B19M"
-};
+/* Aktif varsa onu döndür */
+function getMyDisplaySvg(){
+  const active = LS.getStr("activeCharacterSVG","");
+  return active || avatarSvgFromSelection(current);
+}
 
-const app = initializeApp(firebaseConfig);
-const db = getDatabase(app);
-const auth = getAuth(app);
+/* Random giydir */
+function randomize(){
+  function r(max){ return Math.floor(Math.random()*max); }
+  current.hair = r(WARDROBE.hair.length);
+  current.top = r(WARDROBE.top.length);
+  current.bottom = r(WARDROBE.bottom.length);
+  current.shoes = r(WARDROBE.shoes.length);
+  current.acc = (Math.random()<0.65) ? r(WARDROBE.acc.length) : -1;
+  renderCreator();
+  syncOnlineAuto();
+}
 
+/* =========================
+   GAMES (3 mini oyun)
+========================= */
+const canvas = $("game-canvas");
+const ctx = canvas.getContext("2d");
+let currentGame = null;
+let intervalId = null;
+let anyTimers = [];
+
+function stopAnyGame(){
+  if(intervalId){ clearInterval(intervalId); intervalId=null; }
+  for(const t of anyTimers) clearTimeout(t);
+  anyTimers = [];
+  canvas.onclick = null;
+  currentGame = null;
+}
+
+function openGame(which){
+  hideAll(); showPanel("game");
+  $("btn-restart").onclick = ()=>startGame(which);
+  startGame(which);
+}
+
+function startGame(which){
+  stopAnyGame();
+  currentGame = which;
+  if(which==="bounce") startBounce();
+  else if(which==="reaction") startReaction();
+  else if(which==="runner") startRunner();
+}
+
+/* bounce */
+function startBounce(){
+  $("game-title").textContent="Neon Bounce";
+  let score=0, lives=3;
+  const wallH=14;
+  const ball={x:180,y:260,dx:2.4,dy:-3.1,r:10};
+
+  canvas.onclick = ()=> ball.dy *= -1;
+
+  intervalId=setInterval(()=>{
+    ctx.fillStyle="rgba(10,10,15,0.25)";
+    ctx.fillRect(0,0,canvas.width,canvas.height);
+
+    ctx.fillStyle="#ff3355";
+    ctx.fillRect(0,0,canvas.width,wallH);
+
+    ctx.save();
+    ctx.shadowColor="#00ffff";
+    ctx.shadowBlur=18;
+    ctx.fillStyle="#00ffff";
+    ctx.beginPath(); ctx.arc(ball.x,ball.y,ball.r,0,Math.PI*2); ctx.fill();
+    ctx.restore();
+
+    ball.x+=ball.dx; ball.y+=ball.dy;
+
+    if(ball.x+ball.r>canvas.width){ ball.x=canvas.width-ball.r; ball.dx*=-1; }
+    if(ball.x-ball.r<0){ ball.x=ball.r; ball.dx*=-1; }
+
+    if(ball.y-ball.r<wallH){
+      ball.y=wallH+ball.r;
+      ball.dy*=-1;
+      score++;
+      if(score%10===0){ ball.dx*=1.08; ball.dy*=1.08; }
+    }
+
+    if(ball.y+ball.r>canvas.height){
+      lives--;
+      if(lives<=0){
+        clearInterval(intervalId); intervalId=null;
+        $("hud").innerHTML=`SKOR: <b>${score}</b> | CAN: <b style="color:var(--bad)">0</b>`;
+        return;
+      }
+      ball.x=180; ball.y=260; ball.dx=2.4; ball.dy=-3.1;
+    }
+
+    $("hud").innerHTML=`SKOR: <b>${score}</b> | CAN: <b>${lives}</b><br><small>Tıkla: yön değiştir</small>`;
+  },16);
+}
+
+/* reaction */
+function startReaction(){
+  $("game-title").textContent="Reaction Rush";
+  let score=0;
+  let can=false;
+  let started=0;
+  let target={x:180,y:260,r:32};
+
+  function drawWait(){
+    ctx.fillStyle="rgba(10,10,15,1)";
+    ctx.fillRect(0,0,canvas.width,canvas.height);
+    ctx.fillStyle="#00ffff";
+    ctx.font="12px 'Press Start 2P'";
+    ctx.fillText("BEKLE...",110,250);
+  }
+  function drawTarget(){
+    ctx.fillStyle="rgba(10,10,15,1)";
+    ctx.fillRect(0,0,canvas.width,canvas.height);
+    target.x=90+Math.random()*(canvas.width-180);
+    target.y=120+Math.random()*(canvas.height-240);
+
+    ctx.save();
+    ctx.shadowColor="#ff00ff";
+    ctx.shadowBlur=22;
+    ctx.fillStyle="#ff00ff";
+    ctx.beginPath(); ctx.arc(target.x,target.y,target.r,0,Math.PI*2); ctx.fill();
+    ctx.restore();
+
+    ctx.fillStyle="#000";
+    ctx.font="10px 'Press Start 2P'";
+    ctx.fillText("TIKLA", target.x-22, target.y+4);
+
+    can=true;
+    started=performance.now();
+  }
+  function schedule(){
+    can=false;
+    drawWait();
+    const delay = 700 + Math.random()*1300;
+    anyTimers.push(setTimeout(drawTarget, delay));
+  }
+
+  canvas.onclick=(e)=>{
+    const r=canvas.getBoundingClientRect();
+    const mx=(e.clientX-r.left)*(canvas.width/r.width);
+    const my=(e.clientY-r.top)*(canvas.height/r.height);
+
+    if(!can){ score=Math.max(0,score-1); $("hud").innerHTML=`ERKEN! PUAN: <b>${score}</b>`; return; }
+
+    const dx=mx-target.x, dy=my-target.y;
+    if(Math.sqrt(dx*dx+dy*dy)<=target.r){
+      const ms=Math.round(performance.now()-started);
+      score += (ms<250?3: ms<400?2:1);
+      $("hud").innerHTML=`PUAN: <b>${score}</b> | TEPKİ: <b>${ms}ms</b>`;
+      schedule();
+    }else{
+      score=Math.max(0,score-1);
+      $("hud").innerHTML=`ISKA! PUAN: <b>${score}</b>`;
+    }
+  };
+
+  $("hud").innerHTML=`PUAN: <b>${score}</b><br><small>Hedef çıkınca tıkla</small>`;
+  schedule();
+}
+
+/* runner */
+function startRunner(){
+  $("game-title").textContent="Neon Runner";
+  let score=0, lives=3;
+  let y=canvas.height-74, vy=0, onGround=true;
+  let obs=[];
+  let t=0, speed=3.2;
+
+  canvas.onclick=()=>{
+    if(onGround){ vy=-10.8; onGround=false; }
+  };
+
+  intervalId=setInterval(()=>{
+    ctx.fillStyle="rgba(10,10,15,0.25)";
+    ctx.fillRect(0,0,canvas.width,canvas.height);
+
+    ctx.strokeStyle="#00ffff";
+    ctx.lineWidth=2;
+    ctx.beginPath(); ctx.moveTo(0,canvas.height-40); ctx.lineTo(canvas.width,canvas.height-40); ctx.stroke();
+
+    const px=70,pw=26,ph=34;
+
+    vy+=0.55; y+=vy;
+    if(y>canvas.height-40-ph){ y=canvas.height-40-ph; vy=0; onGround=true; }
+
+    ctx.save();
+    ctx.shadowColor="#ff00ff";
+    ctx.shadowBlur=16;
+    ctx.fillStyle="#ff00ff";
+    ctx.fillRect(px,y,pw,ph);
+    ctx.restore();
+
+    t++;
+    if(t%70===0){
+      obs.push({x:canvas.width+10,w:20+Math.random()*22,h:20+Math.random()*28});
+    }
+
+    for(const o of obs){
+      o.x -= speed;
+      ctx.save();
+      ctx.shadowColor="#00ffff";
+      ctx.shadowBlur=14;
+      ctx.fillStyle="#00ffff";
+      ctx.fillRect(o.x,canvas.height-40-o.h,o.w,o.h);
+      ctx.restore();
+
+      const oy = canvas.height-40-o.h;
+      const hit = px < o.x+o.w && px+pw > o.x && y < oy+o.h && y+ph > oy;
+      if(hit){
+        lives--;
+        o.x = -9999;
+        if(lives<=0){
+          clearInterval(intervalId); intervalId=null;
+          $("hud").innerHTML=`SKOR: <b>${score}</b> | CAN: <b style="color:var(--bad)">0</b>`;
+          return;
+        }
+      }
+    }
+
+    obs = obs.filter(o=>o.x>-60);
+    score++;
+    if(score%120===0) speed*=1.06;
+
+    $("hud").innerHTML=`SKOR: <b>${score}</b> | CAN: <b>${lives}</b><br><small>Tıkla: zıpla</small>`;
+  },16);
+}
+
+/* =========================
+   ONLINE (INTERNETSİZ)
+   BroadcastChannel: aynı PC’de 2 sekme
+========================= */
 const netHud = $("netHud");
 const roomHud = $("roomHud");
 
-const roomState = {
-  uid: null,
-  inRoom: false,
+const onlineState = {
   roomId: null,
-  role: null,   // "p1" | "p2"
-  unsubRoom: null,
-  unsubChat: null,
-  connected: false
+  role: null,     // "p1" / "p2"
+  bc: null,
+  lastSeen: 0
 };
 
 function setNetUI(on){
@@ -781,175 +1144,124 @@ function setNetUI(on){
     netHud.innerHTML = `NET: <b>OFF</b> ❌`;
   }
 }
+
 function updateRoomUI(){
-  roomHud.innerHTML = `ROOM: <b>${roomState.roomId ?? "---"}</b>`;
+  roomHud.innerHTML = `ROOM: <b>${onlineState.roomId ?? "---"}</b>`;
 }
+
 function randomRoomCode(){
   return String(Math.floor(10000 + Math.random()*90000));
 }
 
-async function ensureAuth(){
-  if(roomState.uid) return roomState.uid;
-  await signInAnonymously(auth);
-  return new Promise((resolve, reject) => {
-    const off = onAuthStateChanged(auth, (u)=>{
-      if(u){
-        roomState.uid = u.uid;
-        off();
-        resolve(u.uid);
-      }
-    });
-    setTimeout(()=>reject(new Error("Auth timeout")), 7000);
-  });
+function updateOnlineInfo(){
+  const nick = LS.getStr("nickname","anon");
+  const hint = `Kullanıcı: <b>${escapeHtml(nick)}</b> • Oda: <b>${onlineState.roomId ?? "---"}</b> • Sistem: <b>2 SEKME</b>`;
+  $("onlineInfo").innerHTML = hint + `<br><small>Not: Bu online sistem internet istemez. Aynı PC’de yeni sekme aç → aynı oda kodu.</small>`;
+}
+
+function ensureChannel(roomId){
+  if(onlineState.bc) onlineState.bc.close();
+  onlineState.bc = new BroadcastChannel("asya_room_" + roomId);
+  onlineState.bc.onmessage = (ev)=>onRoomMessage(ev.data);
+  setNetUI(true);
+}
+
+function createRoom(){
+  const id = randomRoomCode();
+  joinRoom(id, true);
+  alert("Oda kuruldu: " + id + " (2. sekmede bu kodla gir)");
+}
+
+function joinRoom(roomId, asHost=false){
+  roomId = String(roomId||"").trim();
+  if(!/^\d{5}$/.test(roomId)) return alert("Oda kodu 5 haneli olmalı!");
+
+  onlineState.roomId = roomId;
+  onlineState.role = asHost ? "p1" : "p2";
+  onlineState.lastSeen = Date.now();
+  ensureChannel(roomId);
+  updateRoomUI();
+  updateOnlineInfo();
+
+  // kendini gönder
+  broadcast({ type:"join", role: onlineState.role, nick: LS.getStr("nickname","anon"), svg: getMyDisplaySvg(), ts: Date.now() });
+
+  renderOnlinePreviews();
+  refreshChatUI();
+}
+
+function leaveRoom(){
+  if(!onlineState.roomId) return;
+  broadcast({ type:"leave", role: onlineState.role, nick: LS.getStr("nickname","anon"), ts: Date.now() });
+
+  if(onlineState.bc){ onlineState.bc.close(); onlineState.bc=null; }
+  onlineState.roomId=null;
+  onlineState.role=null;
+
+  updateRoomUI();
+  updateOnlineInfo();
+  renderOnlinePreviews();
+  refreshChatUI();
+  setNetUI(!!window.BroadcastChannel);
+  alert("Odadan çıktın.");
+}
+
+function broadcast(msg){
+  if(!onlineState.bc) return;
+  onlineState.bc.postMessage(msg);
 }
 
 function renderOnlinePreviews(){
   $("p1Preview").innerHTML = getMyDisplaySvg();
-  if(!roomState.inRoom){
-    $("p2Preview").innerHTML = "<small>Bağlanınca gelecek…</small>";
+  if(!onlineState.roomId) $("p2Preview").innerHTML = "<small>Bağlanınca gelecek…</small>";
+}
+
+function syncOnlineAuto(){
+  // online oda açıksa otomatik “ben” güncelle
+  if(!onlineState.roomId || !onlineState.bc) return;
+  broadcast({ type:"state", role: onlineState.role, nick: LS.getStr("nickname","anon"), svg: getMyDisplaySvg(), ts: Date.now() });
+  $("p1Preview").innerHTML = getMyDisplaySvg();
+}
+
+/* “Diğer kişi”yi göstermek için basit mantık */
+let other = { nick:"", svg:"", ts:0 };
+
+function onRoomMessage(data){
+  if(!data || typeof data !== "object") return;
+  if(!onlineState.roomId) return;
+
+  // aynı role ise ignore (2 sekmede p1/p2 ayrılır ama yanlış olursa)
+  if(data.role && data.role === onlineState.role) return;
+
+  if(data.type === "join" || data.type === "state"){
+    other.nick = data.nick || "anon";
+    other.svg = data.svg || "";
+    other.ts = data.ts || Date.now();
+    $("p2Preview").innerHTML = other.svg ? other.svg : "<small>Bağlanınca gelecek…</small>";
+  }
+
+  if(data.type === "leave"){
+    other = { nick:"", svg:"", ts:0 };
+    $("p2Preview").innerHTML = "<small>Diğer kişi çıktı.</small>";
+  }
+
+  if(data.type === "chat"){
+    addMsgToUI(data.nick || "anon", data.text || "");
   }
 }
 
-async function createRoom(){
-  await ensureAuth();
-  const roomId = randomRoomCode();
-  const roomRef = ref(db, `rooms/${roomId}`);
-  const nick = LS.getStr("nickname","anon");
-
-  await set(roomRef, {
-    createdAt: Date.now(),
-    p1: { uid: roomState.uid, nick, svg: getMyDisplaySvg(), ts: Date.now() }
-  });
-
-  roomState.inRoom = true;
-  roomState.roomId = roomId;
-  roomState.role = "p1";
-  updateRoomUI();
-
-  onDisconnect(roomRef).remove().catch(()=>{});
-  listenRoom(roomId);
-
-  alert("Oda kuruldu: " + roomId);
-  renderOnlinePreviews();
-  refreshChatUI();
+/* =========================
+   CHAT (online oda içinde)
+========================= */
+function refreshChatUI(){
+  $("chatList").innerHTML = "";
+  if(!onlineState.roomId){
+    $("chatList").innerHTML = `<div class="msg"><small>Chat için odaya girmen lazım.</small></div>`;
+    return;
+  }
+  $("chatList").innerHTML = `<div class="msg"><small>Chat hazır.</small></div>`;
 }
 
-async function joinRoom(roomId){
-  await ensureAuth();
-  roomId = String(roomId||"").trim();
-  if(!/^\d{5}$/.test(roomId)) return alert("Oda kodu 5 haneli olmalı!");
-
-  const roomRef = ref(db, `rooms/${roomId}`);
-  const snap = await get(roomRef);
-  if(!snap.exists()) return alert("Oda bulunamadı!");
-
-  const data = snap.val();
-  if(!data.p1) return alert("Oda bozuk (p1 yok).");
-  if(data.p2 && data.p2.uid && data.p2.uid !== roomState.uid) return alert("Oda dolu!");
-
-  const nick = LS.getStr("nickname","anon");
-  await update(roomRef, {
-    p2: { uid: roomState.uid, nick, svg: getMyDisplaySvg(), ts: Date.now() }
-  });
-
-  roomState.inRoom = true;
-  roomState.roomId = roomId;
-  roomState.role = "p2";
-  updateRoomUI();
-
-  const p2Ref = ref(db, `rooms/${roomId}/p2`);
-  onDisconnect(p2Ref).remove().catch(()=>{});
-
-  listenRoom(roomId);
-  alert("Odaya girdin: " + roomId);
-  renderOnlinePreviews();
-  refreshChatUI();
-}
-
-function listenRoom(roomId){
-  if(roomState.unsubRoom) roomState.unsubRoom();
-  const roomRef = ref(db, `rooms/${roomId}`);
-
-  const unsubscribe = onValue(roomRef, (snap)=>{
-    if(!snap.exists()){
-      roomState.inRoom = false;
-      roomState.roomId = null;
-      roomState.role = null;
-      updateRoomUI();
-      $("p2Preview").innerHTML = "<small>Oda kapandı.</small>";
-      stopChatListen();
-      refreshChatUI();
-      return;
-    }
-
-    const data = snap.val();
-    if(roomState.role === "p1"){
-      $("p1Preview").innerHTML = getMyDisplaySvg();
-      $("p2Preview").innerHTML = (data.p2 && data.p2.svg) ? data.p2.svg : "<small>Arkadaş bekleniyor…</small>";
-    }else if(roomState.role === "p2"){
-      $("p1Preview").innerHTML = getMyDisplaySvg();
-      $("p2Preview").innerHTML = (data.p1 && data.p1.svg) ? data.p1.svg : "<small>p1 yok…</small>";
-    }
-    updateRoomUI();
-  });
-
-  roomState.unsubRoom = unsubscribe;
-}
-
-async function pushMyState(){
-  if(!roomState.inRoom || !roomState.roomId || !roomState.role) return;
-  const nick = LS.getStr("nickname","anon");
-  const svg = getMyDisplaySvg();
-  const meRef = ref(db, `rooms/${roomState.roomId}/${roomState.role}`);
-  await update(meRef, { uid: roomState.uid, nick, svg, ts: Date.now() });
-  $("p1Preview").innerHTML = svg;
-}
-
-async function leaveRoom(){
-  if(!roomState.inRoom || !roomState.roomId) return;
-
-  const roomId = roomState.roomId;
-  const role = roomState.role;
-
-  try{
-    if(role === "p1") await remove(ref(db, `rooms/${roomId}`));
-    else await remove(ref(db, `rooms/${roomId}/p2`));
-  }catch(e){}
-
-  if(roomState.unsubRoom) roomState.unsubRoom();
-  roomState.unsubRoom = null;
-
-  roomState.inRoom = false;
-  roomState.roomId = null;
-  roomState.role = null;
-  updateRoomUI();
-
-  stopChatListen();
-  refreshChatUI();
-  renderOnlinePreviews();
-  alert("Odadan çıktın.");
-}
-
-/* DB CONNECTED -> NET */
-onValue(ref(db, ".info/connected"), (snap)=>{
-  roomState.connected = !!snap.val();
-  setNetUI(roomState.connected && !!roomState.uid);
-});
-
-/* Auth state */
-onAuthStateChanged(auth, (u)=>{
-  roomState.uid = u ? u.uid : null;
-  setNetUI(roomState.connected && !!roomState.uid);
-});
-
-/* -------------------- CHAT -------------------- */
-function stopChatListen(){
-  if(roomState.unsubChat) roomState.unsubChat();
-  roomState.unsubChat = null;
-}
-function escapeHtml(s){
-  return String(s).replace(/[&<>"']/g, (c)=>({ "&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;","'":"&#39;" }[c]));
-}
 function addMsgToUI(nick, text){
   const div = document.createElement("div");
   div.className = "msg";
@@ -957,557 +1269,96 @@ function addMsgToUI(nick, text){
   $("chatList").appendChild(div);
   $("chatList").scrollTop = $("chatList").scrollHeight;
 }
-function refreshChatUI(){
-  $("chatList").innerHTML = "";
-  if(!roomState.inRoom || !roomState.roomId){
-    $("chatList").innerHTML = `<div class="msg"><small>Chat için odaya girmen lazım.</small></div>`;
-    return;
-  }
-  $("chatList").innerHTML = `<div class="msg"><small>Chat hazır. Mesaj yaz.</small></div>`;
-  startChatListen();
-}
-function startChatListen(){
-  stopChatListen();
-  if(!roomState.inRoom || !roomState.roomId) return;
 
-  const chatRef = ref(db, `rooms/${roomState.roomId}/chat`);
-  const q = query(chatRef, limitToLast(40));
-
-  $("chatList").innerHTML = "";
-  const unsubscribe = onChildAdded(q, (snap)=>{
-    const m = snap.val();
-    if(!m || !m.text) return;
-    addMsgToUI(m.nick || "anon", m.text);
-  });
-  roomState.unsubChat = unsubscribe;
-}
-async function sendChat(){
-  if(!roomState.inRoom || !roomState.roomId) return alert("Önce odaya gir!");
+function sendChat(){
+  if(!onlineState.roomId || !onlineState.bc) return alert("Önce odaya gir!");
   const txt = $("chatInput").value.trim();
   if(!txt) return;
 
-  await ensureAuth();
   const nick = LS.getStr("nickname","anon");
-  const chatRef = ref(db, `rooms/${roomState.roomId}/chat`);
-  await push(chatRef, { uid: roomState.uid, nick, text: txt, ts: Date.now() });
+  broadcast({ type:"chat", nick, text: txt, ts: Date.now(), role: onlineState.role });
+  addMsgToUI(nick, txt);
   $("chatInput").value = "";
 }
 
-/* -------------------- GAMES (3 oyun) -------------------- */
-let canvas, ctx;
-let currentGame = null;
-
-let particles = [];
-let shake = 0;
-
-function spawnParticles(x,y, count=14){
-  for(let i=0;i<count;i++){
-    particles.push({
-      x,y,
-      vx:(Math.random()-0.5)*5,
-      vy:(Math.random()-0.5)*5,
-      life: 18 + Math.random()*10
-    });
-  }
-}
-function updateParticles(){
-  for(const p of particles){
-    p.x += p.vx;
-    p.y += p.vy;
-    p.vx *= 0.95;
-    p.vy *= 0.95;
-    p.life -= 1;
-  }
-  particles = particles.filter(p => p.life > 0);
-}
-function drawParticles(){
-  for(const p of particles){
-    ctx.save();
-    ctx.globalAlpha = Math.max(0, p.life/28);
-    ctx.fillStyle = "#ff00ff";
-    ctx.beginPath();
-    ctx.arc(p.x, p.y, 2.2, 0, Math.PI*2);
-    ctx.fill();
-    ctx.restore();
-  }
-}
-function addShake(power=7){ shake = Math.max(shake, power); }
-
-function drawActiveAvatar(){
-  const svg = LS.getStr("activeCharacterSVG","");
-  ctx.save();
-  ctx.globalAlpha = 0.9;
-  ctx.fillStyle = "rgba(0,0,0,0.35)";
-  ctx.fillRect(8, 8, 92, 62);
-  ctx.strokeStyle = "#00ffff";
-  ctx.lineWidth = 2;
-  ctx.strokeRect(8, 8, 92, 62);
-  ctx.fillStyle = "#00ffff";
-  ctx.font = "10px 'Press Start 2P'";
-  ctx.fillText(svg ? "AKTIF" : "YOK", 18, 34);
-  ctx.restore();
-}
-
-function openGame(which){
-  hideAll();
-  showPanel("game");
-  $("btn-restart").onclick = () => startGame(which);
-  startGame(which);
-}
-
-function startGame(which){
-  stopAnyGame();
-  currentGame = which;
-  if(which === "bounce") startBounce();
-  else if(which === "reaction") startReaction();
-  else if(which === "runner") startRunner();
-}
-
-function stopAnyGame(){
-  stopBounce();
-  stopReaction();
-  stopRunner();
-  currentGame = null;
-  if(canvas) canvas.onclick = null;
-  particles = [];
-  shake = 0;
-}
-
-/* GAME 1: NEON BOUNCE */
-let bounceInterval = null;
-let bounce = null;
-
-function startBounce(){
-  $("game-title").textContent = "Neon Bounce";
-  bounce = {
-    score:0,
-    lives:3,
-    wallH: 14,
-    ball:{ x:canvas.width/2, y:canvas.height/2, dx:2.4, dy:-3.1, r:10 },
-    speedUpEvery: 10
-  };
-
-  canvas.onclick = () => { bounce.ball.dy *= -1; };
-
-  bounceInterval = setInterval(() => {
-    ctx.save();
-    ctx.fillStyle = "rgba(10,10,15,0.22)";
-    ctx.fillRect(0,0,canvas.width,canvas.height);
-    ctx.restore();
-
-    let sx = 0, sy = 0;
-    if(shake > 0){
-      sx = (Math.random()-0.5) * shake;
-      sy = (Math.random()-0.5) * shake;
-      shake *= 0.82;
-      if(shake < 0.7) shake = 0;
-    }
-
-    ctx.save();
-    ctx.translate(sx, sy);
-
-    ctx.fillStyle = "red";
-    ctx.fillRect(0,0,canvas.width,bounce.wallH);
-
-    ctx.fillStyle = "yellow";
-    ctx.beginPath();
-    ctx.arc(bounce.ball.x, bounce.ball.y, bounce.ball.r, 0, Math.PI*2);
-    ctx.fill();
-
-    const b = bounce.ball;
-    b.x += b.dx;
-    b.y += b.dy;
-
-    let bounced = false;
-
-    if(b.x + b.r > canvas.width){ b.x = canvas.width - b.r; b.dx *= -1; bounced = true; }
-    if(b.x - b.r < 0){ b.x = b.r; b.dx *= -1; bounced = true; }
-
-    if(b.y - b.r < bounce.wallH){
-      b.y = bounce.wallH + b.r;
-      b.dy *= -1;
-      bounced = true;
-      bounce.score += 1;
-      addScoreToDaily(1);
-
-      if(bounce.score % bounce.speedUpEvery === 0){
-        b.dx *= 1.08;
-        b.dy *= 1.08;
-      }
-    }
-
-    if(b.y + b.r > canvas.height){
-      bounce.lives -= 1;
-      spawnParticles(b.x, canvas.height - 10, 28);
-      addShake(12);
-
-      if(bounce.lives <= 0){
-        bounce.lives = 0;
-        canvas.onclick = null;
-        stopBounce();
-        $("hud").innerHTML =
-          `SKOR: <b>${bounce.score}</b> | CAN: <b style="color:var(--bad)">0</b><br><small>Yeniden’e bas</small>`;
-        ctx.restore();
-        return;
-      }else{
-        b.x = canvas.width/2; b.y = canvas.height/2;
-        b.dx = 2.4; b.dy = -3.1;
-      }
-    }
-
-    if(bounced){
-      spawnParticles(b.x, b.y, 14);
-      addShake(7);
-    }
-
-    updateParticles();
-    drawParticles();
-    drawActiveAvatar();
-    ctx.restore();
-
-    $("hud").innerHTML =
-      `SKOR: <b>${bounce.score}</b> | CAN: <b>${bounce.lives}</b><br><small>Topa tıkla: yön değiştir</small>`;
-  }, 16);
-}
-function stopBounce(){
-  if(bounceInterval){
-    clearInterval(bounceInterval);
-    bounceInterval = null;
-  }
-}
-
-/* GAME 2: REACTION RUSH */
-let reaction = null;
-let reactionTimer = null;
-let reactionStateTimer = null;
-
-function startReaction(){
-  $("game-title").textContent = "Reaction Rush";
-  reaction = {
-    best: LS.get("bestReactionMs", null),
-    startedAt: null,
-    canClick:false,
-    round: 0,
-    score: 0,
-    target: null
-  };
-
-  ctx.fillStyle = "rgba(10,10,15,1)";
-  ctx.fillRect(0,0,canvas.width,canvas.height);
-
-  function scheduleRound(){
-    reaction.canClick = false;
-    reaction.startedAt = null;
-    reaction.round += 1;
-
-    ctx.fillStyle = "rgba(10,10,15,1)";
-    ctx.fillRect(0,0,canvas.width,canvas.height);
-
-    ctx.fillStyle = "#00ffff";
-    ctx.font = "12px 'Press Start 2P'";
-    ctx.fillText("BEKLE...", 110, 250);
-
-    const delay = 900 + Math.random()*1600;
-
-    reactionStateTimer = setTimeout(() => {
-      reaction.canClick = true;
-      reaction.startedAt = performance.now();
-
-      ctx.fillStyle = "rgba(10,10,15,1)";
-      ctx.fillRect(0,0,canvas.width,canvas.height);
-
-      const tx = 90 + Math.random()*(canvas.width-180);
-      const ty = 120 + Math.random()*(canvas.height-240);
-      reaction.target = { x:tx, y:ty, r:32 };
-
-      ctx.save();
-      ctx.shadowColor = "#ff00ff";
-      ctx.shadowBlur = 25;
-      ctx.fillStyle = "#ff00ff";
-      ctx.beginPath(); ctx.arc(tx,ty,32,0,Math.PI*2); ctx.fill();
-      ctx.restore();
-
-      ctx.fillStyle = "#000";
-      ctx.font = "10px 'Press Start 2P'";
-      ctx.fillText("TIKLA", tx-22, ty+4);
-
-      $("hud").innerHTML =
-        `ROUND: <b>${reaction.round}</b> | PUAN: <b>${reaction.score}</b><br><small>Hedef çıkınca tıkla</small>`;
-    }, delay);
-  }
-
-  canvas.onclick = (e) => {
-    const rect = canvas.getBoundingClientRect();
-    const mx = (e.clientX - rect.left) * (canvas.width / rect.width);
-    const my = (e.clientY - rect.top) * (canvas.height / rect.height);
-
-    if(!reaction.canClick){
-      reaction.score = Math.max(0, reaction.score - 1);
-      spawnParticles(mx,my,18);
-      addShake(10);
-      $("hud").innerHTML =
-        `ERKEN! PUAN: <b>${reaction.score}</b><br><small>Hedef çıkınca bas</small>`;
-      return;
-    }
-
-    const dx = mx - reaction.target.x;
-    const dy = my - reaction.target.y;
-    const dist = Math.sqrt(dx*dx + dy*dy);
-
-    if(dist <= reaction.target.r){
-      const ms = Math.round(performance.now() - reaction.startedAt);
-
-      let gained = 1;
-      if(ms < 250) gained = 3;
-      else if(ms < 400) gained = 2;
-
-      reaction.score += gained;
-      addScoreToDaily(gained);
-
-      if(reaction.best === null || ms < reaction.best){
-        reaction.best = ms;
-        LS.set("bestReactionMs", ms);
-      }
-
-      spawnParticles(reaction.target.x, reaction.target.y, 30);
-      addShake(8);
-
-      ctx.fillStyle = "rgba(10,10,15,1)";
-      ctx.fillRect(0,0,canvas.width,canvas.height);
-
-      ctx.fillStyle = "#00ff66";
-      ctx.font = "12px 'Press Start 2P'";
-      ctx.fillText("SÜPER!", 120, 220);
-      ctx.fillStyle = "#00ffff";
-      ctx.font = "10px 'Press Start 2P'";
-      ctx.fillText(`TEPKİ: ${ms}ms`, 85, 260);
-      ctx.fillText(`BEST: ${reaction.best}ms`, 85, 290);
-
-      $("hud").innerHTML =
-        `PUAN: <b>${reaction.score}</b> | SON: <b>${ms}ms</b> | BEST: <b>${reaction.best}ms</b>`;
-
-      reaction.canClick = false;
-      clearTimeout(reactionTimer);
-      reactionTimer = setTimeout(scheduleRound, 900);
-    }else{
-      reaction.score = Math.max(0, reaction.score - 1);
-      spawnParticles(mx,my,14);
-      addShake(6);
-      $("hud").innerHTML =
-        `ISKA! PUAN: <b>${reaction.score}</b><br><small>Hedefe bas</small>`;
-    }
-  };
-
-  scheduleRound();
-}
-function stopReaction(){
-  if(reactionStateTimer){ clearTimeout(reactionStateTimer); reactionStateTimer = null; }
-  if(reactionTimer){ clearTimeout(reactionTimer); reactionTimer = null; }
-}
-
-/* GAME 3: NEON RUNNER */
-let runnerInterval = null;
-let runner = null;
-
-function startRunner(){
-  $("game-title").textContent = "Neon Runner";
-  runner = {
-    score: 0,
-    lives: 3,
-    y: canvas.height - 70,
-    vy: 0,
-    onGround: true,
-    obstacles: [],
-    t: 0,
-    speed: 3.2
-  };
-
-  canvas.onclick = () => {
-    if(runner.onGround){
-      runner.vy = -10.8;
-      runner.onGround = false;
-      spawnParticles(70, runner.y+30, 18);
-      addShake(6);
-    }
-  };
-
-  runnerInterval = setInterval(() => {
-    ctx.fillStyle = "rgba(10,10,15,0.25)";
-    ctx.fillRect(0,0,canvas.width,canvas.height);
-
-    let sx=0, sy=0;
-    if(shake>0){
-      sx=(Math.random()-0.5)*shake;
-      sy=(Math.random()-0.5)*shake;
-      shake*=0.82;
-      if(shake<0.7) shake=0;
-    }
-
-    ctx.save();
-    ctx.translate(sx, sy);
-
-    ctx.strokeStyle = "#00ffff";
-    ctx.lineWidth = 2;
-    ctx.beginPath();
-    ctx.moveTo(0, canvas.height-40);
-    ctx.lineTo(canvas.width, canvas.height-40);
-    ctx.stroke();
-
-    const px = 70, pw = 26, ph = 34;
-    runner.vy += 0.55;
-    runner.y += runner.vy;
-    if(runner.y > canvas.height-40 - ph){
-      runner.y = canvas.height-40 - ph;
-      runner.vy = 0;
-      runner.onGround = true;
-    }
-
-    ctx.save();
-    ctx.shadowColor = "#ff00ff";
-    ctx.shadowBlur = 18;
-    ctx.fillStyle = "#ff00ff";
-    ctx.fillRect(px, runner.y, pw, ph);
-    ctx.restore();
-
-    runner.t++;
-    if(runner.t % 70 === 0){
-      const h = 20 + Math.random()*28;
-      runner.obstacles.push({ x: canvas.width + 10, w: 20 + Math.random()*22, h });
-    }
-
-    for(const ob of runner.obstacles){
-      ob.x -= runner.speed;
-
-      ctx.save();
-      ctx.shadowColor = "#00ffff";
-      ctx.shadowBlur = 14;
-      ctx.fillStyle = "#00ffff";
-      ctx.fillRect(ob.x, canvas.height-40 - ob.h, ob.w, ob.h);
-      ctx.restore();
-
-      const ox = ob.x, oy = canvas.height-40 - ob.h, ow = ob.w, oh = ob.h;
-      const hit =
-        px < ox+ow && px+pw > ox &&
-        runner.y < oy+oh && runner.y+ph > oy;
-
-      if(hit){
-        runner.lives -= 1;
-        spawnParticles(px+pw, runner.y+ph/2, 32);
-        addShake(14);
-        ob.x = -9999;
-
-        if(runner.lives <= 0){
-          runner.lives = 0;
-          stopRunner();
-          canvas.onclick = null;
-          $("hud").innerHTML =
-            `SKOR: <b>${runner.score}</b> | CAN: <b style="color:var(--bad)">0</b><br><small>Yeniden’e bas</small>`;
-          ctx.restore();
-          return;
-        }
-      }
-    }
-
-    runner.obstacles = runner.obstacles.filter(ob => ob.x > -60);
-
-    runner.score += 1;
-    if(runner.score % 120 === 0) runner.speed *= 1.06;
-    if(runner.score % 30 === 0) addScoreToDaily(1);
-
-    updateParticles();
-    drawParticles();
-    drawActiveAvatar();
-    ctx.restore();
-
-    $("hud").innerHTML =
-      `SKOR: <b>${runner.score}</b> | CAN: <b>${runner.lives}</b><br><small>Tıkla: zıpla</small>`;
-  }, 16);
-}
-function stopRunner(){
-  if(runnerInterval){
-    clearInterval(runnerInterval);
-    runnerInterval = null;
-  }
-}
-
-/* -------------------- INIT -------------------- */
+/* =========================
+   INIT
+========================= */
 function init(){
-  hideAll();
-  showPanel("login");
+  // net hud
+  setNetUI(!!window.BroadcastChannel);
+  updateRoomUI();
 
-  // canvas init (null olmasın diye burada)
-  canvas = $("game-canvas");
-  ctx = canvas.getContext("2d");
+  hideAll(); showPanel("login");
 
-  // Login
+  // login
   $("btn-enter").onclick = enterSite;
-  $("nickname").addEventListener("keydown", (e)=>{ if(e.key==="Enter") enterSite(); });
+  $("nickname").addEventListener("keydown",(e)=>{ if(e.key==="Enter") enterSite(); });
+
   const savedNick = LS.getStr("nickname","");
   if(savedNick) $("nickname").value = savedNick;
-  $("nickname").focus();
 
-  // Menu
-  $("btn-library").onclick = openLibrary;
+  // menu buttons
   $("btn-creator").onclick = openCreator;
+  $("btn-library").onclick = openLibrary;
   $("btn-games").onclick = openGamesHub;
   $("btn-online").onclick = openOnline;
 
-  // Creator
-  $("btn-hair").onclick = ()=>change("hair");
-  $("btn-top").onclick = ()=>change("top");
-  $("btn-bottom").onclick = ()=>change("bottom");
-  $("btn-shoes").onclick = ()=>change("shoes");
-  $("btn-save").onclick = saveCurrentCharacter;
+  // creator
   $("btn-back1").onclick = backToMenu;
+  $("btn-save").onclick = saveCharacter;
+  $("btn-random").onclick = randomize;
 
-  // Library
+  $("btn-pick-hair").onclick = ()=>openPicker("hair");
+  $("btn-pick-top").onclick = ()=>openPicker("top");
+  $("btn-pick-bottom").onclick = ()=>openPicker("bottom");
+  $("btn-pick-shoes").onclick = ()=>openPicker("shoes");
+  $("btn-pick-acc").onclick = ()=>openPicker("acc");
+
+  // modal
+  $("btn-close-picker").onclick = closePicker;
+  $("pickerSearch").addEventListener("input", buildPickerGrid);
+  $("pickerFilter").addEventListener("change", buildPickerGrid);
+  $("pickerBackdrop").addEventListener("click",(e)=>{ if(e.target === $("pickerBackdrop")) closePicker(); });
+
+  // library
   $("btn-back2").onclick = backToMenu;
+  $("btn-clear-all").onclick = clearAllMy;
 
-  // Games
-  $("btn-g1").onclick = ()=>openGame("bounce");
-  $("btn-g2").onclick = ()=>openGame("reaction");
-  $("btn-g3").onclick = ()=>openGame("runner");
+  // games
   $("btn-back-games").onclick = backToMenu;
+  $("btn-game-bounce").onclick = ()=>openGame("bounce");
+  $("btn-game-reaction").onclick = ()=>openGame("reaction");
+  $("btn-game-runner").onclick = ()=>openGame("runner");
 
-  // Game screen
-  $("btn-back-games2").onclick = openGamesHub;
-  $("btn-back-menu2").onclick = backToMenu;
+  // game screen
+  $("btn-back-to-games").onclick = openGamesHub;
+  $("btn-back-to-menu2").onclick = backToMenu;
 
-  // Online
+  // online
   $("btn-back3").onclick = backToMenu;
   $("btn-create-room").onclick = createRoom;
-  $("btn-join-room").onclick = ()=>joinRoom($("roomCodeInput").value);
+  $("btn-join-room").onclick = ()=>joinRoom($("roomCodeInput").value, false);
   $("btn-leave-room").onclick = leaveRoom;
-  $("btn-sync").onclick = pushMyState;
+  $("btn-sync").onclick = syncOnlineAuto;
 
-  $("btn-hair2").onclick = ()=>change("hair");
-  $("btn-top2").onclick = ()=>change("top");
-  $("btn-bottom2").onclick = ()=>change("bottom");
-  $("btn-shoes2").onclick = ()=>change("shoes");
-
-  // Chat
+  // chat
   $("btn-send").onclick = sendChat;
-  $("chatInput").addEventListener("keydown", (e)=>{ if(e.key==="Enter") sendChat(); });
+  $("chatInput").addEventListener("keydown",(e)=>{ if(e.key==="Enter") sendChat(); });
 
-  // UI initial
-  updateRoomUI();
-  updateQuestUI();
-  updateUnlockBadge();
-  renderCharacter();
+  // initial render
+  renderCreator();
   renderOnlinePreviews();
   refreshChatUI();
-
-  // Auth (NET ON için)
-  ensureAuth().catch((e)=>{
-    console.log("AUTH FAIL:", e);
-  });
+  updateOnlineInfo();
 }
 
-if(document.readyState === "loading") document.addEventListener("DOMContentLoaded", init);
+if(document.readyState==="loading") document.addEventListener("DOMContentLoaded", init);
 else init();
 </script>
-
 </body>
 </html>
+
+
 
 
