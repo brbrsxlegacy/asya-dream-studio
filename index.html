@@ -296,6 +296,45 @@ input{ width:min(420px, 90vw); }
   margin:8px 0;
 }
 
+
+/* =========================
+   LEADERBOARD (GLOBAL BEST)
+========================= */
+
+function scoreRef(game){
+  return db.ref("leaderboard/" + game);
+}
+
+async function submitBestScore(game, score){
+  const nick = LS.getStr("nickname","anon");
+  const ref = scoreRef(game).child(nick);
+
+  const snap = await ref.get();
+  if(!snap.exists() || score > snap.val().score){
+    await ref.set({
+      score: score,
+      ts: Date.now()
+    });
+  }
+}
+
+async function getBestScore(game){
+  const snap = await scoreRef(game)
+    .orderByChild("score")
+    .limitToLast(1)
+    .get();
+
+  let best = 0;
+  snap.forEach(s=>{
+    best = s.val().score || 0;
+  });
+  return best;
+}
+
+
+
+
+  
 /* chat */
 .chat-wrap{
   width:min(980px, 96vw);
@@ -927,8 +966,13 @@ function stopAnyGame(){
   currentGame = null;
 }
 
-function openGame(which){
-  hideAll(); showPanel("game");
+async function openGame(which){
+  hideAll(); 
+  showPanel("game");
+
+  const best = await getBestScore(which);
+  $("hud").innerHTML = `BEST SCORE: <b>${best}</b>`;
+
   $("btn-restart").onclick = ()=>startGame(which);
   startGame(which);
 }
@@ -979,6 +1023,7 @@ function startBounce(){
     if(ball.y+ball.r>canvas.height){
       lives--;
       if(lives<=0){
+        submitBestScore("bounce", score);
         clearInterval(intervalId); intervalId=null;
         $("hud").innerHTML=`SKOR: <b>${score}</b> | CAN: <b style="color:var(--bad)">0</b>`;
         return;
@@ -1043,6 +1088,7 @@ function startReaction(){
     if(Math.sqrt(dx*dx+dy*dy)<=target.r){
       const ms=Math.round(performance.now()-started);
       score += (ms<250?3: ms<400?2:1);
+      submitBestScore("reaction", score);
       $("hud").innerHTML=`PUAN: <b>${score}</b> | TEPKİ: <b>${ms}ms</b>`;
       schedule();
     }else{
@@ -1106,13 +1152,12 @@ function startRunner(){
       if(hit){
         lives--;
         o.x = -9999;
-        if(lives<=0){
-          clearInterval(intervalId); intervalId=null;
-          $("hud").innerHTML=`SKOR: <b>${score}</b> | CAN: <b style="color:var(--bad)">0</b>`;
-          return;
-        }
+      if(lives<=0){
+        submitBestScore("runner", score);
+        clearInterval(intervalId); intervalId=null;
+        $("hud").innerHTML=`SKOR: <b>${score}</b> | CAN: <b style="color:var(--bad)">0</b>`;
+        return;
       }
-    }
 
     obs = obs.filter(o=>o.x>-60);
     score++;
@@ -1402,5 +1447,6 @@ else init();
 </script>
 </body>
 </html>
+
 
 
