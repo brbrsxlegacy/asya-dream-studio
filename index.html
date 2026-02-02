@@ -456,7 +456,7 @@ input{ width:min(420px, 90vw); }
       <div class="controls">
         <button id="btn-sync" style="border-color:var(--good);color:var(--good)">SENKRONLA</button>
       </div>
-      <p><small>Not: Aynı PC’de 2 sekme açıp aynı oda koduna girersen “Diğer Kişi” görünür.</small></p>
+      <p><small>Not: Gerçek online: farklı cihazlardan aynı oda koduna gir.</small></p>
     </div>
 
     <div class="avatar-box">
@@ -502,6 +502,10 @@ input{ width:min(420px, 90vw); }
     </div>
   </div>
 </div>
+
+<!-- Firebase (Realtime Database) -->
+<script src="https://www.gstatic.com/firebasejs/10.12.5/firebase-app-compat.js"></script>
+<script src="https://www.gstatic.com/firebasejs/10.12.5/firebase-database-compat.js"></script>
 
 <script>
 /* =========================
@@ -590,82 +594,17 @@ function makeTop(i, tag="basic"){
   const c1 = pick(PAL[tag] || PAL.basic, i+1);
   const c2 = pick(PAL[tag] || PAL.basic, i+5);
   const style = i % 10;
-
-  // Göbek kapatma fix: Üstleri daha uzun yaptık
-  // Genel ölçü: y=54, height=46-50 arası
-  if(style===0) return {
-    name:`Tişört #${i}`, tag,
-    svg:`<rect x="33" y="54" width="34" height="46" rx="10" fill="${c1}"/>
-         <rect x="35" y="58" width="30" height="4" rx="2" fill="${c2}" opacity=".25"/>`
-  };
-
-  if(style===1) return {
-    name:`Hoodie #${i}`, tag,
-    svg:`<rect x="32" y="53" width="36" height="50" rx="12" fill="${c1}"/>
-         <rect x="40" y="56" width="20" height="8" rx="4" fill="${c2}" opacity=".45"/>
-         <rect x="35" y="66" width="30" height="2" fill="${c2}" opacity=".25"/>`
-  };
-
-  if(style===2) return {
-    name:`Ceket #${i}`, tag,
-    svg:`<rect x="32" y="53" width="36" height="50" rx="10" fill="${c1}"/>
-         <rect x="49" y="53" width="2" height="50" fill="${c2}" opacity=".8"/>
-         <rect x="35" y="59" width="12" height="4" rx="2" fill="${c2}" opacity=".25"/>
-         <rect x="53" y="59" width="12" height="4" rx="2" fill="${c2}" opacity=".25"/>`
-  };
-
-  if(style===3) return {
-    name:`Kazak #${i}`, tag,
-    svg:`<rect x="33" y="54" width="34" height="48" rx="12" fill="${c1}"/>
-         <rect x="33" y="64" width="34" height="2" fill="${c2}" opacity=".45"/>
-         <rect x="33" y="70" width="34" height="2" fill="${c2}" opacity=".45"/>
-         <rect x="33" y="76" width="34" height="2" fill="${c2}" opacity=".45"/>`
-  };
-
-  if(style===4) return {
-    name:`Neon Üst #${i}`, tag,
-    svg:`<rect x="33" y="54" width="34" height="48" rx="12" fill="${c1}"/>
-         <rect x="33" y="54" width="34" height="4" fill="${c2}" opacity=".95"/>
-         <rect x="33" y="98" width="34" height="4" fill="${c2}" opacity=".95"/>`
-  };
-
-  if(style===5) return {
-    name:`Formal Gömlek #${i}`, tag,
-    svg:`<rect x="33" y="54" width="34" height="48" rx="10" fill="${c1}"/>
-         <rect x="49" y="54" width="2" height="48" fill="${c2}" opacity=".7"/>
-         <rect x="47" y="60" width="6" height="4" rx="2" fill="${c2}" opacity=".8"/>
-         <rect x="47" y="68" width="6" height="4" rx="2" fill="${c2}" opacity=".8"/>
-         <rect x="47" y="76" width="6" height="4" rx="2" fill="${c2}" opacity=".8"/>`
-  };
-
-  if(style===6) return {
-    name:`Kolsuz #${i}`, tag,
-    svg:`<rect x="35" y="54" width="30" height="46" rx="12" fill="${c1}"/>
-         <rect x="37" y="60" width="26" height="4" rx="2" fill="${c2}" opacity=".25"/>`
-  };
-
-  if(style===7) return {
-    name:`Kısa Ceket #${i}`, tag,
-    svg:`<rect x="32" y="54" width="36" height="44" rx="12" fill="${c1}"/>
-         <rect x="32" y="54" width="36" height="5" fill="${c2}" opacity=".6"/>
-         <rect x="49" y="54" width="2" height="44" fill="${c2}" opacity=".65"/>`
-  };
-
-  if(style===8) return {
-    name:`Cute Üst #${i}`, tag,
-    svg:`<rect x="33" y="54" width="34" height="48" rx="14" fill="${c1}"/>
-         <rect x="39" y="72" width="22" height="8" rx="4" fill="${c2}" opacity=".45"/>
-         <rect x="37" y="60" width="26" height="2" fill="${c2}" opacity=".2"/>`
-  };
-
-  return {
-    name:`Street Üst #${i}`, tag,
-    svg:`<rect x="32" y="53" width="36" height="50" rx="10" fill="${c1}"/>
-         <rect x="34" y="78" width="32" height="5" rx="2" fill="${c2}" opacity=".55"/>
-         <rect x="34" y="60" width="32" height="2" fill="${c2}" opacity=".2"/>`
-  };
+  if(style===0) return {name:`Tişört #${i}`, tag, svg:`<rect x="36" y="56" width="28" height="30" rx="6" fill="${c1}"/>`};
+  if(style===1) return {name:`Hoodie #${i}`, tag, svg:`<rect x="34" y="54" width="32" height="34" rx="8" fill="${c1}"/><rect x="41" y="58" width="18" height="6" rx="3" fill="${c2}" opacity=".5"/>`};
+  if(style===2) return {name:`Ceket #${i}`, tag, svg:`<rect x="34" y="54" width="32" height="36" rx="8" fill="${c1}"/><rect x="49" y="54" width="2" height="36" fill="${c2}" opacity=".7"/>`};
+  if(style===3) return {name:`Kazak #${i}`, tag, svg:`<rect x="35" y="55" width="30" height="34" rx="8" fill="${c1}"/><rect x="35" y="64" width="30" height="2" fill="${c2}" opacity=".5"/><rect x="35" y="70" width="30" height="2" fill="${c2}" opacity=".5"/>`};
+  if(style===4) return {name:`Neon Üst #${i}`, tag, svg:`<rect x="35" y="55" width="30" height="34" rx="8" fill="${c1}"/><rect x="35" y="55" width="30" height="3" fill="${c2}" opacity=".9"/><rect x="35" y="86" width="30" height="3" fill="${c2}" opacity=".9"/>`};
+  if(style===5) return {name:`Formal Gömlek #${i}`, tag, svg:`<rect x="35" y="55" width="30" height="34" rx="8" fill="${c1}"/><rect x="48" y="55" width="4" height="6" fill="${c2}" opacity=".7"/><rect x="48" y="61" width="4" height="6" fill="${c2}" opacity=".7"/>`};
+  if(style===6) return {name:`Kolsuz #${i}`, tag, svg:`<rect x="38" y="56" width="24" height="32" rx="8" fill="${c1}"/>`};
+  if(style===7) return {name:`Kısa Ceket #${i}`, tag, svg:`<rect x="34" y="56" width="32" height="28" rx="8" fill="${c1}"/><rect x="34" y="56" width="32" height="4" fill="${c2}" opacity=".6"/>`};
+  if(style===8) return {name:`Cute Üst #${i}`, tag, svg:`<rect x="36" y="56" width="28" height="32" rx="10" fill="${c1}"/><rect x="40" y="70" width="20" height="6" rx="3" fill="${c2}" opacity=".5"/>`};
+  return {name:`Street Üst #${i}`, tag, svg:`<rect x="34" y="54" width="32" height="36" rx="8" fill="${c1}"/><rect x="36" y="74" width="28" height="4" fill="${c2}" opacity=".55"/>`};
 }
-
 
 function makeBottom(i, tag="basic"){
   const c1 = pick(PAL[tag] || PAL.basic, i+2);
@@ -713,8 +652,6 @@ function makeAcc(i, tag="basic"){
 function buildWardrobe(){
   const wardrobe = { hair:[], top:[], bottom:[], shoes:[], acc:[] };
 
-  // Buradaki sayıları arttırırsan katalog büyür.
-  // Şu haliyle toplam ~320+ parça var.
   for(let i=0;i<80;i++){
     wardrobe.hair.push(makeHair(i, i%3===0?"neon": i%3===1?"street":"basic"));
   }
@@ -805,7 +742,6 @@ function buildPickerGrid(){
     return avatarSvgFromSelection(sel);
   };
 
-  // Aksesuar için "None" seçeneği
   if(pickerCategory === "acc"){
     const it = document.createElement("div");
     it.className = "item";
@@ -874,7 +810,7 @@ function openOnline(){
   stopAnyGame();
   hideAll(); showPanel("online");
   renderOnlinePreviews();
-  refreshChatUI();
+  refreshChatUI(!!onlineState.roomId);
   updateOnlineInfo();
 }
 
@@ -1187,17 +1123,35 @@ function startRunner(){
 }
 
 /* =========================
-   ONLINE (INTERNETSİZ)
-   BroadcastChannel: aynı PC’de 2 sekme
+   ONLINE (GERÇEK ONLINE - Firebase Realtime Database)
+   Online dışında hiçbir şeye dokunulmadı
 ========================= */
+
+const firebaseConfig = {
+  apiKey: "AIzaSyABqkhpL1SMRzRJ9GQLjjZE2IryqpAvMPw",
+  authDomain: "pixelroom-ae218.firebaseapp.com",
+  databaseURL: "https://pixelroom-ae218-default-rtdb.europe-west1.firebasedatabase.app",
+  projectId: "pixelroom-ae218",
+  storageBucket: "pixelroom-ae218.firebasestorage.app",
+  messagingSenderId: "720297722320",
+  appId: "1:720297722320:web:c815edae99d1efa7ff39d5",
+  measurementId: "G-HD8901B19M"
+};
+
+firebase.initializeApp(firebaseConfig);
+const db = firebase.database();
+
 const netHud = $("netHud");
 const roomHud = $("roomHud");
 
 const onlineState = {
   roomId: null,
-  role: null,     // "p1" / "p2"
-  bc: null,
-  lastSeen: 0
+  role: null,
+  nick: () => LS.getStr("nickname","anon"),
+  listeners: [],
+  connected: false,
+  myPlayerRef: null,
+  chatRef: null
 };
 
 function setNetUI(on){
@@ -1209,71 +1163,130 @@ function setNetUI(on){
     netHud.innerHTML = `NET: <b>OFF</b> ❌`;
   }
 }
-
 function updateRoomUI(){
   roomHud.innerHTML = `ROOM: <b>${onlineState.roomId ?? "---"}</b>`;
 }
-
 function randomRoomCode(){
   return String(Math.floor(10000 + Math.random()*90000));
 }
-
 function updateOnlineInfo(){
-  const nick = LS.getStr("nickname","anon");
-  const hint = `Kullanıcı: <b>${escapeHtml(nick)}</b> • Oda: <b>${onlineState.roomId ?? "---"}</b> • Sistem: <b>2 SEKME</b>`;
-  $("onlineInfo").innerHTML = hint + `<br><small>Not: Bu online sistem internet istemez. Aynı PC’de yeni sekme aç → aynı oda kodu.</small>`;
+  const nick = onlineState.nick();
+  const hint = `Kullanıcı: <b>${escapeHtml(nick)}</b> • Oda: <b>${onlineState.roomId ?? "---"}</b> • Sistem: <b>GERÇEK ONLINE</b>`;
+  $("onlineInfo").innerHTML = hint + `<br><small>Not: Farklı cihazlardan aynı oda koduna girebilirsin.</small>`;
 }
 
-function ensureChannel(roomId){
-  if(onlineState.bc) onlineState.bc.close();
-  onlineState.bc = new BroadcastChannel("asya_room_" + roomId);
-  onlineState.bc.onmessage = (ev)=>onRoomMessage(ev.data);
-  setNetUI(true);
+// bağlantı durumu
+(function watchConnected(){
+  db.ref(".info/connected").on("value", (snap)=>{
+    onlineState.connected = !!snap.val();
+    setNetUI(onlineState.connected);
+  });
+})();
+
+function cleanupRoomListeners(){
+  for(const off of onlineState.listeners){
+    try{ off(); }catch{}
+  }
+  onlineState.listeners = [];
+  onlineState.myPlayerRef = null;
+  onlineState.chatRef = null;
 }
 
 function createRoom(){
   const id = randomRoomCode();
   joinRoom(id, true);
-  alert("Oda kuruldu: " + id + " (2. sekmede bu kodla gir)");
+  alert("Oda kuruldu: " + id + " (Arkadaşın bu kodla girsin)");
 }
 
-function joinRoom(roomId, asHost=false){
+async function joinRoom(roomId, asHost=false){
   roomId = String(roomId||"").trim();
   if(!/^\d{5}$/.test(roomId)) return alert("Oda kodu 5 haneli olmalı!");
 
+  if(onlineState.roomId) await leaveRoom(true);
+
   onlineState.roomId = roomId;
-  onlineState.role = asHost ? "p1" : "p2";
-  onlineState.lastSeen = Date.now();
-  ensureChannel(roomId);
+
+  const roomRef = db.ref(`rooms/${roomId}`);
+  const p1Ref = db.ref(`rooms/${roomId}/players/p1`);
+  const p2Ref = db.ref(`rooms/${roomId}/players/p2`);
+
+  if(asHost){
+    onlineState.role = "p1";
+  }else{
+    const [p1Snap, p2Snap] = await Promise.all([p1Ref.get(), p2Ref.get()]);
+    if(!p1Snap.exists()){
+      onlineState.role = "p1";
+    }else if(!p2Snap.exists()){
+      onlineState.role = "p2";
+    }else{
+      onlineState.roomId = null;
+      onlineState.role = null;
+      updateRoomUI();
+      updateOnlineInfo();
+      return alert("Bu oda dolu (2 kişi). Başka kod deneyin.");
+    }
+  }
+
   updateRoomUI();
   updateOnlineInfo();
 
-  // kendini gönder
-  broadcast({ type:"join", role: onlineState.role, nick: LS.getStr("nickname","anon"), svg: getMyDisplaySvg(), ts: Date.now() });
+  onlineState.myPlayerRef = db.ref(`rooms/${roomId}/players/${onlineState.role}`);
+  onlineState.myPlayerRef.onDisconnect().remove();
+
+  await onlineState.myPlayerRef.set({
+    nick: onlineState.nick(),
+    svg: getMyDisplaySvg(),
+    ts: Date.now()
+  });
+
+  const otherRole = (onlineState.role === "p1") ? "p2" : "p1";
+  const otherRef = db.ref(`rooms/${roomId}/players/${otherRole}`);
+
+  const otherCb = otherRef.on("value", (snap)=>{
+    const v = snap.val();
+    if(v && v.svg){
+      $("p2Preview").innerHTML = v.svg;
+    }else{
+      $("p2Preview").innerHTML = "<small>Bağlanınca gelecek…</small>";
+    }
+  });
+  onlineState.listeners.push(()=>otherRef.off("value", otherCb));
+
+  roomRef.child("meta").update({ updatedAt: Date.now() });
+
+  onlineState.chatRef = db.ref(`rooms/${roomId}/chat`);
+
+  // chat temizle + yeniden kur
+  refreshChatUI(true);
+
+  const chatQuery = onlineState.chatRef.limitToLast(50);
+  const chatCb = chatQuery.on("child_added", (snap)=>{
+    const m = snap.val();
+    if(m && m.nick && m.text) addMsgToUI(m.nick, m.text);
+  });
+  onlineState.listeners.push(()=>chatQuery.off("child_added", chatCb));
 
   renderOnlinePreviews();
-  refreshChatUI();
 }
 
-function leaveRoom(){
+async function leaveRoom(silent=false){
   if(!onlineState.roomId) return;
-  broadcast({ type:"leave", role: onlineState.role, nick: LS.getStr("nickname","anon"), ts: Date.now() });
 
-  if(onlineState.bc){ onlineState.bc.close(); onlineState.bc=null; }
-  onlineState.roomId=null;
-  onlineState.role=null;
+  try{
+    if(onlineState.myPlayerRef) await onlineState.myPlayerRef.remove();
+  }catch{}
+
+  cleanupRoomListeners();
+
+  onlineState.roomId = null;
+  onlineState.role = null;
 
   updateRoomUI();
   updateOnlineInfo();
   renderOnlinePreviews();
-  refreshChatUI();
-  setNetUI(!!window.BroadcastChannel);
-  alert("Odadan çıktın.");
-}
+  refreshChatUI(false);
 
-function broadcast(msg){
-  if(!onlineState.bc) return;
-  onlineState.bc.postMessage(msg);
+  if(!silent) alert("Odadan çıktın.");
 }
 
 function renderOnlinePreviews(){
@@ -1281,46 +1294,22 @@ function renderOnlinePreviews(){
   if(!onlineState.roomId) $("p2Preview").innerHTML = "<small>Bağlanınca gelecek…</small>";
 }
 
-function syncOnlineAuto(){
-  // online oda açıksa otomatik “ben” güncelle
-  if(!onlineState.roomId || !onlineState.bc) return;
-  broadcast({ type:"state", role: onlineState.role, nick: LS.getStr("nickname","anon"), svg: getMyDisplaySvg(), ts: Date.now() });
+async function syncOnlineAuto(){
+  if(!onlineState.roomId || !onlineState.myPlayerRef) return;
+  await onlineState.myPlayerRef.set({
+    nick: onlineState.nick(),
+    svg: getMyDisplaySvg(),
+    ts: Date.now()
+  });
   $("p1Preview").innerHTML = getMyDisplaySvg();
 }
 
-/* “Diğer kişi”yi göstermek için basit mantık */
-let other = { nick:"", svg:"", ts:0 };
-
-function onRoomMessage(data){
-  if(!data || typeof data !== "object") return;
-  if(!onlineState.roomId) return;
-
-  // aynı role ise ignore (2 sekmede p1/p2 ayrılır ama yanlış olursa)
-  if(data.role && data.role === onlineState.role) return;
-
-  if(data.type === "join" || data.type === "state"){
-    other.nick = data.nick || "anon";
-    other.svg = data.svg || "";
-    other.ts = data.ts || Date.now();
-    $("p2Preview").innerHTML = other.svg ? other.svg : "<small>Bağlanınca gelecek…</small>";
-  }
-
-  if(data.type === "leave"){
-    other = { nick:"", svg:"", ts:0 };
-    $("p2Preview").innerHTML = "<small>Diğer kişi çıktı.</small>";
-  }
-
-  if(data.type === "chat"){
-    addMsgToUI(data.nick || "anon", data.text || "");
-  }
-}
-
 /* =========================
-   CHAT (online oda içinde)
+   CHAT (Firebase)
 ========================= */
-function refreshChatUI(){
+function refreshChatUI(inRoom){
   $("chatList").innerHTML = "";
-  if(!onlineState.roomId){
+  if(!inRoom){
     $("chatList").innerHTML = `<div class="msg"><small>Chat için odaya girmen lazım.</small></div>`;
     return;
   }
@@ -1335,14 +1324,15 @@ function addMsgToUI(nick, text){
   $("chatList").scrollTop = $("chatList").scrollHeight;
 }
 
-function sendChat(){
-  if(!onlineState.roomId || !onlineState.bc) return alert("Önce odaya gir!");
+async function sendChat(){
+  if(!onlineState.roomId || !onlineState.chatRef) return alert("Önce odaya gir!");
+
   const txt = $("chatInput").value.trim();
   if(!txt) return;
 
-  const nick = LS.getStr("nickname","anon");
-  broadcast({ type:"chat", nick, text: txt, ts: Date.now(), role: onlineState.role });
-  addMsgToUI(nick, txt);
+  const nick = onlineState.nick();
+  await onlineState.chatRef.push({ nick, text: txt, ts: Date.now() });
+
   $("chatInput").value = "";
 }
 
@@ -1350,26 +1340,22 @@ function sendChat(){
    INIT
 ========================= */
 function init(){
-  // net hud
-  setNetUI(!!window.BroadcastChannel);
+  setNetUI(false);
   updateRoomUI();
 
   hideAll(); showPanel("login");
 
-  // login
   $("btn-enter").onclick = enterSite;
   $("nickname").addEventListener("keydown",(e)=>{ if(e.key==="Enter") enterSite(); });
 
   const savedNick = LS.getStr("nickname","");
   if(savedNick) $("nickname").value = savedNick;
 
-  // menu buttons
   $("btn-creator").onclick = openCreator;
   $("btn-library").onclick = openLibrary;
   $("btn-games").onclick = openGamesHub;
   $("btn-online").onclick = openOnline;
 
-  // creator
   $("btn-back1").onclick = backToMenu;
   $("btn-save").onclick = saveCharacter;
   $("btn-random").onclick = randomize;
@@ -1380,41 +1366,34 @@ function init(){
   $("btn-pick-shoes").onclick = ()=>openPicker("shoes");
   $("btn-pick-acc").onclick = ()=>openPicker("acc");
 
-  // modal
   $("btn-close-picker").onclick = closePicker;
   $("pickerSearch").addEventListener("input", buildPickerGrid);
   $("pickerFilter").addEventListener("change", buildPickerGrid);
   $("pickerBackdrop").addEventListener("click",(e)=>{ if(e.target === $("pickerBackdrop")) closePicker(); });
 
-  // library
   $("btn-back2").onclick = backToMenu;
   $("btn-clear-all").onclick = clearAllMy;
 
-  // games
   $("btn-back-games").onclick = backToMenu;
   $("btn-game-bounce").onclick = ()=>openGame("bounce");
   $("btn-game-reaction").onclick = ()=>openGame("reaction");
   $("btn-game-runner").onclick = ()=>openGame("runner");
 
-  // game screen
   $("btn-back-to-games").onclick = openGamesHub;
   $("btn-back-to-menu2").onclick = backToMenu;
 
-  // online
   $("btn-back3").onclick = backToMenu;
   $("btn-create-room").onclick = createRoom;
   $("btn-join-room").onclick = ()=>joinRoom($("roomCodeInput").value, false);
-  $("btn-leave-room").onclick = leaveRoom;
+  $("btn-leave-room").onclick = ()=>leaveRoom(false);
   $("btn-sync").onclick = syncOnlineAuto;
 
-  // chat
   $("btn-send").onclick = sendChat;
   $("chatInput").addEventListener("keydown",(e)=>{ if(e.key==="Enter") sendChat(); });
 
-  // initial render
   renderCreator();
   renderOnlinePreviews();
-  refreshChatUI();
+  refreshChatUI(false);
   updateOnlineInfo();
 }
 
@@ -1423,8 +1402,5 @@ else init();
 </script>
 </body>
 </html>
-
-
-
 
 
