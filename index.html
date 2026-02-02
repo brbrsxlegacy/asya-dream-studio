@@ -296,45 +296,6 @@ input{ width:min(420px, 90vw); }
   margin:8px 0;
 }
 
-
-/* =========================
-   LEADERBOARD (GLOBAL BEST)
-========================= */
-
-function scoreRef(game){
-  return db.ref("leaderboard/" + game);
-}
-
-async function submitBestScore(game, score){
-  const nick = LS.getStr("nickname","anon");
-  const ref = scoreRef(game).child(nick);
-
-  const snap = await ref.get();
-  if(!snap.exists() || score > snap.val().score){
-    await ref.set({
-      score: score,
-      ts: Date.now()
-    });
-  }
-}
-
-async function getBestScore(game){
-  const snap = await scoreRef(game)
-    .orderByChild("score")
-    .limitToLast(1)
-    .get();
-
-  let best = 0;
-  snap.forEach(s=>{
-    best = s.val().score || 0;
-  });
-  return best;
-}
-
-
-
-
-  
 /* chat */
 .chat-wrap{
   width:min(980px, 96vw);
@@ -576,8 +537,56 @@ function escapeHtml(s){
 }
 
 /* =========================
+   FIREBASE INIT (TEK SEFER)
+========================= */
+const firebaseConfig = {
+  apiKey: "AIzaSyABqkhpL1SMRzRJ9GQLjjZE2IryqpAvMPw",
+  authDomain: "pixelroom-ae218.firebaseapp.com",
+  databaseURL: "https://pixelroom-ae218-default-rtdb.europe-west1.firebasedatabase.app",
+  projectId: "pixelroom-ae218",
+  storageBucket: "pixelroom-ae218.firebasestorage.app",
+  messagingSenderId: "720297722320",
+  appId: "1:720297722320:web:c815edae99d1efa7ff39d5",
+  measurementId: "G-HD8901B19M"
+};
+
+if (!firebase.apps.length) firebase.initializeApp(firebaseConfig);
+const db = firebase.database();
+
+/* =========================
+   LEADERBOARD (GLOBAL BEST)
+========================= */
+function scoreRef(game){
+  return db.ref("leaderboard/" + game);
+}
+
+async function submitBestScore(game, score){
+  const nick = LS.getStr("nickname","anon");
+  const ref = scoreRef(game).child(nick);
+
+  const snap = await ref.once("value");
+  const prev = snap.exists() ? (snap.val().score || 0) : 0;
+
+  if(score > prev){
+    await ref.set({ score, ts: Date.now() });
+  }
+}
+
+async function getBestScore(game){
+  const snap = await scoreRef(game)
+    .orderByChild("score")
+    .limitToLast(1)
+    .once("value");
+
+  let best = 0;
+  snap.forEach(s=>{
+    best = s.val().score || 0;
+  });
+  return best;
+}
+
+/* =========================
    AVATAR SVG ENGINE
-   (Kıyafetleri otomatik üretir)
 ========================= */
 
 /* body base */
@@ -967,7 +976,7 @@ function stopAnyGame(){
 }
 
 async function openGame(which){
-  hideAll(); 
+  hideAll();
   showPanel("game");
 
   const best = await getBestScore(which);
@@ -1101,7 +1110,7 @@ function startReaction(){
   schedule();
 }
 
-/* runner */
+/* runner (BRACE FIX) */
 function startRunner(){
   $("game-title").textContent="Neon Runner";
   let score=0, lives=3;
@@ -1140,6 +1149,7 @@ function startRunner(){
 
     for(const o of obs){
       o.x -= speed;
+
       ctx.save();
       ctx.shadowColor="#00ffff";
       ctx.shadowBlur=14;
@@ -1152,12 +1162,15 @@ function startRunner(){
       if(hit){
         lives--;
         o.x = -9999;
-      if(lives<=0){
-        submitBestScore("runner", score);
-        clearInterval(intervalId); intervalId=null;
-        $("hud").innerHTML=`SKOR: <b>${score}</b> | CAN: <b style="color:var(--bad)">0</b>`;
-        return;
+
+        if(lives<=0){
+          submitBestScore("runner", score);
+          clearInterval(intervalId); intervalId=null;
+          $("hud").innerHTML=`SKOR: <b>${score}</b> | CAN: <b style="color:var(--bad)">0</b>`;
+          return;
+        }
       }
+    }
 
     obs = obs.filter(o=>o.x>-60);
     score++;
@@ -1168,24 +1181,8 @@ function startRunner(){
 }
 
 /* =========================
-   ONLINE (GERÇEK ONLINE - Firebase Realtime Database)
-   Online dışında hiçbir şeye dokunulmadı
+   ONLINE (Firebase Realtime Database)
 ========================= */
-
-const firebaseConfig = {
-  apiKey: "AIzaSyABqkhpL1SMRzRJ9GQLjjZE2IryqpAvMPw",
-  authDomain: "pixelroom-ae218.firebaseapp.com",
-  databaseURL: "https://pixelroom-ae218-default-rtdb.europe-west1.firebasedatabase.app",
-  projectId: "pixelroom-ae218",
-  storageBucket: "pixelroom-ae218.firebasestorage.app",
-  messagingSenderId: "720297722320",
-  appId: "1:720297722320:web:c815edae99d1efa7ff39d5",
-  measurementId: "G-HD8901B19M"
-};
-
-firebase.initializeApp(firebaseConfig);
-const db = firebase.database();
-
 const netHud = $("netHud");
 const roomHud = $("roomHud");
 
@@ -1220,7 +1217,6 @@ function updateOnlineInfo(){
   $("onlineInfo").innerHTML = hint + `<br><small>Not: Farklı cihazlardan aynı oda koduna girebilirsin.</small>`;
 }
 
-// bağlantı durumu
 (function watchConnected(){
   db.ref(".info/connected").on("value", (snap)=>{
     onlineState.connected = !!snap.val();
@@ -1258,7 +1254,11 @@ async function joinRoom(roomId, asHost=false){
   if(asHost){
     onlineState.role = "p1";
   }else{
-    const [p1Snap, p2Snap] = await Promise.all([p1Ref.get(), p2Ref.get()]);
+    const [p1Snap, p2Snap] = await Promise.all([
+      p1Ref.once("value"),
+      p2Ref.once("value")
+    ]);
+
     if(!p1Snap.exists()){
       onlineState.role = "p1";
     }else if(!p2Snap.exists()){
@@ -1301,7 +1301,6 @@ async function joinRoom(roomId, asHost=false){
 
   onlineState.chatRef = db.ref(`rooms/${roomId}/chat`);
 
-  // chat temizle + yeniden kur
   refreshChatUI(true);
 
   const chatQuery = onlineState.chatRef.limitToLast(50);
@@ -1447,6 +1446,5 @@ else init();
 </script>
 </body>
 </html>
-
 
 
