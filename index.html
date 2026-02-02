@@ -1,1132 +1,90 @@
 <!DOCTYPE html>
 <html lang="tr">
 <head>
-<meta charset="UTF-8" />
-<meta name="viewport" content="width=device-width, initial-scale=1.0" />
-<title>Asya Dream Studio - Dolap + Kıyafet + Oyun + Online</title>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Asya Dream Studio</title>
 <link href="https://fonts.googleapis.com/css2?family=Press+Start+2P&display=swap" rel="stylesheet">
 
-<style>
-:root{
-  --neon-pink:#ff00ff;
-  --neon-blue:#00ffff;
-  --good:#00ff66;
-  --bad:#ff3355;
-  --bg1:#1a1a2e;
-  --bg2:#000;
-}
-*{box-sizing:border-box;margin:0;padding:0}
-html,body{
-  width:100%;height:100%;
-  font-family:'Press Start 2P', cursive;
-  background:radial-gradient(circle at 50% 50%, var(--bg1) 0%, var(--bg2) 100%);
-  color:#fff;
-  display:flex;
-  flex-direction:column;
-  align-items:center;
-  justify-content:flex-start;
-  padding:18px 10px;
-}
-.hidden{display:none !important;}
-h2,p{ text-align:center; line-height:1.5; }
-small{ opacity:.85; }
+<script src="https://www.gstatic.com/firebasejs/10.12.5/firebase-app-compat.js"></script>
+<script src="https://www.gstatic.com/firebasejs/10.12.5/firebase-database-compat.js"></script>
 
+<style>
+body{
+  margin:0;
+  background:#0b0b12;
+  color:white;
+  font-family:'Press Start 2P';
+  text-align:center;
+}
+.hidden{display:none}
 button{
   padding:10px 14px;
-  cursor:pointer;
+  margin:6px;
   font-family:'Press Start 2P';
-  border:2px solid var(--neon-pink);
-  color:var(--neon-pink);
   background:transparent;
+  color:#0ff;
+  border:2px solid #0ff;
   border-radius:12px;
-  transition:.25s;
-}
-button:hover{ background:var(--neon-pink); color:#000; box-shadow:0 0 15px var(--neon-pink); }
-button:disabled{ opacity:.45; cursor:not-allowed; }
-
-input, select{
-  padding:10px 12px;
-  border-radius:12px;
-  border:2px solid var(--neon-blue);
-  background:#0b0b0f;
-  color:#fff;
-  font-family:'Press Start 2P';
-  outline:none;
-}
-input{ width:min(420px, 90vw); }
-
-.controls{
-  display:flex;
-  justify-content:center;
-  align-items:center;
-  gap:10px;
-  flex-wrap:wrap;
-  margin-top:12px;
-}
-.panel{
-  width:min(1100px, 96vw);
-  display:flex;
-  flex-direction:column;
-  align-items:center;
-  gap:10px;
-}
-.badge{
-  border:1px solid rgba(255,255,255,.25);
-  padding:10px 12px;
-  border-radius:14px;
-  background:rgba(0,0,0,.40);
-  width:min(980px, 96vw);
-}
-.badge b{ color:var(--neon-blue); }
-
-.topbar{
-  position:fixed;
-  top:10px; left:10px; right:10px;
-  display:flex;
-  align-items:center;
-  justify-content:space-between;
-  pointer-events:none;
-  z-index:999;
-}
-.net-badge, .room-badge{
-  pointer-events:none;
-  padding:8px 10px;
-  border-radius:12px;
-  border:1px solid rgba(255,255,255,.25);
-  background:rgba(0,0,0,.50);
-  font-size:10px;
-}
-.net-badge b{ color:var(--good); }
-.net-badge.off b{ color:var(--bad); }
-.room-badge b{ color:var(--neon-blue); }
-
-/* creator preview */
-#character-canvas{
-  width:360px;height:520px;
-  border:2px solid var(--neon-blue);
-  border-radius:18px;
-  background:linear-gradient(145deg,#0c0c12,#1a1a2a);
-  box-shadow:0 0 18px rgba(0,255,255,.18), 0 0 18px rgba(255,0,255,.18);
-  display:flex;
-  align-items:center;
-  justify-content:center;
-  margin:8px 0;
-}
-#character-canvas svg{ width:100%; height:100%; }
-
-/* picker modal */
-.modal-back{
-  position:fixed;
-  inset:0;
-  background:rgba(0,0,0,.70);
-  display:flex;
-  align-items:center;
-  justify-content:center;
-  z-index:2000;
-  padding:14px;
-}
-.modal{
-  width:min(980px, 96vw);
-  max-height:min(84vh, 760px);
-  overflow:hidden;
-  border:2px solid var(--neon-blue);
-  border-radius:18px;
-  background:rgba(0,0,0,.75);
-  box-shadow:0 0 18px rgba(0,255,255,.2);
-  display:flex;
-  flex-direction:column;
-}
-.modal-top{
-  display:flex;
-  align-items:center;
-  justify-content:space-between;
-  gap:10px;
-  padding:12px;
-  border-bottom:1px solid rgba(255,255,255,.12);
-}
-.modal-top h3{ font-size:12px; }
-.modal-top .row{
-  display:flex;
-  gap:10px;
-  flex-wrap:wrap;
-  justify-content:flex-end;
-  align-items:center;
-}
-.modal-body{
-  padding:12px;
-  overflow:auto;
-}
-.grid{
-  display:grid;
-  grid-template-columns: repeat(6, minmax(0, 1fr));
-  gap:10px;
-}
-@media (max-width:980px){ .grid{ grid-template-columns: repeat(3, minmax(0, 1fr)); } }
-@media (max-width:520px){ .grid{ grid-template-columns: repeat(2, minmax(0, 1fr)); } }
-
-.item{
-  border:2px solid rgba(255,255,255,.16);
-  border-radius:14px;
-  background:rgba(0,0,0,.35);
-  padding:10px;
-  display:flex;
-  flex-direction:column;
-  align-items:center;
-  gap:8px;
   cursor:pointer;
-  transition:.18s;
 }
-.item:hover{
-  transform:translateY(-2px);
-  border-color: var(--neon-pink);
-  box-shadow:0 0 12px rgba(255,0,255,.25);
-}
-.item svg{ width:110px; height:160px; }
-.item .name{ font-size:9px; opacity:.95; text-align:center; line-height:1.35; }
-
-/* library */
-#dolap-list{
-  display:flex;
-  flex-wrap:wrap;
-  gap:14px;
-  justify-content:center;
-  padding:10px;
-  max-width:96vw;
-  overflow:auto;
-  max-height:60vh;
-}
-.character-card{
-  width:210px;
-  border:2px solid var(--neon-blue);
+button:hover{background:#0ff;color:black}
+canvas{
+  border:2px solid #f0f;
   border-radius:14px;
-  background:rgba(0,0,0,.55);
-  padding:10px;
-  display:flex;
-  flex-direction:column;
-  align-items:center;
-  gap:10px;
 }
-.character-card svg{ width:110px; height:160px; }
-.character-card .row{ display:flex; gap:8px; flex-wrap:wrap; justify-content:center; }
-.character-card .row button{ padding:8px 10px; font-size:10px; }
-
-/* games */
-.grid3{
-  display:grid;
-  grid-template-columns: repeat(3, minmax(0, 1fr));
-  gap:10px;
-  width:min(900px, 96vw);
-}
-@media (max-width:900px){ .grid3{ grid-template-columns: 1fr; } }
-.game-btn{
-  padding:14px 12px;
-  border:2px solid var(--neon-blue);
-  color:var(--neon-blue);
-}
-.game-btn:hover{ background:var(--neon-blue); color:#000; box-shadow:0 0 15px var(--neon-blue); }
-#game-canvas{
-  width:min(520px, 96vw);
-  height:auto;
-  border:2px solid var(--neon-pink);
-  border-radius:14px;
-  background:#0a0a0f;
-  box-shadow:0 0 18px rgba(255,0,255,.22);
-  touch-action: manipulation;
-}
-
-/* online */
-.online-top-controls{
-  position: sticky;
-  top: 62px;
-  z-index: 60;
-  width: min(980px, 96vw);
-  display:flex;
-  justify-content:space-between;
-  align-items:center;
-  gap:10px;
-  flex-wrap:wrap;
-  padding:12px;
-  border-radius:16px;
-  border:1px solid rgba(255,255,255,.18);
-  background: rgba(0,0,0,.60);
-  backdrop-filter: blur(6px);
-}
-.online-top-controls .group{ display:flex; gap:10px; flex-wrap:wrap; align-items:center; }
-.online-top-controls input{ width:170px; }
-
-.online-stage{
-  width:min(980px, 96vw);
-  display:flex;
-  gap:18px;
-  justify-content:center;
-  flex-wrap:wrap;
-  margin-top:8px;
-}
-.avatar-box{
-  width:420px;
-  max-width:96vw;
-  border:2px solid var(--neon-blue);
-  border-radius:16px;
-  background:rgba(0,0,0,.35);
-  padding:12px;
-  display:flex;
-  flex-direction:column;
-  align-items:center;
-  gap:10px;
-  box-shadow:0 0 15px rgba(0,255,255,.18);
-}
-.avatar-box h3{ font-size:12px; }
-.avatar-preview{
-  width:240px;
-  height:340px;
-  border:2px solid var(--neon-pink);
-  border-radius:14px;
-  display:flex;
-  justify-content:center;
-  align-items:center;
-  background:linear-gradient(145deg,#0c0c12,#1a1a2a);
-  box-shadow:0 0 15px rgba(255,0,255,.22);
-}
-.avatar-preview svg{ width:100%; height:100%; }
-
-.sep{
-  width:min(980px, 96vw);
-  height:1px;
-  background:rgba(255,255,255,.12);
-  margin:8px 0;
-}
-
-/* chat */
-.chat-wrap{
-  width:min(980px, 96vw);
-  border:1px solid rgba(255,255,255,.2);
-  border-radius:14px;
-  background:rgba(0,0,0,.35);
-  padding:10px;
-}
-.chat-list{
-  height:240px;
-  overflow:auto;
-  padding:8px;
-  border-radius:12px;
-  border:1px solid rgba(255,255,255,.15);
-  background:rgba(0,0,0,.25);
-}
-.msg{
-  font-size:10px;
-  line-height:1.4;
-  margin:6px 0;
-  opacity:.95;
-  word-break:break-word;
-}
-.msg b{ color:var(--neon-blue); }
-.chat-row{
-  display:flex;
-  gap:10px;
+#leaderboard{
   margin-top:10px;
-  align-items:center;
-  justify-content:center;
-  flex-wrap:wrap;
+  border:1px solid #0ff;
+  border-radius:12px;
+  padding:8px;
+  max-width:360px;
+  margin-inline:auto;
 }
-.chat-row input{ width:min(680px, 96vw); }
+.msg{font-size:10px;margin:4px}
 </style>
 </head>
 
 <body>
 
-<div class="topbar">
-  <div class="room-badge" id="roomHud">ROOM: <b>---</b></div>
-  <div class="net-badge off" id="netHud">NET: <b>OFF</b> ❌</div>
+<h1>ASYA DREAM STUDIO</h1>
+
+<div id="login">
+  <input id="nickname" placeholder="Takma ad">
+  <br><br>
+  <button onclick="enterSite()">GİR</button>
 </div>
 
-<!-- LOGIN -->
-<div id="login" class="panel">
-  <h2>ASYA DREAM STUDIO</h2>
-  <p>Takma adını gir</p>
-  <input id="nickname" placeholder="Takma ad" autocomplete="off" />
-  <div class="controls">
-    <button id="btn-enter">GİR</button>
-  </div>
-  <p><small>Live Server ile aç (yoksa bazı şeyler çalışmayabilir).</small></p>
+<div id="menu" class="hidden">
+  <h3 id="hello"></h3>
+  <button onclick="openGames()">OYUNLAR</button>
 </div>
 
-<!-- MENU -->
-<div id="menu" class="panel hidden">
-  <h2>Merhaba <span id="display-nick"></span>!</h2>
-  <div class="badge">
-    <p><small>Dolap: Kaydedip aktif et • Oyunlar: 3 mini oyun • Online: 2 sekmeyle oda/chat</small></p>
-  </div>
-  <div class="controls">
-    <button id="btn-creator">Karakter Oluştur</button>
-    <button id="btn-library">Dolap</button>
-    <button id="btn-games">Oyunlar</button>
-    <button id="btn-online">Online Mod</button>
-  </div>
+<div id="games" class="hidden">
+  <h3>OYUNLAR</h3>
+  <button onclick="openGame('bounce')">Neon Bounce</button>
+  <button onclick="openGame('reaction')">Reaction Rush</button>
+  <button onclick="openGame('runner')">Neon Runner</button>
+  <br>
+  <button onclick="backMenu()">MENÜ</button>
 </div>
 
-<!-- CREATOR -->
-<div id="creator" class="panel hidden">
-  <h2>Karakter Oluştur</h2>
-  <div class="badge" id="creatorInfo"></div>
+<div id="game" class="hidden">
+  <h3 id="gameTitle"></h3>
+  <div id="hud"></div>
+  <canvas id="c" width="300" height="420"></canvas>
+  <br>
+  <button onclick="restart()">YENİDEN</button>
+  <button onclick="backMenu()">MENÜ</button>
 
-  <div id="character-canvas"></div>
-
-  <div class="controls">
-    <button id="btn-pick-hair">Saç Seç</button>
-    <button id="btn-pick-top">Üst Seç</button>
-    <button id="btn-pick-bottom">Alt Seç</button>
-    <button id="btn-pick-shoes">Ayakkabı Seç</button>
-    <button id="btn-pick-acc">Aksesuar Seç</button>
-  </div>
-
-  <div class="controls">
-    <button id="btn-random" style="border-color:var(--neon-blue);color:var(--neon-blue)">RANDOM</button>
-    <button id="btn-save" style="border-color:var(--good);color:var(--good)">KAYDET</button>
-    <button id="btn-back1">MENÜ</button>
+  <div id="leaderboard">
+    <b>LEADERBOARD</b>
+    <div id="lb"></div>
   </div>
 </div>
-
-<!-- LIBRARY -->
-<div id="library" class="panel hidden">
-  <h2>Dolap</h2>
-  <div class="badge">
-    <p><small>AKTİF yapınca Online’da senin karakterin o gider.</small></p>
-  </div>
-  <div id="dolap-list"></div>
-  <div class="controls">
-    <button id="btn-clear-all" style="border-color:var(--bad);color:var(--bad)">HEPSİNİ SİL</button>
-    <button id="btn-back2">MENÜ</button>
-  </div>
-</div>
-
-<!-- GAMES HUB -->
-<div id="games" class="panel hidden">
-  <h2>OYUNLAR</h2>
-  <div class="badge"><small>Bir oyun seç.</small></div>
-
-  <div class="grid3">
-    <button class="game-btn" id="btn-game-bounce">Neon Bounce</button>
-    <button class="game-btn" id="btn-game-reaction">Reaction Rush</button>
-    <button class="game-btn" id="btn-game-runner">Neon Runner</button>
-  </div>
-
-  <div class="controls">
-    <button id="btn-back-games">MENÜ</button>
-  </div>
-</div>
-
-<!-- GAME SCREEN -->
-<div id="game" class="panel hidden">
-  <h2 id="game-title">Oyun</h2>
-  <div class="badge" id="hud"></div>
-  <canvas id="game-canvas" width="360" height="520"></canvas>
-  <div class="controls">
-    <button id="btn-restart">YENİDEN</button>
-    <button id="btn-back-to-games">OYUNLAR</button>
-    <button id="btn-back-to-menu2">MENÜ</button>
-  </div>
-</div>
-
-<!-- ONLINE -->
-<div id="online" class="panel hidden">
-  <h2>ONLINE MOD + CHAT</h2>
-
-  <div class="online-top-controls">
-    <div class="group">
-      <button id="btn-back3">MENÜ</button>
-    </div>
-    <div class="group">
-      <button id="btn-create-room" style="border-color:var(--neon-blue);color:var(--neon-blue)">ODA OLUŞTUR</button>
-      <input id="roomCodeInput" placeholder="ODA KODU" maxlength="5" />
-      <button id="btn-join-room" style="border-color:var(--neon-blue);color:var(--neon-blue)">GİR</button>
-    </div>
-    <div class="group">
-      <button id="btn-leave-room" style="border-color:var(--bad);color:var(--bad)">ODADAN ÇIK</button>
-    </div>
-  </div>
-
-  <div class="badge" id="onlineInfo"></div>
-
-  <div class="sep"></div>
-
-  <div class="online-stage">
-    <div class="avatar-box">
-      <h3>Sen</h3>
-      <div class="avatar-preview" id="p1Preview"></div>
-      <div class="controls">
-        <button id="btn-sync" style="border-color:var(--good);color:var(--good)">SENKRONLA</button>
-      </div>
-      <p><small>Not: Gerçek online: farklı cihazlardan aynı oda koduna gir.</small></p>
-    </div>
-
-    <div class="avatar-box">
-      <h3>Diğer Kişi</h3>
-      <div class="avatar-preview" id="p2Preview"><small>Bağlanınca gelecek…</small></div>
-      <p><small>Gerçek zamanlı güncellenir.</small></p>
-    </div>
-  </div>
-
-  <div class="sep"></div>
-
-  <div class="chat-wrap">
-    <p style="text-align:center"><small>CHAT</small></p>
-    <div class="chat-list" id="chatList"></div>
-    <div class="chat-row">
-      <input id="chatInput" placeholder="Mesaj yaz (Enter)" maxlength="120" />
-      <button id="btn-send" style="border-color:var(--neon-blue);color:var(--neon-blue)">GÖNDER</button>
-    </div>
-  </div>
-</div>
-
-<!-- MODAL -->
-<div id="pickerBackdrop" class="modal-back hidden">
-  <div class="modal">
-    <div class="modal-top">
-      <h3 id="pickerTitle">Seç</h3>
-      <div class="row">
-        <select id="pickerFilter">
-          <option value="all">Tümü</option>
-          <option value="basic">Basic</option>
-          <option value="neon">Neon</option>
-          <option value="sport">Sport</option>
-          <option value="formal">Formal</option>
-          <option value="street">Street</option>
-          <option value="cute">Cute</option>
-        </select>
-        <input id="pickerSearch" placeholder="Ara..." style="width:220px" />
-        <button id="btn-close-picker" style="border-color:var(--bad);color:var(--bad)">KAPAT</button>
-      </div>
-    </div>
-    <div class="modal-body">
-      <div class="grid" id="pickerGrid"></div>
-    </div>
-  </div>
-</div>
-
-<!-- Firebase (Realtime Database) -->
-<script src="https://www.gstatic.com/firebasejs/10.12.5/firebase-app-compat.js"></script>
-<script src="https://www.gstatic.com/firebasejs/10.12.5/firebase-database-compat.js"></script>
 
 <script>
-/* =========================
-   STORAGE + DOM
-========================= */
-const LS = {
-  get(k, def){ try{ return JSON.parse(localStorage.getItem(k)) ?? def; }catch{ return def; } },
-  set(k, v){ localStorage.setItem(k, JSON.stringify(v)); },
-  getStr(k, def=""){ return localStorage.getItem(k) ?? def; },
-  setStr(k, v){ localStorage.setItem(k, v); }
-};
-const $ = (id)=>document.getElementById(id);
-
-function hideAll(){
-  ["login","menu","creator","library","games","game","online"].forEach(id=>{
-    const el = $(id);
-    if(el) el.classList.add("hidden");
-  });
-}
-function showPanel(id){
-  const el = $(id);
-  if(!el){ console.error("Panel yok:", id); return; }
-  el.classList.remove("hidden");
-}
-function escapeHtml(s){
-  return String(s).replace(/[&<>"']/g, c=>({
-    "&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;","'":"&#39;"
-  }[c]));
-}
-
-/* =========================
-   AVATAR SVG ENGINE
-   (Kıyafetleri otomatik üretir)
-========================= */
-
-/* body base */
-const BODY = {
-  head:`<rect x="36" y="18" width="28" height="28" rx="6" fill="#ffdbac"/>`,
-  neck:`<rect x="44" y="46" width="12" height="10" rx="3" fill="#ffdbac"/>`,
-  torso:`<rect x="38" y="56" width="24" height="36" rx="6" fill="#ffdbac"/>`,
-  legL:`<rect x="40" y="92" width="10" height="44" rx="4" fill="#ffdbac"/>`,
-  legR:`<rect x="50" y="92" width="10" height="44" rx="4" fill="#ffdbac"/>`
-};
-
-/* yüz: basit ama tatlı */
-function faceLayer(){
-  return `
-    <rect x="42" y="28" width="6" height="6" rx="2" fill="#111"/>
-    <rect x="52" y="28" width="6" height="6" rx="2" fill="#111"/>
-    <rect x="43" y="24" width="6" height="2" fill="#6b3b1a"/>
-    <rect x="52" y="24" width="6" height="2" fill="#6b3b1a"/>
-    <rect x="47" y="36" width="6" height="2" rx="1" fill="#c75d6d"/>
-    <rect x="41" y="34" width="4" height="2" fill="#ff9bb3" opacity=".55"/>
-    <rect x="55" y="34" width="4" height="2" fill="#ff9bb3" opacity=".55"/>
-  `;
-}
-
-/* paletler */
-const PAL = {
-  basic:["#222","#444","#666","#9b5cff","#1e90ff","#ff0055","#00ffff","#00ff66","#ffd700","#ffffff","#ff7aa8","#ff8c00"],
-  neon:["#ff00ff","#00ffff","#00ff66","#ff3355","#9b5cff","#ffffff","#111","#ffd700"],
-  cute:["#ff7aa8","#ffb3d1","#ffd1e6","#ffffff","#9b5cff","#00ffff"],
-  sport:["#111","#222","#00ffff","#00ff66","#ff3355","#ffffff"],
-  street:["#111","#222","#333","#ff00ff","#00ffff","#ff8c00"],
-  formal:["#111","#222","#ffffff","#9b5cff","#ffd700","#444"]
-};
-
-function pick(arr, i){ return arr[i % arr.length]; }
-
-/* item üreticileri: her kategori için name + tag + svg layer */
-function makeHair(i, tag="basic"){
-  const c1 = pick(PAL[tag] || PAL.basic, i);
-  const c2 = pick(PAL[tag] || PAL.basic, i+3);
-  const style = i % 8;
-  if(style===0) return {name:`Kısa Saç #${i}`, tag, svg:`<rect x="32" y="14" width="36" height="14" rx="6" fill="${c1}"/>`};
-  if(style===1) return {name:`Perçem #${i}`, tag, svg:`<rect x="30" y="14" width="40" height="16" rx="7" fill="${c1}"/><rect x="34" y="20" width="32" height="4" fill="${c2}" opacity=".5"/>`};
-  if(style===2) return {name:`Uzun Saç #${i}`, tag, svg:`<rect x="30" y="14" width="40" height="18" rx="8" fill="${c1}"/><rect x="28" y="30" width="12" height="30" rx="6" fill="${c1}"/><rect x="60" y="30" width="12" height="30" rx="6" fill="${c1}"/>`};
-  if(style===3) return {name:`Topuz #${i}`, tag, svg:`<rect x="33" y="16" width="34" height="14" rx="7" fill="${c1}"/><rect x="44" y="8" width="12" height="10" rx="5" fill="${c1}"/><rect x="46" y="10" width="8" height="3" fill="${c2}" opacity=".6"/>`};
-  if(style===4) return {name:`Örgü #${i}`, tag, svg:`<rect x="31" y="14" width="38" height="16" rx="8" fill="${c1}"/><rect x="28" y="32" width="10" height="22" rx="5" fill="${c1}"/><rect x="62" y="32" width="10" height="22" rx="5" fill="${c1}"/><rect x="30" y="36" width="6" height="2" fill="${c2}" opacity=".7"/><rect x="64" y="36" width="6" height="2" fill="${c2}" opacity=".7"/>`};
-  if(style===5) return {name:`Dalgalı #${i}`, tag, svg:`<rect x="30" y="14" width="40" height="18" rx="8" fill="${c1}"/><rect x="29" y="30" width="42" height="8" rx="4" fill="${c2}" opacity=".35"/>`};
-  if(style===6) return {name:`Kakül #${i}`, tag, svg:`<rect x="31" y="14" width="38" height="16" rx="8" fill="${c1}"/><rect x="34" y="22" width="32" height="5" rx="2" fill="${c2}" opacity=".55"/>`};
-  return {name:`Havalı #${i}`, tag, svg:`<rect x="31" y="14" width="38" height="16" rx="8" fill="${c1}"/><rect x="38" y="12" width="24" height="4" rx="2" fill="${c2}" opacity=".7"/>`};
-}
-
-function makeTop(i, tag="basic"){
-  const c1 = pick(PAL[tag] || PAL.basic, i+1);
-  const c2 = pick(PAL[tag] || PAL.basic, i+5);
-  const style = i % 10;
-  if(style===0) return {name:`Tişört #${i}`, tag, svg:`<rect x="36" y="56" width="28" height="30" rx="6" fill="${c1}"/>`};
-  if(style===1) return {name:`Hoodie #${i}`, tag, svg:`<rect x="34" y="54" width="32" height="34" rx="8" fill="${c1}"/><rect x="41" y="58" width="18" height="6" rx="3" fill="${c2}" opacity=".5"/>`};
-  if(style===2) return {name:`Ceket #${i}`, tag, svg:`<rect x="34" y="54" width="32" height="36" rx="8" fill="${c1}"/><rect x="49" y="54" width="2" height="36" fill="${c2}" opacity=".7"/>`};
-  if(style===3) return {name:`Kazak #${i}`, tag, svg:`<rect x="35" y="55" width="30" height="34" rx="8" fill="${c1}"/><rect x="35" y="64" width="30" height="2" fill="${c2}" opacity=".5"/><rect x="35" y="70" width="30" height="2" fill="${c2}" opacity=".5"/>`};
-  if(style===4) return {name:`Neon Üst #${i}`, tag, svg:`<rect x="35" y="55" width="30" height="34" rx="8" fill="${c1}"/><rect x="35" y="55" width="30" height="3" fill="${c2}" opacity=".9"/><rect x="35" y="86" width="30" height="3" fill="${c2}" opacity=".9"/>`};
-  if(style===5) return {name:`Formal Gömlek #${i}`, tag, svg:`<rect x="35" y="55" width="30" height="34" rx="8" fill="${c1}"/><rect x="48" y="55" width="4" height="6" fill="${c2}" opacity=".7"/><rect x="48" y="61" width="4" height="6" fill="${c2}" opacity=".7"/>`};
-  if(style===6) return {name:`Kolsuz #${i}`, tag, svg:`<rect x="38" y="56" width="24" height="32" rx="8" fill="${c1}"/>`};
-  if(style===7) return {name:`Kısa Ceket #${i}`, tag, svg:`<rect x="34" y="56" width="32" height="28" rx="8" fill="${c1}"/><rect x="34" y="56" width="32" height="4" fill="${c2}" opacity=".6"/>`};
-  if(style===8) return {name:`Cute Üst #${i}`, tag, svg:`<rect x="36" y="56" width="28" height="32" rx="10" fill="${c1}"/><rect x="40" y="70" width="20" height="6" rx="3" fill="${c2}" opacity=".5"/>`};
-  return {name:`Street Üst #${i}`, tag, svg:`<rect x="34" y="54" width="32" height="36" rx="8" fill="${c1}"/><rect x="36" y="74" width="28" height="4" fill="${c2}" opacity=".55"/>`};
-}
-
-function makeBottom(i, tag="basic"){
-  const c1 = pick(PAL[tag] || PAL.basic, i+2);
-  const c2 = pick(PAL[tag] || PAL.basic, i+7);
-  const style = i % 10;
-  if(style===0) return {name:`Pantolon #${i}`, tag, svg:`<rect x="40" y="92" width="10" height="44" rx="4" fill="${c1}"/><rect x="50" y="92" width="10" height="44" rx="4" fill="${c1}"/>`};
-  if(style===1) return {name:`Şort #${i}`, tag, svg:`<rect x="38" y="90" width="28" height="16" rx="6" fill="${c1}"/>`};
-  if(style===2) return {name:`Etek #${i}`, tag, svg:`<rect x="38" y="90" width="28" height="22" rx="6" fill="${c1}"/><rect x="38" y="100" width="28" height="2" fill="${c2}" opacity=".6"/>`};
-  if(style===3) return {name:`Jogger #${i}`, tag, svg:`<rect x="40" y="92" width="10" height="44" rx="4" fill="${c1}"/><rect x="50" y="92" width="10" height="44" rx="4" fill="${c1}"/><rect x="40" y="128" width="20" height="3" fill="${c2}" opacity=".7"/>`};
-  if(style===4) return {name:`Neon Alt #${i}`, tag, svg:`<rect x="40" y="92" width="10" height="44" rx="4" fill="${c1}"/><rect x="50" y="92" width="10" height="44" rx="4" fill="${c1}"/><rect x="40" y="92" width="20" height="3" fill="${c2}" opacity=".9"/>`};
-  if(style===5) return {name:`Kargo #${i}`, tag, svg:`<rect x="40" y="92" width="10" height="44" rx="4" fill="${c1}"/><rect x="50" y="92" width="10" height="44" rx="4" fill="${c1}"/><rect x="41" y="110" width="8" height="6" fill="${c2}" opacity=".55"/><rect x="51" y="110" width="8" height="6" fill="${c2}" opacity=".55"/>`};
-  if(style===6) return {name:`Formal Alt #${i}`, tag, svg:`<rect x="40" y="92" width="10" height="44" rx="2" fill="${c1}"/><rect x="50" y="92" width="10" height="44" rx="2" fill="${c1}"/>`};
-  if(style===7) return {name:`Cute Etek #${i}`, tag, svg:`<rect x="38" y="90" width="28" height="24" rx="10" fill="${c1}"/><rect x="44" y="94" width="16" height="4" rx="2" fill="${c2}" opacity=".5"/>`};
-  if(style===8) return {name:`Street Alt #${i}`, tag, svg:`<rect x="40" y="92" width="10" height="44" rx="4" fill="${c1}"/><rect x="50" y="92" width="10" height="44" rx="4" fill="${c1}"/><rect x="40" y="104" width="20" height="2" fill="${c2}" opacity=".55"/>`};
-  return {name:`Sport Şort #${i}`, tag, svg:`<rect x="38" y="90" width="28" height="16" rx="6" fill="${c1}"/><rect x="40" y="94" width="24" height="3" rx="1" fill="${c2}" opacity=".6"/>`};
-}
-
-function makeShoes(i, tag="basic"){
-  const c1 = pick(PAL[tag] || PAL.basic, i+4);
-  const c2 = pick(PAL[tag] || PAL.basic, i+9);
-  const style = i % 8;
-  if(style===0) return {name:`Sneaker #${i}`, tag, svg:`<rect x="38" y="136" width="14" height="8" rx="3" fill="${c1}"/><rect x="52" y="136" width="14" height="8" rx="3" fill="${c1}"/>`};
-  if(style===1) return {name:`Neon Sneaker #${i}`, tag, svg:`<rect x="38" y="136" width="14" height="8" rx="3" fill="${c1}"/><rect x="52" y="136" width="14" height="8" rx="3" fill="${c1}"/><rect x="38" y="136" width="28" height="2" fill="${c2}" opacity=".9"/>`};
-  if(style===2) return {name:`Bot #${i}`, tag, svg:`<rect x="38" y="130" width="14" height="14" rx="3" fill="${c1}"/><rect x="52" y="130" width="14" height="14" rx="3" fill="${c1}"/>`};
-  if(style===3) return {name:`Topuklu #${i}`, tag, svg:`<rect x="38" y="136" width="14" height="6" rx="2" fill="${c1}"/><rect x="52" y="136" width="14" height="6" rx="2" fill="${c1}"/><rect x="44" y="142" width="3" height="4" fill="${c2}" /><rect x="58" y="142" width="3" height="4" fill="${c2}" />`};
-  if(style===4) return {name:`Sandalet #${i}`, tag, svg:`<rect x="38" y="138" width="14" height="4" rx="2" fill="${c1}"/><rect x="52" y="138" width="14" height="4" rx="2" fill="${c1}"/><rect x="40" y="137" width="10" height="2" fill="${c2}" opacity=".65"/><rect x="54" y="137" width="10" height="2" fill="${c2}" opacity=".65"/>`};
-  if(style===5) return {name:`Sport #${i}`, tag, svg:`<rect x="38" y="136" width="14" height="8" rx="3" fill="${c1}"/><rect x="52" y="136" width="14" height="8" rx="3" fill="${c1}"/><rect x="42" y="138" width="6" height="2" fill="${c2}" opacity=".7"/><rect x="56" y="138" width="6" height="2" fill="${c2}" opacity=".7"/>`};
-  if(style===6) return {name:`Formal #${i}`, tag, svg:`<rect x="38" y="136" width="14" height="7" rx="2" fill="${c1}"/><rect x="52" y="136" width="14" height="7" rx="2" fill="${c1}"/><rect x="38" y="142" width="28" height="2" fill="${c2}" opacity=".4"/>`};
-  return {name:`Cute #${i}`, tag, svg:`<rect x="38" y="136" width="14" height="8" rx="4" fill="${c1}"/><rect x="52" y="136" width="14" height="8" rx="4" fill="${c1}"/><rect x="42" y="136" width="4" height="4" rx="2" fill="${c2}" opacity=".55"/><rect x="56" y="136" width="4" height="4" rx="2" fill="${c2}" opacity=".55"/>`};
-}
-
-function makeAcc(i, tag="basic"){
-  const c1 = pick(PAL[tag] || PAL.basic, i+6);
-  const style = i % 7;
-  if(style===0) return {name:`Gözlük #${i}`, tag, svg:`<rect x="41" y="28" width="8" height="6" rx="2" fill="none" stroke="${c1}" stroke-width="2"/><rect x="51" y="28" width="8" height="6" rx="2" fill="none" stroke="${c1}" stroke-width="2"/><rect x="49" y="30" width="2" height="2" fill="${c1}"/>`};
-  if(style===1) return {name:`Taç #${i}`, tag, svg:`<rect x="40" y="12" width="20" height="6" rx="3" fill="${c1}"/><rect x="44" y="10" width="3" height="6" fill="${c1}"/><rect x="53" y="10" width="3" height="6" fill="${c1}"/>`};
-  if(style===2) return {name:`Şapka #${i}`, tag, svg:`<rect x="34" y="14" width="32" height="8" rx="4" fill="${c1}"/><rect x="30" y="20" width="40" height="4" rx="2" fill="${c1}"/>`};
-  if(style===3) return {name:`Kolye #${i}`, tag, svg:`<rect x="44" y="52" width="12" height="2" fill="${c1}" opacity=".9"/><rect x="49" y="54" width="2" height="4" fill="${c1}" opacity=".9"/>`};
-  if(style===4) return {name:`Maske #${i}`, tag, svg:`<rect x="41" y="32" width="18" height="6" rx="3" fill="${c1}" opacity=".8"/>`};
-  if(style===5) return {name:`Küpe #${i}`, tag, svg:`<rect x="35" y="34" width="3" height="6" rx="1" fill="${c1}"/><rect x="62" y="34" width="3" height="6" rx="1" fill="${c1}"/>`};
-  return {name:`Bandana #${i}`, tag, svg:`<rect x="34" y="24" width="32" height="4" rx="2" fill="${c1}" opacity=".9"/>`};
-}
-
-/* Kıyafet envanteri (çok sayıda) */
-function buildWardrobe(){
-  const wardrobe = { hair:[], top:[], bottom:[], shoes:[], acc:[] };
-
-  for(let i=0;i<80;i++){
-    wardrobe.hair.push(makeHair(i, i%3===0?"neon": i%3===1?"street":"basic"));
-  }
-  for(let i=0;i<90;i++){
-    wardrobe.top.push(makeTop(i, i%4===0?"sport": i%4===1?"street": i%4===2?"cute":"formal"));
-  }
-  for(let i=0;i<90;i++){
-    wardrobe.bottom.push(makeBottom(i, i%4===0?"sport": i%4===1?"street": i%4===2?"cute":"formal"));
-  }
-  for(let i=0;i<80;i++){
-    wardrobe.shoes.push(makeShoes(i, i%4===0?"sport": i%4===1?"street": i%4===2?"cute":"formal"));
-  }
-  for(let i=0;i<55;i++){
-    wardrobe.acc.push(makeAcc(i, i%3===0?"neon": i%3===1?"cute":"basic"));
-  }
-  return wardrobe;
-}
-
-const WARDROBE = buildWardrobe();
-
-/* Seçili parçalar */
-let current = {
-  hair: 0,
-  top: 0,
-  bottom: 0,
-  shoes: 0,
-  acc: -1
-};
-
-function avatarSvgFromSelection(sel){
-  const hair = WARDROBE.hair[sel.hair]?.svg ?? "";
-  const top  = WARDROBE.top[sel.top]?.svg ?? "";
-  const bot  = WARDROBE.bottom[sel.bottom]?.svg ?? "";
-  const sh   = WARDROBE.shoes[sel.shoes]?.svg ?? "";
-  const acc  = (sel.acc>=0 ? (WARDROBE.acc[sel.acc]?.svg ?? "") : "");
-
-  return `
-  <svg viewBox="0 0 100 160" xmlns="http://www.w3.org/2000/svg">
-    ${BODY.head}
-    ${faceLayer()}
-    ${hair}
-    ${BODY.neck}
-    ${BODY.torso}
-    ${top}
-    ${BODY.legL}
-    ${BODY.legR}
-    ${bot}
-    ${sh}
-    ${acc}
-  </svg>`;
-}
-
-function renderCreator(){
-  $("character-canvas").innerHTML = avatarSvgFromSelection(current);
-  const count = WARDROBE.hair.length + WARDROBE.top.length + WARDROBE.bottom.length + WARDROBE.shoes.length + WARDROBE.acc.length;
-  $("creatorInfo").innerHTML = `Kıyafet Havuzu: <b>${count}</b> parça • Saç:<b>${WARDROBE.hair.length}</b> Üst:<b>${WARDROBE.top.length}</b> Alt:<b>${WARDROBE.bottom.length}</b> Ayakkabı:<b>${WARDROBE.shoes.length}</b> Aksesuar:<b>${WARDROBE.acc.length}</b>`;
-}
-
-/* =========================
-   PICKER MODAL (Grid seçici)
-========================= */
-let pickerCategory = "hair";
-
-function openPicker(cat){
-  pickerCategory = cat;
-  $("pickerTitle").textContent = ({
-    hair:"Saç Seç", top:"Üst Seç", bottom:"Alt Seç", shoes:"Ayakkabı Seç", acc:"Aksesuar Seç"
-  }[cat] || "Seç");
-  $("pickerSearch").value = "";
-  $("pickerFilter").value = "all";
-  buildPickerGrid();
-  $("pickerBackdrop").classList.remove("hidden");
-}
-
-function closePicker(){
-  $("pickerBackdrop").classList.add("hidden");
-}
-
-function buildPickerGrid(){
-  const grid = $("pickerGrid");
-  grid.innerHTML = "";
-  const q = $("pickerSearch").value.trim().toLowerCase();
-  const f = $("pickerFilter").value;
-
-  const list = WARDROBE[pickerCategory] || [];
-  const previewBase = (selOverride)=>{
-    const sel = {...current, ...selOverride};
-    return avatarSvgFromSelection(sel);
-  };
-
-  if(pickerCategory === "acc"){
-    const it = document.createElement("div");
-    it.className = "item";
-    it.innerHTML = `<div class="name">YOK</div>${previewBase({acc:-1})}`;
-    it.onclick = ()=>{ current.acc = -1; renderCreator(); closePicker(); syncOnlineAuto(); };
-    grid.appendChild(it);
-  }
-
-  for(let i=0;i<list.length;i++){
-    const item = list[i];
-    if(f !== "all" && item.tag !== f) continue;
-    if(q && !item.name.toLowerCase().includes(q) && !(item.tag||"").toLowerCase().includes(q)) continue;
-
-    const it = document.createElement("div");
-    it.className = "item";
-
-    const preview = previewBase({[pickerCategory]: i});
-    it.innerHTML = `<div class="name">${escapeHtml(item.name)}<br><small>${escapeHtml(item.tag)}</small></div>${preview}`;
-
-    it.onclick = ()=>{
-      current[pickerCategory] = i;
-      renderCreator();
-      closePicker();
-      syncOnlineAuto();
-    };
-
-    grid.appendChild(it);
-  }
-}
-
-/* =========================
-   LOGIN + MENU NAV
-========================= */
-function enterSite(){
-  const nick = $("nickname").value.trim();
-  if(!nick) return alert("Takma ad boş olamaz!");
-  LS.setStr("nickname", nick);
-  $("display-nick").textContent = nick;
-  hideAll(); showPanel("menu");
-}
-
-function backToMenu(){
-  hideAll();
-  $("display-nick").textContent = LS.getStr("nickname","");
-  showPanel("menu");
-}
-
-function openCreator(){
-  stopAnyGame();
-  hideAll(); showPanel("creator");
-  renderCreator();
-}
-
-function openLibrary(){
-  stopAnyGame();
-  hideAll(); showPanel("library");
-  loadLibrary();
-}
-
-function openGamesHub(){
-  stopAnyGame();
-  hideAll(); showPanel("games");
-}
-
-function openOnline(){
-  stopAnyGame();
-  hideAll(); showPanel("online");
-  renderOnlinePreviews();
-  refreshChatUI(!!onlineState.roomId);
-  updateOnlineInfo();
-}
-
-/* =========================
-   DOLAP (kayıt / aktif / sil)
-========================= */
-function saveCharacter(){
-  const nick = LS.getStr("nickname","anon");
-  const svg = avatarSvgFromSelection(current);
-  const saved = LS.get("savedCharacters", []);
-  const item = {
-    nick,
-    svg,
-    ts: Date.now(),
-    meta: {
-      hair: WARDROBE.hair[current.hair]?.name,
-      top: WARDROBE.top[current.top]?.name,
-      bottom: WARDROBE.bottom[current.bottom]?.name,
-      shoes: WARDROBE.shoes[current.shoes]?.name,
-      acc: current.acc>=0 ? WARDROBE.acc[current.acc]?.name : "YOK"
-    }
-  };
-  saved.push(item);
-  LS.set("savedCharacters", saved);
-  alert("Karakter kaydedildi!");
-}
-
-function loadLibrary(){
-  const nick = LS.getStr("nickname","");
-  const container = $("dolap-list");
-  container.innerHTML = "";
-
-  const saved = LS.get("savedCharacters", []);
-  const mine = saved.filter(x=>x.nick===nick).slice().reverse();
-
-  if(mine.length===0){
-    container.innerHTML = "<p>Henüz karakter yok. Oluşturup KAYDET bas.</p>";
-    return;
-  }
-
-  for(const c of mine){
-    const card = document.createElement("div");
-    card.className = "character-card";
-    const meta = c.meta || {};
-    card.innerHTML = `
-      <div>${c.svg}</div>
-      <small>${new Date(c.ts).toLocaleString()}</small>
-      <small>Üst: ${escapeHtml(meta.top||"-")}</small>
-      <small>Alt: ${escapeHtml(meta.bottom||"-")}</small>
-      <div class="row">
-        <button class="btnActive" style="border-color:var(--neon-blue);color:var(--neon-blue)">AKTİF</button>
-        <button class="btnDel" style="border-color:var(--bad);color:var(--bad)">SİL</button>
-      </div>
-    `;
-
-    card.querySelector(".btnActive").onclick = ()=>{
-      LS.setStr("activeCharacterSVG", c.svg);
-      alert("Aktif karakter ayarlandı!");
-      syncOnlineAuto();
-    };
-
-    card.querySelector(".btnDel").onclick = ()=>{
-      const all = LS.get("savedCharacters", []);
-      LS.set("savedCharacters", all.filter(x => !(x.nick===c.nick && x.ts===c.ts)));
-      loadLibrary();
-    };
-
-    container.appendChild(card);
-  }
-}
-
-function clearAllMy(){
-  const nick = LS.getStr("nickname","");
-  const all = LS.get("savedCharacters", []);
-  const kept = all.filter(x=>x.nick!==nick);
-  LS.set("savedCharacters", kept);
-  if(LS.getStr("activeCharacterSVG","")) LS.setStr("activeCharacterSVG","");
-  loadLibrary();
-  alert("Hepsi silindi.");
-}
-
-/* Aktif varsa onu döndür */
-function getMyDisplaySvg(){
-  const active = LS.getStr("activeCharacterSVG","");
-  return active || avatarSvgFromSelection(current);
-}
-
-/* Random giydir */
-function randomize(){
-  function r(max){ return Math.floor(Math.random()*max); }
-  current.hair = r(WARDROBE.hair.length);
-  current.top = r(WARDROBE.top.length);
-  current.bottom = r(WARDROBE.bottom.length);
-  current.shoes = r(WARDROBE.shoes.length);
-  current.acc = (Math.random()<0.65) ? r(WARDROBE.acc.length) : -1;
-  renderCreator();
-  syncOnlineAuto();
-}
-
-/* =========================
-   GAMES (3 mini oyun)
-========================= */
-const canvas = $("game-canvas");
-const ctx = canvas.getContext("2d");
-let currentGame = null;
-let intervalId = null;
-let anyTimers = [];
-
-function stopAnyGame(){
-  if(intervalId){ clearInterval(intervalId); intervalId=null; }
-  for(const t of anyTimers) clearTimeout(t);
-  anyTimers = [];
-  canvas.onclick = null;
-  currentGame = null;
-}
-
-function openGame(which){
-  hideAll(); showPanel("game");
-  $("btn-restart").onclick = ()=>startGame(which);
-  startGame(which);
-}
-
-function startGame(which){
-  stopAnyGame();
-  currentGame = which;
-  if(which==="bounce") startBounce();
-  else if(which==="reaction") startReaction();
-  else if(which==="runner") startRunner();
-}
-
-/* bounce */
-function startBounce(){
-  $("game-title").textContent="Neon Bounce";
-  let score=0, lives=3;
-  const wallH=14;
-  const ball={x:180,y:260,dx:2.4,dy:-3.1,r:10};
-
-  canvas.onclick = ()=> ball.dy *= -1;
-
-  intervalId=setInterval(()=>{
-    ctx.fillStyle="rgba(10,10,15,0.25)";
-    ctx.fillRect(0,0,canvas.width,canvas.height);
-
-    ctx.fillStyle="#ff3355";
-    ctx.fillRect(0,0,canvas.width,wallH);
-
-    ctx.save();
-    ctx.shadowColor="#00ffff";
-    ctx.shadowBlur=18;
-    ctx.fillStyle="#00ffff";
-    ctx.beginPath(); ctx.arc(ball.x,ball.y,ball.r,0,Math.PI*2); ctx.fill();
-    ctx.restore();
-
-    ball.x+=ball.dx; ball.y+=ball.dy;
-
-    if(ball.x+ball.r>canvas.width){ ball.x=canvas.width-ball.r; ball.dx*=-1; }
-    if(ball.x-ball.r<0){ ball.x=ball.r; ball.dx*=-1; }
-
-    if(ball.y-ball.r<wallH){
-      ball.y=wallH+ball.r;
-      ball.dy*=-1;
-      score++;
-      if(score%10===0){ ball.dx*=1.08; ball.dy*=1.08; }
-    }
-
-    if(ball.y+ball.r>canvas.height){
-      lives--;
-      if(lives<=0){
-        clearInterval(intervalId); intervalId=null;
-        $("hud").innerHTML=`SKOR: <b>${score}</b> | CAN: <b style="color:var(--bad)">0</b>`;
-        return;
-      }
-      ball.x=180; ball.y=260; ball.dx=2.4; ball.dy=-3.1;
-    }
-
-    $("hud").innerHTML=`SKOR: <b>${score}</b> | CAN: <b>${lives}</b><br><small>Tıkla: yön değiştir</small>`;
-  },16);
-}
-
-/* reaction */
-function startReaction(){
-  $("game-title").textContent="Reaction Rush";
-  let score=0;
-  let can=false;
-  let started=0;
-  let target={x:180,y:260,r:32};
-
-  function drawWait(){
-    ctx.fillStyle="rgba(10,10,15,1)";
-    ctx.fillRect(0,0,canvas.width,canvas.height);
-    ctx.fillStyle="#00ffff";
-    ctx.font="12px 'Press Start 2P'";
-    ctx.fillText("BEKLE...",110,250);
-  }
-  function drawTarget(){
-    ctx.fillStyle="rgba(10,10,15,1)";
-    ctx.fillRect(0,0,canvas.width,canvas.height);
-    target.x=90+Math.random()*(canvas.width-180);
-    target.y=120+Math.random()*(canvas.height-240);
-
-    ctx.save();
-    ctx.shadowColor="#ff00ff";
-    ctx.shadowBlur=22;
-    ctx.fillStyle="#ff00ff";
-    ctx.beginPath(); ctx.arc(target.x,target.y,target.r,0,Math.PI*2); ctx.fill();
-    ctx.restore();
-
-    ctx.fillStyle="#000";
-    ctx.font="10px 'Press Start 2P'";
-    ctx.fillText("TIKLA", target.x-22, target.y+4);
-
-    can=true;
-    started=performance.now();
-  }
-  function schedule(){
-    can=false;
-    drawWait();
-    const delay = 700 + Math.random()*1300;
-    anyTimers.push(setTimeout(drawTarget, delay));
-  }
-
-  canvas.onclick=(e)=>{
-    const r=canvas.getBoundingClientRect();
-    const mx=(e.clientX-r.left)*(canvas.width/r.width);
-    const my=(e.clientY-r.top)*(canvas.height/r.height);
-
-    if(!can){ score=Math.max(0,score-1); $("hud").innerHTML=`ERKEN! PUAN: <b>${score}</b>`; return; }
-
-    const dx=mx-target.x, dy=my-target.y;
-    if(Math.sqrt(dx*dx+dy*dy)<=target.r){
-      const ms=Math.round(performance.now()-started);
-      score += (ms<250?3: ms<400?2:1);
-      $("hud").innerHTML=`PUAN: <b>${score}</b> | TEPKİ: <b>${ms}ms</b>`;
-      schedule();
-    }else{
-      score=Math.max(0,score-1);
-      $("hud").innerHTML=`ISKA! PUAN: <b>${score}</b>`;
-    }
-  };
-
-  $("hud").innerHTML=`PUAN: <b>${score}</b><br><small>Hedef çıkınca tıkla</small>`;
-  schedule();
-}
-
-/* runner */
-function startRunner(){
-  $("game-title").textContent="Neon Runner";
-  let score=0, lives=3;
-  let y=canvas.height-74, vy=0, onGround=true;
-  let obs=[];
-  let t=0, speed=3.2;
-
-  canvas.onclick=()=>{
-    if(onGround){ vy=-10.8; onGround=false; }
-  };
-
-  intervalId=setInterval(()=>{
-    ctx.fillStyle="rgba(10,10,15,0.25)";
-    ctx.fillRect(0,0,canvas.width,canvas.height);
-
-    ctx.strokeStyle="#00ffff";
-    ctx.lineWidth=2;
-    ctx.beginPath(); ctx.moveTo(0,canvas.height-40); ctx.lineTo(canvas.width,canvas.height-40); ctx.stroke();
-
-    const px=70,pw=26,ph=34;
-
-    vy+=0.55; y+=vy;
-    if(y>canvas.height-40-ph){ y=canvas.height-40-ph; vy=0; onGround=true; }
-
-    ctx.save();
-    ctx.shadowColor="#ff00ff";
-    ctx.shadowBlur=16;
-    ctx.fillStyle="#ff00ff";
-    ctx.fillRect(px,y,pw,ph);
-    ctx.restore();
-
-    t++;
-    if(t%70===0){
-      obs.push({x:canvas.width+10,w:20+Math.random()*22,h:20+Math.random()*28});
-    }
-
-    for(const o of obs){
-      o.x -= speed;
-      ctx.save();
-      ctx.shadowColor="#00ffff";
-      ctx.shadowBlur=14;
-      ctx.fillStyle="#00ffff";
-      ctx.fillRect(o.x,canvas.height-40-o.h,o.w,o.h);
-      ctx.restore();
-
-      const oy = canvas.height-40-o.h;
-      const hit = px < o.x+o.w && px+pw > o.x && y < oy+o.h && y+ph > oy;
-      if(hit){
-        lives--;
-        o.x = -9999;
-        if(lives<=0){
-          clearInterval(intervalId); intervalId=null;
-          $("hud").innerHTML=`SKOR: <b>${score}</b> | CAN: <b style="color:var(--bad)">0</b>`;
-          return;
-        }
-      }
-    }
-
-    obs = obs.filter(o=>o.x>-60);
-    score++;
-    if(score%120===0) speed*=1.06;
-
-    $("hud").innerHTML=`SKOR: <b>${score}</b> | CAN: <b>${lives}</b><br><small>Tıkla: zıpla</small>`;
-  },16);
-}
-
-/* =========================
-   ONLINE (GERÇEK ONLINE - Firebase Realtime Database)
-   Online dışında hiçbir şeye dokunulmadı
-========================= */
-
+/* ================= FIREBASE ================= */
 const firebaseConfig = {
   apiKey: "AIzaSyABqkhpL1SMRzRJ9GQLjjZE2IryqpAvMPw",
   authDomain: "pixelroom-ae218.firebaseapp.com",
@@ -1134,273 +92,149 @@ const firebaseConfig = {
   projectId: "pixelroom-ae218",
   storageBucket: "pixelroom-ae218.firebasestorage.app",
   messagingSenderId: "720297722320",
-  appId: "1:720297722320:web:c815edae99d1efa7ff39d5",
-  measurementId: "G-HD8901B19M"
+  appId: "1:720297722320:web:c815edae99d1efa7ff39d5"
 };
-
 firebase.initializeApp(firebaseConfig);
 const db = firebase.database();
 
-const netHud = $("netHud");
-const roomHud = $("roomHud");
+/* ================= GENEL ================= */
+const $=id=>document.getElementById(id);
+let nick="", game="", score=0, loop=null;
+const ctx = $("c").getContext("2d");
 
-const onlineState = {
-  roomId: null,
-  role: null,
-  nick: () => LS.getStr("nickname","anon"),
-  listeners: [],
-  connected: false,
-  myPlayerRef: null,
-  chatRef: null
-};
+function hideAll(){
+  ["login","menu","games","game"].forEach(i=>$(i).classList.add("hidden"));
+}
 
-function setNetUI(on){
-  if(on){
-    netHud.classList.remove("off");
-    netHud.innerHTML = `NET: <b>ON</b> ✅`;
-  }else{
-    netHud.classList.add("off");
-    netHud.innerHTML = `NET: <b>OFF</b> ❌`;
+/* ================= LOGIN ================= */
+function enterSite(){
+  nick=$("nickname").value.trim();
+  if(!nick) return alert("Nick gir");
+  $("hello").innerText="Merhaba "+nick;
+  hideAll(); $("menu").classList.remove("hidden");
+}
+function backMenu(){
+  stopGame();
+  hideAll(); $("menu").classList.remove("hidden");
+}
+function openGames(){
+  hideAll(); $("games").classList.remove("hidden");
+}
+
+/* ================= LEADERBOARD ================= */
+function lbRef(g){ return db.ref("leaderboard/"+g); }
+
+async function submitBestScore(g,s){
+  const ref=lbRef(g).child(nick);
+  const snap=await ref.get();
+  if(!snap.exists() || s>snap.val()){
+    ref.set(s);
   }
 }
-function updateRoomUI(){
-  roomHud.innerHTML = `ROOM: <b>${onlineState.roomId ?? "---"}</b>`;
-}
-function randomRoomCode(){
-  return String(Math.floor(10000 + Math.random()*90000));
-}
-function updateOnlineInfo(){
-  const nick = onlineState.nick();
-  const hint = `Kullanıcı: <b>${escapeHtml(nick)}</b> • Oda: <b>${onlineState.roomId ?? "---"}</b> • Sistem: <b>GERÇEK ONLINE</b>`;
-  $("onlineInfo").innerHTML = hint + `<br><small>Not: Farklı cihazlardan aynı oda koduna girebilirsin.</small>`;
-}
 
-// bağlantı durumu
-(function watchConnected(){
-  db.ref(".info/connected").on("value", (snap)=>{
-    onlineState.connected = !!snap.val();
-    setNetUI(onlineState.connected);
+async function loadLB(g){
+  $("lb").innerHTML="Yükleniyor...";
+  lbRef(g).orderByValue().limitToLast(10).on("value",snap=>{
+    let arr=[];
+    snap.forEach(c=>arr.push([c.key,c.val()]));
+    arr.reverse();
+    $("lb").innerHTML="";
+    arr.forEach((x,i)=>{
+      $("lb").innerHTML+=`<div class="msg">${i+1}. ${x[0]} : ${x[1]}</div>`;
+    });
   });
-})();
-
-function cleanupRoomListeners(){
-  for(const off of onlineState.listeners){
-    try{ off(); }catch{}
-  }
-  onlineState.listeners = [];
-  onlineState.myPlayerRef = null;
-  onlineState.chatRef = null;
 }
 
-function createRoom(){
-  const id = randomRoomCode();
-  joinRoom(id, true);
-  alert("Oda kuruldu: " + id + " (Arkadaşın bu kodla girsin)");
+async function showBest(g){
+  const snap=await lbRef(g).orderByValue().limitToLast(1).get();
+  let best=0;
+  snap.forEach(s=>best=s.val());
+  $("hud").innerHTML=`BEST SCORE: <b>${best}</b>`;
 }
 
-async function joinRoom(roomId, asHost=false){
-  roomId = String(roomId||"").trim();
-  if(!/^\d{5}$/.test(roomId)) return alert("Oda kodu 5 haneli olmalı!");
+/* ================= GAME CORE ================= */
+async function openGame(g){
+  game=g; score=0;
+  hideAll(); $("game").classList.remove("hidden");
+  $("gameTitle").innerText=g.toUpperCase();
+  await showBest(g);
+  loadLB(g);
+  startGame();
+}
 
-  if(onlineState.roomId) await leaveRoom(true);
+function restart(){
+  stopGame();
+  openGame(game);
+}
+function stopGame(){
+  if(loop) clearInterval(loop);
+  loop=null;
+}
 
-  onlineState.roomId = roomId;
+/* ================= GAMES ================= */
+function startGame(){
+  if(game==="bounce") bounce();
+  if(game==="reaction") reaction();
+  if(game==="runner") runner();
+}
 
-  const roomRef = db.ref(`rooms/${roomId}`);
-  const p1Ref = db.ref(`rooms/${roomId}/players/p1`);
-  const p2Ref = db.ref(`rooms/${roomId}/players/p2`);
-
-  if(asHost){
-    onlineState.role = "p1";
-  }else{
-    const [p1Snap, p2Snap] = await Promise.all([p1Ref.get(), p2Ref.get()]);
-    if(!p1Snap.exists()){
-      onlineState.role = "p1";
-    }else if(!p2Snap.exists()){
-      onlineState.role = "p2";
-    }else{
-      onlineState.roomId = null;
-      onlineState.role = null;
-      updateRoomUI();
-      updateOnlineInfo();
-      return alert("Bu oda dolu (2 kişi). Başka kod deneyin.");
+/* Neon Bounce */
+function bounce(){
+  let y=200,dy=3;
+  loop=setInterval(()=>{
+    ctx.clearRect(0,0,300,420);
+    ctx.fillStyle="#0ff";
+    ctx.beginPath();ctx.arc(150,y,10,0,Math.PI*2);ctx.fill();
+    y+=dy;
+    if(y<10||y>410){
+      dy*=-1;
+      score++;
+      submitBestScore("bounce",score);
     }
-  }
+    $("hud").innerHTML+=`<br>SKOR: ${score}`;
+  },16);
+}
 
-  updateRoomUI();
-  updateOnlineInfo();
+/* Reaction Rush */
+function reaction(){
+  let ready=false,t0=0;
+  $("hud").innerHTML="BEKLE...";
+  setTimeout(()=>{
+    ready=true;
+    ctx.clearRect(0,0,300,420);
+    ctx.fillStyle="#f0f";
+    ctx.fillRect(120,190,60,40);
+    t0=Date.now();
+  },1000+Math.random()*2000);
 
-  onlineState.myPlayerRef = db.ref(`rooms/${roomId}/players/${onlineState.role}`);
-  onlineState.myPlayerRef.onDisconnect().remove();
+  $("c").onclick=()=>{
+    if(!ready) return;
+    const ms=Date.now()-t0;
+    score+=Math.max(0,500-ms);
+    submitBestScore("reaction",score);
+    $("hud").innerHTML=`TEPKİ: ${ms}ms<br>SKOR: ${score}`;
+    ready=false;
+  };
+}
 
-  await onlineState.myPlayerRef.set({
-    nick: onlineState.nick(),
-    svg: getMyDisplaySvg(),
-    ts: Date.now()
-  });
-
-  const otherRole = (onlineState.role === "p1") ? "p2" : "p1";
-  const otherRef = db.ref(`rooms/${roomId}/players/${otherRole}`);
-
-  const otherCb = otherRef.on("value", (snap)=>{
-    const v = snap.val();
-    if(v && v.svg){
-      $("p2Preview").innerHTML = v.svg;
-    }else{
-      $("p2Preview").innerHTML = "<small>Bağlanınca gelecek…</small>";
+/* Neon Runner */
+function runner(){
+  let x=0;
+  loop=setInterval(()=>{
+    ctx.clearRect(0,0,300,420);
+    ctx.fillStyle="#0ff";
+    ctx.fillRect(x,380,30,30);
+    x+=4;
+    if(x>300){
+      x=0;
+      score++;
+      submitBestScore("runner",score);
     }
-  });
-  onlineState.listeners.push(()=>otherRef.off("value", otherCb));
-
-  roomRef.child("meta").update({ updatedAt: Date.now() });
-
-  onlineState.chatRef = db.ref(`rooms/${roomId}/chat`);
-
-  // chat temizle + yeniden kur
-  refreshChatUI(true);
-
-  const chatQuery = onlineState.chatRef.limitToLast(50);
-  const chatCb = chatQuery.on("child_added", (snap)=>{
-    const m = snap.val();
-    if(m && m.nick && m.text) addMsgToUI(m.nick, m.text);
-  });
-  onlineState.listeners.push(()=>chatQuery.off("child_added", chatCb));
-
-  renderOnlinePreviews();
+    $("hud").innerHTML+=`<br>SKOR: ${score}`;
+  },30);
 }
-
-async function leaveRoom(silent=false){
-  if(!onlineState.roomId) return;
-
-  try{
-    if(onlineState.myPlayerRef) await onlineState.myPlayerRef.remove();
-  }catch{}
-
-  cleanupRoomListeners();
-
-  onlineState.roomId = null;
-  onlineState.role = null;
-
-  updateRoomUI();
-  updateOnlineInfo();
-  renderOnlinePreviews();
-  refreshChatUI(false);
-
-  if(!silent) alert("Odadan çıktın.");
-}
-
-function renderOnlinePreviews(){
-  $("p1Preview").innerHTML = getMyDisplaySvg();
-  if(!onlineState.roomId) $("p2Preview").innerHTML = "<small>Bağlanınca gelecek…</small>";
-}
-
-async function syncOnlineAuto(){
-  if(!onlineState.roomId || !onlineState.myPlayerRef) return;
-  await onlineState.myPlayerRef.set({
-    nick: onlineState.nick(),
-    svg: getMyDisplaySvg(),
-    ts: Date.now()
-  });
-  $("p1Preview").innerHTML = getMyDisplaySvg();
-}
-
-/* =========================
-   CHAT (Firebase)
-========================= */
-function refreshChatUI(inRoom){
-  $("chatList").innerHTML = "";
-  if(!inRoom){
-    $("chatList").innerHTML = `<div class="msg"><small>Chat için odaya girmen lazım.</small></div>`;
-    return;
-  }
-  $("chatList").innerHTML = `<div class="msg"><small>Chat hazır.</small></div>`;
-}
-
-function addMsgToUI(nick, text){
-  const div = document.createElement("div");
-  div.className = "msg";
-  div.innerHTML = `<b>${escapeHtml(nick)}</b>: ${escapeHtml(text)}`;
-  $("chatList").appendChild(div);
-  $("chatList").scrollTop = $("chatList").scrollHeight;
-}
-
-async function sendChat(){
-  if(!onlineState.roomId || !onlineState.chatRef) return alert("Önce odaya gir!");
-
-  const txt = $("chatInput").value.trim();
-  if(!txt) return;
-
-  const nick = onlineState.nick();
-  await onlineState.chatRef.push({ nick, text: txt, ts: Date.now() });
-
-  $("chatInput").value = "";
-}
-
-/* =========================
-   INIT
-========================= */
-function init(){
-  setNetUI(false);
-  updateRoomUI();
-
-  hideAll(); showPanel("login");
-
-  $("btn-enter").onclick = enterSite;
-  $("nickname").addEventListener("keydown",(e)=>{ if(e.key==="Enter") enterSite(); });
-
-  const savedNick = LS.getStr("nickname","");
-  if(savedNick) $("nickname").value = savedNick;
-
-  $("btn-creator").onclick = openCreator;
-  $("btn-library").onclick = openLibrary;
-  $("btn-games").onclick = openGamesHub;
-  $("btn-online").onclick = openOnline;
-
-  $("btn-back1").onclick = backToMenu;
-  $("btn-save").onclick = saveCharacter;
-  $("btn-random").onclick = randomize;
-
-  $("btn-pick-hair").onclick = ()=>openPicker("hair");
-  $("btn-pick-top").onclick = ()=>openPicker("top");
-  $("btn-pick-bottom").onclick = ()=>openPicker("bottom");
-  $("btn-pick-shoes").onclick = ()=>openPicker("shoes");
-  $("btn-pick-acc").onclick = ()=>openPicker("acc");
-
-  $("btn-close-picker").onclick = closePicker;
-  $("pickerSearch").addEventListener("input", buildPickerGrid);
-  $("pickerFilter").addEventListener("change", buildPickerGrid);
-  $("pickerBackdrop").addEventListener("click",(e)=>{ if(e.target === $("pickerBackdrop")) closePicker(); });
-
-  $("btn-back2").onclick = backToMenu;
-  $("btn-clear-all").onclick = clearAllMy;
-
-  $("btn-back-games").onclick = backToMenu;
-  $("btn-game-bounce").onclick = ()=>openGame("bounce");
-  $("btn-game-reaction").onclick = ()=>openGame("reaction");
-  $("btn-game-runner").onclick = ()=>openGame("runner");
-
-  $("btn-back-to-games").onclick = openGamesHub;
-  $("btn-back-to-menu2").onclick = backToMenu;
-
-  $("btn-back3").onclick = backToMenu;
-  $("btn-create-room").onclick = createRoom;
-  $("btn-join-room").onclick = ()=>joinRoom($("roomCodeInput").value, false);
-  $("btn-leave-room").onclick = ()=>leaveRoom(false);
-  $("btn-sync").onclick = syncOnlineAuto;
-
-  $("btn-send").onclick = sendChat;
-  $("chatInput").addEventListener("keydown",(e)=>{ if(e.key==="Enter") sendChat(); });
-
-  renderCreator();
-  renderOnlinePreviews();
-  refreshChatUI(false);
-  updateOnlineInfo();
-}
-
-if(document.readyState==="loading") document.addEventListener("DOMContentLoaded", init);
-else init();
 </script>
+
 </body>
 </html>
-
 
