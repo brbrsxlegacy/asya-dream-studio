@@ -561,28 +561,41 @@ function scoreRef(game){
 }
 
 async function submitBestScore(game, score){
-  const nick = LS.getStr("nickname","anon");
-  const ref = scoreRef(game).child(nick);
+  // önce local best güncelle (garanti)
+  const key = "best_" + game;
+  const prevLocal = Number(LS.get(key, 0)) || 0;
+  if(score > prevLocal) LS.set(key, score);
 
-  const snap = await ref.once("value");
-  const prev = snap.exists() ? (snap.val().score || 0) : 0;
+  // sonra Firebase dene (olursa olur)
+  try{
+    const nick = LS.getStr("nickname","anon");
+    const ref = scoreRef(game).child(nick);
 
-  if(score > prev){
-    await ref.set({ score, ts: Date.now() });
+    const snap = await ref.once("value");
+    const prev = snap.exists() ? (snap.val().score || 0) : 0;
+
+    if(score > prev){
+      await ref.set({ score, ts: Date.now() });
+    }
+  }catch(e){
+    console.warn("Leaderboard yazılamadı (normal):", e);
   }
 }
 
 async function getBestScore(game){
-  const snap = await scoreRef(game)
-    .orderByChild("score")
-    .limitToLast(1)
-    .once("value");
+  try{
+    const snap = await scoreRef(game)
+      .orderByChild("score")
+      .limitToLast(1)
+      .once("value");
 
-  let best = 0;
-  snap.forEach(s=>{
-    best = s.val().score || 0;
-  });
-  return best;
+    let best = 0;
+    snap.forEach(s => { best = s.val().score || 0; });
+    return best;
+  }catch(e){
+    console.warn("Leaderboard okunamadı, local best döndürüyorum:", e);
+    return Number(LS.get("best_" + game, 0)) || 0;
+  }
 }
 
 /* =========================
@@ -979,10 +992,19 @@ async function openGame(which){
   hideAll();
   showPanel("game");
 
-  const best = await getBestScore(which);
-  $("hud").innerHTML = `BEST SCORE: <b>${best}</b>`;
+  let best = 0;
 
+  // Firebase çalışmazsa oyun yine başlasın
+  try{
+    best = await getBestScore(which);
+  }catch(e){
+    console.warn("Leaderboard okunamadı, local best kullanılacak:", e);
+    best = Number(LS.get("best_" + which, 0)) || 0;
+  }
+
+  $("hud").innerHTML = `BEST SCORE: <b>${best}</b>`;
   $("btn-restart").onclick = ()=>startGame(which);
+
   startGame(which);
 }
 
@@ -1446,5 +1468,6 @@ else init();
 </script>
 </body>
 </html>
+
 
 
