@@ -1,0 +1,35 @@
+<!doctype html>
+<html lang="tr">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+  <meta name="theme-color" content="#f8edf5">
+  <meta name="description" content="Asya Dream Studio: kendi karakterini yarat, kıyafetlerini tasarla, hayalindeki odayı dekore et ve altı mini oyunla yıldızları topla.">
+  <title>Asya Dream Studio · Hayal et, tasarla, oyna</title>
+  <link rel="icon" type="image/svg+xml" href="assets/icon.svg">
+  <link rel="stylesheet" href="assets/styles.css">
+  <link rel="manifest" href="manifest.webmanifest">
+</head>
+<body>
+  <a class="skip-link" href="#main">İçeriğe geç</a>
+  <div class="app-shell">
+    <aside class="sidebar" id="sidebar" aria-label="Ana menü">
+      <a class="brand" href="#home" aria-label="Asya Dream Studio ana sayfa"><span class="brand-mark">✿</span><span>asya<span class="brand-small">DREAM STUDIO</span></span><span class="brand-dot">✧</span></a>
+      <span class="nav-caption">KENDİ DÜNYANI YARAT</span>
+      <nav id="nav"></nav>
+      <div class="sidebar-bottom"><div class="little-garden"><span>✦</span><span>Biraz hayal gücü,<br>bir sürü olasılık.</span><span>✿</span></div><button class="profile-button" data-action="profile" id="sidebar-profile"></button><div class="credit">ASYA DREAM STUDIO <span>v3.0</span></div></div>
+    </aside>
+    <div class="workspace">
+      <header class="topbar"><div class="topbar-left"><button class="icon-button mobile-menu" data-action="menu" aria-label="Menüyü aç" aria-expanded="false">☰</button><span class="breadcrumb">Stüdyom <span>/</span> <b id="page-label">Hayal panosu</b></span></div><div class="topbar-right"><span class="saved-indicator" id="save-state"><i></i> Otomatik kayıt</span><button class="currency" data-route="shop" title="Butiği aç"><span>✦</span> <b id="coin-count">250</b></button><button class="profile-circle" data-action="profile" id="top-profile" aria-label="Profil ayarları">A</button></div></header>
+      <main id="main" tabindex="-1"></main>
+      <footer class="footer"><span>Sevgiyle ve biraz yıldız tozuyla yapıldı.</span><span>Hayallerin sana ait. <span class="pink">✧</span></span></footer>
+    </div>
+  </div>
+  <nav class="mobile-nav" id="mobile-nav" aria-label="Hızlı gezinme"></nav>
+  <dialog id="dialog"><div id="dialog-content"></div></dialog>
+  <div class="toast-stack" id="toasts" aria-live="polite" aria-atomic="false"></div>
+  <div id="confetti" aria-hidden="true"></div>
+  <noscript><p>Stüdyoyu açmak için tarayıcında JavaScript'i etkinleştir.</p></noscript>
+  <script type="module" src="assets/app.js"></script>
+</body>
+</html>
